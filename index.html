@@ -479,7 +479,7 @@ render();
   const pairs=[['workedDetail','schRingWork'],['carryTotal','schRingBalance'],['targetModeInfo','schRingTarget'],['paidHours','schRingPayout'],['adjustHours','schRingAdjust']];
   for(const [source,target] of pairs){const a=document.getElementById(source),b=document.getElementById(target);if(!a||!b)continue;let v=a.value??a.textContent;if(source==='targetModeInfo'){const m=v.match(/([\d,.]+)\s*h/);v=m?m[1]+' h':'Automatisch'}else if(source==='paidHours'||source==='adjustHours'){v=(Number(v)||0).toLocaleString('de-DE',{maximumFractionDigits:1})+' h'}b.textContent=v||'–'}
  };
- const ringObs=new MutationObserver(updateRing);ringObs.observe(document.getElementById('hoursPanel'),{subtree:true,characterData:true,childList:true,attributes:true,attributeFilter:['value']});
+ const ringObs=new MutationObserver(updateRing);for(const id of ['workedDetail','carryTotal','targetModeInfo']){const el=document.getElementById(id);if(el)ringObs.observe(el,{subtree:true,characterData:true,childList:true})}
  document.getElementById('hoursPanel').addEventListener('input',updateRing);
  updateRing();
 })();
