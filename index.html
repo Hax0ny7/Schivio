@@ -246,6 +246,13 @@ body[data-theme="light"] .sch-wheel .sch-sector{background:transparent!important
 body[data-theme="light"] .sch-wheel-center{z-index:5!important}
 </style><style>
 #setupOverlay{position:fixed;inset:0;z-index:9999;background:#000b;display:grid;place-items:center;padding:14px}#setupOverlay.hidden{display:none}#setupCard{background:var(--card,#24272b);color:var(--text,#f6f7f9);border:1px solid var(--border,#666);border-radius:18px;padding:20px;width:min(100%,440px);max-height:90dvh;overflow:auto;box-shadow:0 20px 60px #0008}#setupCard h2{margin:10px 0}#setupCard p{font-size:13px;line-height:1.5;opacity:.85}#setupCard label{display:block;margin:12px 0 5px;font-size:13px;font-weight:600}#setupCard select,#setupCard input:not([type=checkbox]){width:100%;box-sizing:border-box;min-height:42px}#setupCard .setup-toggle{display:flex;gap:10px;align-items:center;padding:10px 0}#setupCard .setup-toggle input{width:20px;height:20px}#setupCard .setup-actions{display:flex;gap:12px;margin-top:18px}#setupCard .setup-actions button{flex:1}#setupOpen{width:100%;margin:12px 0}#setupOverlay [hidden]{display:none!important}
+</style><style>
+#bonusPreview{margin:14px 0;padding:16px;border:1px solid var(--border,#555);border-radius:16px;background:var(--card,#25272b);color:var(--text,#eee)}
+#bonusPreview h3{margin:0 0 8px;font-size:17px}#bonusPreview p{font-size:12px;opacity:.8;line-height:1.5}
+#bonusPreview .bonus-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border,#555);padding:9px 0;font-size:13px}
+#bonusPreview .bonus-row strong{white-space:nowrap}#bonusPreview .bonus-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#bonusPreview label{display:block;font-size:12px;margin:9px 0 4px}#bonusPreview input{width:100%;min-width:0}
+#bonusPreview details{margin-top:10px}#bonusPreview summary{cursor:pointer;font-weight:650;padding:8px 0}
 </style></head><body><main><header><img alt="Schivio Logo" class="brandicon" src="./icon-192.png"/><div><h1>schivio</h1><small>Dein Dienstplan. Dein Gehalt.</small></div></header><nav aria-label="Hauptnavigation" class="tabs bottom-tabs"><button class="active" id="tabPlan"><span class="tab-icon">▦</span>Kalender</button><button class="secondary" id="tabHours"><span class="tab-icon">▥</span>Auswertung</button><button class="secondary" id="tabShare"><span class="tab-icon">♧</span>Teilen</button><button class="secondary" id="tabTemplates"><span class="tab-icon">◷</span>Schichten</button><button class="secondary" id="tabSettings"><span class="tab-icon">☰</span>Mehr</button></nav><section id="plan"><div class="calendar-shell"><div class="sticky-month"><strong id="month"></strong><button class="today-button" id="jumpToday" type="button">Heute</button></div><div class="week"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div><div class="month-scroll" id="monthScroll"><div class="calendar-months" id="calendar"></div></div><button aria-label="Planungsmodus öffnen" aria-pressed="false" class="floating-edit" id="togglePlanner" title="Planungsmodus" type="button">✎</button><div class="planner-bar hidden" id="plannerBar"><div class="planner-title"><span>Dienst wählen · Tage antippen oder ziehen</span><button class="mode-button" id="plannerDone">Fertig</button></div><div class="planner-items" id="plannerItems"></div></div></div><div class="hidden"><span id="shiftCount"></span><span id="hours"></span><span id="freeDays"></span><p id="targetDetail"></p><p id="balanceDetail"></p></div><div class="modal-backdrop hidden" id="modalBackdrop"><div aria-labelledby="selectedDate" aria-modal="true" class="modal-dialog" role="dialog"><div class="card" id="editor"><h2 id="selectedDate"></h2><p class="note" id="rangeHint"></p><div class="field"><label for="shift">Dienst</label><button aria-controls="shiftChoices" aria-expanded="false" class="shift-trigger" id="shiftTrigger" type="button"><span id="shiftLabel">Dienst auswählen</span><span aria-hidden="true">⌄</span></button><div aria-label="Dienst auswählen" class="shift-choices hidden" id="shiftChoices" role="group"><button data-shift="" type="button">Einträge löschen / frei lassen</button><button data-shift="F" type="button">Frühdienst</button><button data-shift="S" type="button">Spätdienst</button><button data-shift="N" type="button">Nachtdienst</button><button data-shift="U" type="button">Urlaub</button><button data-shift="K" type="button">Krank</button><button data-shift="T" type="button">Fortbildung</button><button data-shift="A" type="button">Überstundenabbau</button><button data-shift="X" type="button">Sonstiger Dienst</button></div></div><div class="row"><button id="save">Für Auswahl speichern</button><button class="secondary" id="cancel">Schließen</button></div></div></div></div><div class="modal-backdrop hidden" id="agendaBackdrop"><div aria-labelledby="agendaTitle" aria-modal="true" class="modal-dialog" role="dialog"><div class="card"><h2 id="agendaTitle">Tagesübersicht</h2><div id="agendaItems"></div><div class="row"><button id="agendaPlan">Dienst eintragen</button><button class="secondary" id="agendaClose">Schließen</button></div></div></div></div></section><section class="hidden" id="hoursPanel"><div class="section-title"><h2>Auswertung</h2><p>Arbeitszeit und Gehalt</p></div><div class="sch-dashboard"><div aria-label="Auswertung – Funktionsmenü" class="sch-wheel">
 <div class="sch-wheel-center"><span class="sch-eyebrow">Tarifliches Grundentgelt</span><strong id="tariffBaseValue">–</strong><small id="tariffBaseInfo">Tarifprofil einrichten</small></div>
 <button class="sch-sector sch-sector-0" data-panel="work" type="button"><span class="sch-symbol">◷</span><span>Arbeitszeit</span><em id="schRingWork">–</em></button>
@@ -609,4 +616,52 @@ render=function(){originalRender();refreshTariff()};
 refreshTariff();
 })();
 </script>
-</body></html>
+<script>
+(function(){
+const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(n);
+const panel=document.createElement('div');panel.id='bonusPreview';panel.innerHTML=`<h3>Zuschlagsanalyse · Beta</h3><p id="bonusStatus">Dienstabhängige Zuschläge werden vorbereitet.</p><div id="bonusRows"></div><details><summary>Individuelle Zuschlagssätze für Testberechnung</summary><p>Diese Sätze sind <b>keine geprüften Tarifwerte</b>. Bitte nur Werte aus deiner Abrechnung oder deinem Tarifvertrag eintragen. Leere Felder werden nicht berechnet.</p><div class="bonus-grid"><div><label>Nacht (%)</label><input id="bonusNight" type="number" min="0" max="300" step="0.1" placeholder="Nicht hinterlegt"></div><div><label>Sonntag (%)</label><input id="bonusSunday" type="number" min="0" max="300" step="0.1" placeholder="Nicht hinterlegt"></div><div><label>Feiertag (%)</label><input id="bonusHoliday" type="number" min="0" max="300" step="0.1" placeholder="Nicht hinterlegt"></div><div><label>Stundenentgelt (€)</label><input id="bonusHourly" type="number" min="0" max="200" step="0.01" placeholder="Manuell"></div></div><label>Nachtdienst-Zeitfenster</label><div class="bonus-grid"><input id="bonusNightFrom" type="time" value="21:00"><input id="bonusNightTo" type="time" value="06:00"></div><p>Überlappungen werden einzeln ausgewiesen. Ob Zuschläge kombiniert werden dürfen, richtet sich nach deinem Tarif. Pausen werden mangels Pausenzeitpunkt anteilig auf die Schicht verteilt.</p><button id="bonusSave" type="button">Testsätze speichern</button></details><p>Eine vollständige Brutto-/Netto-Prognose inklusive tariflicher Zulagen ist noch nicht freigeschaltet.</p>`;
+const tariff=document.getElementById('tariffExplanation');
+if(tariff)tariff.insertAdjacentElement('afterend',panel);else document.getElementById('hoursPanel')?.append(panel);
+const el=id=>document.getElementById(id), keys=['Night','Sunday','Holiday','Hourly'];
+const cfg=data.bonusPreview||{};
+for(const k of keys)el('bonus'+k).value=cfg[k]??'';
+el('bonusNightFrom').value=cfg.nightFrom||'21:00';el('bonusNightTo').value=cfg.nightTo||'06:00';
+el('bonusSave').onclick=()=>{const next={};for(const k of keys){const v=el('bonus'+k).value.trim();if(v!==''){const n=Number(v);if(!Number.isFinite(n)||n<0||n>(k==='Hourly'?200:300)){alert('Ungültiger Wert bei '+k);return}next[k]=n}}next.nightFrom=el('bonusNightFrom').value;next.nightTo=el('bonusNightTo').value;if(!next.nightFrom||!next.nightTo){alert('Bitte Nacht-Zeitfenster angeben');return}data.bonusPreview=next;persist();draw()};
+function minutes(v){const m=/^(\d{2}):(\d{2})$/.exec(v||'');return m?Number(m[1])*60+Number(m[2]):null}
+function draw(){
+ const w=data.setupOptions||{},status=el('bonusStatus'),rows=el('bonusRows');rows.replaceChildren();
+ if(!w.salaryEnabled){panel.hidden=true;return}panel.hidden=false;
+ const y=shown.getFullYear(),m=shown.getMonth(),monthStart=new Date(y,m,1).getTime(),monthEnd=new Date(y,m+1,1).getTime();
+ const state=w.region||data.profile.state||'NW',cache={};const holidays=year=>(cache[year]??=holidaySet(year,state));
+ let total=0,night=0,sunday=0,holiday=0,shifts=0;
+ const nightFrom=minutes((data.bonusPreview||{}).nightFrom||'21:00'),nightTo=minutes((data.bonusPreview||{}).nightTo||'06:00');
+ for(const [day,code] of Object.entries(data.shifts||{})){
+  const template=data.templates?.[code]||data.customShifts?.[code];if(!template||!/^\d{4}-\d{2}-\d{2}$/.test(day))continue;
+  const a=minutes(template.start),b=minutes(template.end),breakMin=Number(template.break||0);
+  if(a===null||b===null||!Number.isFinite(breakMin))continue;
+  const start=new Date(day+'T00:00:00').getTime()+a*60000;
+  const gross=((b-a+1440)%1440)||1440;
+  const end=start+gross*60000;
+  const active=Math.max(0,Math.min(monthEnd,end)-Math.max(monthStart,start));
+  if(active<=0||breakMin>=gross)continue;shifts++;
+  const ratio=(gross-breakMin)/gross;
+  // 15-minute bins for deterministic cross-midnight attribution.
+  for(let t=Math.max(monthStart,start);t<Math.min(monthEnd,end);t+=15*60000){
+   const stop=Math.min(t+15*60000,monthEnd,end),mid=new Date((t+stop)/2),h=(stop-t)/3600000*ratio;
+   const mins=mid.getHours()*60+mid.getMinutes(),date=mid.getFullYear()+'-'+String(mid.getMonth()+1).padStart(2,'0')+'-'+String(mid.getDate()).padStart(2,'0');
+   total+=h;if(nightFrom!==null&&nightTo!==null&&(nightFrom>nightTo?(mins>=nightFrom||mins<nightTo):(mins>=nightFrom&&mins<nightTo)))night+=h;
+   if(mid.getDay()===0)sunday+=h;if(holidays(mid.getFullYear()).has(date))holiday+=h;
+  }
+ }
+ const round=n=>Math.round(n*100)/100;const fmt=n=>n.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1});
+ status.textContent=shifts+' berücksichtigte Schichten im '+shown.toLocaleDateString('de-DE',{month:'long',year:'numeric'})+'. Zeitanteile inklusive Schichten über Mitternacht.';
+ const cfg=data.bonusPreview||{},hourly=Number(cfg.Hourly);let sum=0,calculated=0;
+ function row(label,hours,key){const line=document.createElement('div');line.className='bonus-row';const left=document.createElement('span');left.textContent=label+': '+fmt(round(hours))+' h';const right=document.createElement('strong');if(Object.prototype.hasOwnProperty.call(cfg,key)&&Number.isFinite(hourly)&&hourly>0){const v=round(hours*hourly*Number(cfg[key])/100);sum+=v;calculated++;right.textContent=euro(v)+' ('+cfg[key]+' %)'}else right.textContent='Satz fehlt';line.append(left,right);rows.append(line)}
+ const header=document.createElement('div');header.className='bonus-row';header.textContent='Gesamtarbeitszeit (zeitlich verteilt): '+fmt(round(total))+' h';rows.append(header);
+ row('Nacht',night,'Night');row('Sonntag',sunday,'Sunday');row('Feiertag',holiday,'Holiday');
+ const footer=document.createElement('p');footer.textContent=calculated?'Rechnerische Summe der '+calculated+' konfigurierten Zuschlagsarten: '+euro(sum)+'. Keine verbindliche Tarif-/Auszahlungsprognose; Kombinationen und tarifliche Ausschlüsse nicht geprüft.':'Für eine Testberechnung Stundenentgelt und Zuschlagssätze eintragen.';rows.append(footer);
+ }
+ const oldStats=renderStatsOnly;renderStatsOnly=function(){oldStats();draw()};const oldRender=render;render=function(){oldRender();draw()};
+ draw();
+})();
+</script></body></html>
