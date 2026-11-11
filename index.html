@@ -270,7 +270,23 @@ body[data-theme="light"] .sch-wheel-center{z-index:5!important}
 </style><style>
 #tariffRates{margin:14px 0;padding:16px;border:1px solid var(--border,#555);border-radius:16px;background:var(--card,#25272b);color:var(--text,#eee)}
 #tariffRates[hidden]{display:none!important}#tariffRates h3{margin:0 0 8px;font-size:18px}#tariffRates .tr-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--border,#555)}#tariffRates .tr-row strong{white-space:nowrap}#tariffRates p{font-size:12px;line-height:1.55;opacity:.8}#tariffRates details{margin-top:12px}#tariffRates summary{cursor:pointer;font-weight:650}#tariffRates select{width:100%;margin-top:6px}
-</style></head><body><main><header><img alt="Schivio Logo" class="brandicon" src="./icon-192.png"/><div><h1>schivio</h1><small>Dein Dienstplan. Dein Gehalt.</small></div></header><nav aria-label="Hauptnavigation" class="tabs bottom-tabs"><button class="active" id="tabPlan"><span class="tab-icon">▦</span>Kalender</button><button class="secondary" id="tabHours"><span class="tab-icon">▥</span>Auswertung</button><button class="secondary" id="tabShare"><span class="tab-icon">♧</span>Teilen</button><button class="secondary" id="tabTemplates"><span class="tab-icon">◷</span>Schichten</button><button class="secondary" id="tabSettings"><span class="tab-icon">☰</span>Mehr</button></nav><section id="plan"><div class="calendar-shell"><div class="sticky-month"><strong id="month"></strong><button class="today-button" id="jumpToday" type="button">Heute</button></div><div class="week"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div><div class="month-scroll" id="monthScroll"><div class="calendar-months" id="calendar"></div></div><button aria-label="Planungsmodus öffnen" aria-pressed="false" class="floating-edit" id="togglePlanner" title="Planungsmodus" type="button">✎</button><div class="planner-bar hidden" id="plannerBar"><div class="planner-title"><span>Dienst wählen · Tage antippen oder ziehen</span><button class="mode-button" id="plannerDone">Fertig</button></div><div class="planner-items" id="plannerItems"></div></div></div><div class="hidden"><span id="shiftCount"></span><span id="hours"></span><span id="freeDays"></span><p id="targetDetail"></p><p id="balanceDetail"></p></div><div class="modal-backdrop hidden" id="modalBackdrop"><div aria-labelledby="selectedDate" aria-modal="true" class="modal-dialog" role="dialog"><div class="card" id="editor"><h2 id="selectedDate"></h2><p class="note" id="rangeHint"></p><div class="field"><label for="shift">Dienst</label><button aria-controls="shiftChoices" aria-expanded="false" class="shift-trigger" id="shiftTrigger" type="button"><span id="shiftLabel">Dienst auswählen</span><span aria-hidden="true">⌄</span></button><div aria-label="Dienst auswählen" class="shift-choices hidden" id="shiftChoices" role="group"><button data-shift="" type="button">Einträge löschen / frei lassen</button><button data-shift="F" type="button">Frühdienst</button><button data-shift="S" type="button">Spätdienst</button><button data-shift="N" type="button">Nachtdienst</button><button data-shift="U" type="button">Urlaub</button><button data-shift="K" type="button">Krank</button><button data-shift="T" type="button">Fortbildung</button><button data-shift="A" type="button">Überstundenabbau</button><button data-shift="X" type="button">Sonstiger Dienst</button></div></div><div class="row"><button id="save">Für Auswahl speichern</button><button class="secondary" id="cancel">Schließen</button></div></div></div></div><div class="modal-backdrop hidden" id="agendaBackdrop"><div aria-labelledby="agendaTitle" aria-modal="true" class="modal-dialog" role="dialog"><div class="card"><h2 id="agendaTitle">Tagesübersicht</h2><div id="agendaItems"></div><div class="row"><button id="agendaPlan">Dienst eintragen</button><button class="secondary" id="agendaClose">Schließen</button></div></div></div></div></section><section class="hidden" id="hoursPanel"><div class="section-title"><h2>Auswertung</h2><p>Arbeitszeit und Gehalt</p></div><div class="sch-dashboard"><div aria-label="Auswertung – Funktionsmenü" class="sch-wheel">
+</style>
+<style>
+/* v1.0.20: progressive disclosure, preserving the calculation modules */
+#schSimpleSections{display:grid;gap:10px;margin:12px 0 18px}
+.sch-simple-details{border:1px solid var(--border,#50545c);border-radius:16px;background:var(--card,#292b30);overflow:hidden}
+.sch-simple-details>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;padding:17px 15px;gap:10px;font-weight:700}
+.sch-simple-details>summary::-webkit-details-marker{display:none}
+.sch-simple-details>summary::after{content:'⌄';font-size:21px;opacity:.75}
+.sch-simple-details[open]>summary::after{content:'⌃'}
+.sch-simple-details .sch-simple-sub{display:block;font-size:12px;font-weight:400;opacity:.72;margin-top:3px}
+.sch-simple-body{padding:0 12px 12px}
+.sch-simple-body .card{margin:8px 0}
+#schSimpleSections #bonusPreview,#schSimpleSections #salarySummary,#schSimpleSections #tariffRates{margin:8px 0}
+#schSimpleSections #payPanel{margin:8px 0}
+.sch-simple-explain{font-size:12px;opacity:.75;line-height:1.5;margin:10px 3px}
+</style>
+</head><body><main><header><img alt="Schivio Logo" class="brandicon" src="./icon-192.png"/><div><h1>schivio</h1><small>Dein Dienstplan. Dein Gehalt.</small></div></header><nav aria-label="Hauptnavigation" class="tabs bottom-tabs"><button class="active" id="tabPlan"><span class="tab-icon">▦</span>Kalender</button><button class="secondary" id="tabHours"><span class="tab-icon">▥</span>Auswertung</button><button class="secondary" id="tabShare"><span class="tab-icon">♧</span>Teilen</button><button class="secondary" id="tabTemplates"><span class="tab-icon">◷</span>Schichten</button><button class="secondary" id="tabSettings"><span class="tab-icon">☰</span>Mehr</button></nav><section id="plan"><div class="calendar-shell"><div class="sticky-month"><strong id="month"></strong><button class="today-button" id="jumpToday" type="button">Heute</button></div><div class="week"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div><div class="month-scroll" id="monthScroll"><div class="calendar-months" id="calendar"></div></div><button aria-label="Planungsmodus öffnen" aria-pressed="false" class="floating-edit" id="togglePlanner" title="Planungsmodus" type="button">✎</button><div class="planner-bar hidden" id="plannerBar"><div class="planner-title"><span>Dienst wählen · Tage antippen oder ziehen</span><button class="mode-button" id="plannerDone">Fertig</button></div><div class="planner-items" id="plannerItems"></div></div></div><div class="hidden"><span id="shiftCount"></span><span id="hours"></span><span id="freeDays"></span><p id="targetDetail"></p><p id="balanceDetail"></p></div><div class="modal-backdrop hidden" id="modalBackdrop"><div aria-labelledby="selectedDate" aria-modal="true" class="modal-dialog" role="dialog"><div class="card" id="editor"><h2 id="selectedDate"></h2><p class="note" id="rangeHint"></p><div class="field"><label for="shift">Dienst</label><button aria-controls="shiftChoices" aria-expanded="false" class="shift-trigger" id="shiftTrigger" type="button"><span id="shiftLabel">Dienst auswählen</span><span aria-hidden="true">⌄</span></button><div aria-label="Dienst auswählen" class="shift-choices hidden" id="shiftChoices" role="group"><button data-shift="" type="button">Einträge löschen / frei lassen</button><button data-shift="F" type="button">Frühdienst</button><button data-shift="S" type="button">Spätdienst</button><button data-shift="N" type="button">Nachtdienst</button><button data-shift="U" type="button">Urlaub</button><button data-shift="K" type="button">Krank</button><button data-shift="T" type="button">Fortbildung</button><button data-shift="A" type="button">Überstundenabbau</button><button data-shift="X" type="button">Sonstiger Dienst</button></div></div><div class="row"><button id="save">Für Auswahl speichern</button><button class="secondary" id="cancel">Schließen</button></div></div></div></div><div class="modal-backdrop hidden" id="agendaBackdrop"><div aria-labelledby="agendaTitle" aria-modal="true" class="modal-dialog" role="dialog"><div class="card"><h2 id="agendaTitle">Tagesübersicht</h2><div id="agendaItems"></div><div class="row"><button id="agendaPlan">Dienst eintragen</button><button class="secondary" id="agendaClose">Schließen</button></div></div></div></div></section><section class="hidden" id="hoursPanel"><div class="section-title"><h2>Auswertung</h2><p>Arbeitszeit und Gehalt</p></div><div class="sch-dashboard"><div aria-label="Auswertung – Funktionsmenü" class="sch-wheel">
 <div class="sch-wheel-center"><span class="sch-eyebrow">Tarifliches Grundentgelt</span><strong id="tariffBaseValue">–</strong><small id="tariffBaseInfo">Tarifprofil einrichten</small></div>
 <button class="sch-sector sch-sector-0" data-panel="work" type="button"><span class="sch-symbol">◷</span><span>Arbeitszeit</span><em id="schRingWork">–</em></button>
 <button class="sch-sector sch-sector-1" data-panel="balance" type="button"><span class="sch-symbol">◉</span><span>Zeitguthaben</span><em id="schRingBalance">–</em></button>
@@ -748,4 +764,35 @@ refresh();
  }
  const oldRender=render;render=function(){oldRender();draw()};const oldStats=renderStatsOnly;renderStatsOnly=function(){oldStats();draw()};draw();
 })();
-</script></body></html>
+</script>
+<script>
+/* v1.0.20: UI-only consolidation. No changes to persisted data or payroll formulas. */
+(function(){
+ const panel=document.getElementById('hoursPanel');
+ const dash=panel?.querySelector('.sch-dashboard');
+ if(!dash||document.getElementById('schSimpleSections'))return;
+ const wrapper=document.createElement('div');wrapper.id='schSimpleSections';
+ wrapper.innerHTML=`
+ <details class="sch-simple-details" id="schSimpleWork">
+  <summary><span>Arbeitszeit<span class="sch-simple-sub">Monatssoll, Saldo und Zeitguthaben</span></span></summary>
+  <div class="sch-simple-body"><p class="sch-simple-explain">Tippe oben im Kreis auf einen Wert, um ihn anzusehen oder zu ändern. Die drei Kennzahlen bleiben jederzeit sichtbar.</p></div>
+ </details>
+ <details class="sch-simple-details" id="schSimplePay">
+  <summary><span>Gehalt &amp; Zuschläge<span class="sch-simple-sub">Grundentgelt, Zulagen und Tarifdetails</span></span></summary>
+  <div class="sch-simple-body" id="schSimplePayBody"></div>
+ </details>`;
+ dash.insertAdjacentElement('afterend',wrapper);
+ const payBody=document.getElementById('schSimplePayBody');
+ // Move the existing live components, rather than cloning or rewriting their logic.
+ for(const id of ['salarySummary','tariffRates','tariffExplanation','bonusPreview','payPanel']){
+   const node=document.getElementById(id);
+   if(node){payBody.appendChild(node);if(id==='payPanel')node.classList.remove('hidden')}
+ }
+ // The original salary modal and editable six-segment wheel remain functional.
+ // Hide redundant legacy text until a user opens the pay breakdown.
+ const note=document.createElement('p');note.className='sch-simple-explain';
+ note.textContent='Die Beträge sind Prognosen. Individuelle Testsätze und noch nicht geprüfte Tarifregeln sind keine verbindliche Gehaltsabrechnung.';
+ payBody.prepend(note);
+})();
+</script>
+</body></html>
