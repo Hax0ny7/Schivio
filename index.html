@@ -264,7 +264,7 @@ body[data-theme="light"] .sch-wheel-center{z-index:5!important}
 #salarySheet{position:fixed;inset:0;z-index:2500;background:#000a;display:flex;align-items:flex-end;justify-content:center}#salarySheet[hidden]{display:none!important}
 #salarySheet .salary-modal{background:var(--bg,#202329);color:var(--text,#fff);border:1px solid var(--border,#555);border-radius:22px 22px 0 0;padding:20px;width:min(100%,520px);max-height:85dvh;overflow:auto;box-sizing:border-box}
 #salarySheet .salary-modal h2{margin:0 0 12px}#salarySheet .salary-modal label{display:block;margin:13px 0 5px;font-size:13px}#salarySheet .salary-modal input{width:100%;box-sizing:border-box}
-#salarySheet .salary-modal .salary-allowance{display:grid;grid-template-columns:25px 1fr 105px;align-items:center;gap:10px;padding:8px 0}#salarySheet .salary-modal .salary-allowance input[type=checkbox]{width:19px;height:19px}
+#salarySheet .salary-modal .salary-allowance{display:grid;grid-template-columns:minmax(0,1fr) 120px;align-items:center;gap:10px;padding:8px 0}#salarySheet .salary-modal .salary-allowance input[type=checkbox]{width:19px;height:19px}
 #salarySheet .salary-modal .salary-allowance input[type=number]{min-width:0}
 #salarySheet .salary-modal p{font-size:12px;opacity:.8;line-height:1.5}#salarySheet .salary-modal .salary-buttons{display:flex;gap:10px;margin-top:14px}#salarySheet .salary-modal .salary-buttons button{flex:1}
 </style><style>
@@ -721,10 +721,34 @@ const sheet=document.createElement('div');sheet.id='salarySheet';sheet.hidden=tr
 sheet.innerHTML='<div class="salary-modal" role="dialog" aria-modal="true" aria-labelledby="salarySheetTitle"><h2 id="salarySheetTitle">Zulagen & Zuschläge</h2><p>Schivio berechnet dein Grundentgelt aus deinem Tarifprofil. Weitere Bestandteile sind optional und müssen nur einmal hinterlegt werden.</p><div id="salarySheetBreakdown"></div><h3>Feste Zulagen (monatlich)</h3><div id="salaryAllowances"></div><p>Trage nur Beträge ein, die laut deiner Abrechnung tatsächlich monatlich zustehen. Teilzeitkürzung und tarifliche Voraussetzungen sind bei diesen individuellen Beträgen nicht automatisch geprüft.</p><details><summary>Erweiterte Zuschlagseinstellungen</summary><p>Nacht-, Sonn- und Feiertagszuschläge werden derzeit in der Zuschlagsanalyse Beta verwaltet. Die Werte dort sind Testwerte und werden nicht als geprüfte Tarifwerte ausgegeben.</p><button class="secondary" id="salaryToBonus" type="button">Zur Zuschlagsanalyse</button></details><div class="salary-buttons"><button class="secondary" id="salaryCancel" type="button">Schließen</button><button id="salarySave" type="button">Speichern</button></div></div>';
 document.body.append(sheet);
 const allowances=get('salaryAllowances');
-labels.forEach(([key,label])=>{const line=document.createElement('label');line.className='salary-allowance';line.innerHTML='<input type="checkbox" data-allow-on="'+key+'"><span></span><input type="text" data-allow-value="'+key+'" inputmode="decimal" placeholder="0,00 €">';line.querySelector('span').textContent=label;const amount=line.querySelector('[data-allow-value]'),toggle=line.querySelector('[data-allow-on]');amount.addEventListener('input',()=>{if(amount.value.trim()!==''&&Number(amount.value.trim().replace(',','.'))>0)toggle.checked=true});allowances.append(line)});
+labels.forEach(([key,label])=>{const line=document.createElement('label');line.className='salary-allowance';line.innerHTML='<input type="checkbox" data-allow-on="'+key+'"><span></span><input type="text" data-allow-value="'+key+'" inputmode="decimal" placeholder="0,00 €">';line.querySelector('span').textContent=label;line.querySelector('[data-allow-on]').style.display='none';const amount=line.querySelector('[data-allow-value]'),toggle=line.querySelector('[data-allow-on]');amount.addEventListener('input',()=>{if(amount.value.trim()!==''&&Number(amount.value.trim().replace(',','.'))>0)toggle.checked=true});allowances.append(line)});
 function close(){sheet.hidden=true}function open(){const cfg=data.salaryAllowances||{};labels.forEach(([k])=>{const obj=cfg[k]||{};sheet.querySelector('[data-allow-on="'+k+'"]').checked=!!obj.enabled;sheet.querySelector('[data-allow-value="'+k+'"]').value=obj.value??''});sheet.hidden=false;renderBreakdown()}
 get('salaryDetailsOpen').onclick=open;get('salaryCancel').onclick=close;sheet.addEventListener('click',e=>{if(e.target===sheet)close()});get('salaryToBonus').onclick=()=>{close();get('bonusPreview')?.scrollIntoView({behavior:'smooth',block:'start'})};
-get('salarySave').onclick=()=>{const next={};for(const [k] of labels){const raw=sheet.querySelector('[data-allow-value="'+k+'"]').value;const enabled=sheet.querySelector('[data-allow-on="'+k+'"]').checked||Number(raw.trim().replace(',','.'))>0;const normalized=raw.trim().replace(/\s/g,'').replace(',','.');const n=Number(normalized);if((enabled||normalized!=='')&&(normalized===''||!Number.isFinite(n)||n<0||n>3000)){alert('Bitte einen gültigen Betrag für jede aktivierte Zulage eingeben.');return}next[k]={enabled,value:raw.trim()===''?0:n}}data.salaryAllowances=next;if(!persist())return;close();refresh()};
+get('salarySave').onclick=()=>{
+ const next={};
+ for(const [k] of labels){
+  const field=sheet.querySelector('[data-allow-value="'+k+'"]');
+  const raw=field.value.trim().replace(/\s/g,'').replace(/€/g,'').replace(',','.');
+  // Empty fields are always zero; never block the entire form because a toggle was checked.
+  const amount=raw===''?0:Number(raw);
+  if(!Number.isFinite(amount)||amount<0||amount>3000){
+   alert('Ungültiger Zulagenbetrag. Bitte nur Zahlen zwischen 0 und 3000 eingeben.');
+   field.focus();return;
+  }
+  next[k]={enabled:amount>0,value:amount};
+ }
+ const previous=data.salaryAllowances;
+ data.salaryAllowances=next;
+ if(!persist()){data.salaryAllowances=previous;return}
+ close();refresh();
+ // Verify persistence and show an explicit result rather than silently failing.
+ try{
+  const saved=JSON.parse(localStorage.getItem(key)||'{}').salaryAllowances||{};
+  const ok=labels.every(([k])=>saved[k]&&saved[k].value===next[k].value);
+  if(!ok)alert('Die Zulagen konnten nicht vollständig gespeichert werden.');
+ }catch(e){alert('Die Speicherung konnte nicht überprüft werden.')}
+};
+
 const center=document.querySelector('.sch-wheel-center');center.setAttribute('role','button');center.setAttribute('tabindex','0');center.setAttribute('aria-label','Gehaltsdetails öffnen');center.addEventListener('click',open);center.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
 function moneyText(t){if(!t||!t.includes('€'))return null;const m=t.match(/([\d.]+,\d{2})\s*€/);return m?Number(m[1].replace(/\./g,'').replace(',','.')):null}
 function base(){const t=get('tariffBaseValue')?.textContent||'';return moneyText(t)}
