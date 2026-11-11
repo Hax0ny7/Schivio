@@ -626,7 +626,7 @@ function refreshTariff(){
  const enabled=!!w.salaryEnabled;
  const tariff=w.tariff||data.profile.tariff||'',group=String(w.group||data.profile.group||'').replace(/\s+/g,'').toUpperCase(),level=Number(w.level||data.profile.level),region=w.region||data.profile.state||'NW';
  const y=shown.getFullYear(),m=shown.getMonth()+1,ym=y*100+m;
- value.textContent='–';info.textContent=enabled?'Tarifdaten prüfen':'Gehaltsprognose deaktiviert';expl.hidden=!enabled;
+ value.textContent='–';delete value.dataset.baseAmount;info.textContent=enabled?'Tarifdaten prüfen':'Gehaltsprognose deaktiviert';expl.hidden=!enabled;
  if(!enabled)return;
  let reason='',from='',source='';
  if(tariff==='AVR Caritas'){
@@ -643,7 +643,7 @@ function refreshTariff(){
   const fulltime=Number(w.fulltime);
   const canProrate=Number.isFinite(weekly)&&weekly>0&&Number.isFinite(fulltime)&&fulltime>=30&&fulltime<=45&&weekly<=fulltime;
   const projected=canProrate?Math.round(amount*weekly/fulltime*100)/100:null;
-  value.textContent=euro(projected??amount);
+  value.textContent=euro(projected??amount);value.dataset.baseAmount=String(projected??amount);
   info.textContent=group+' · Stufe '+level+' · '+(projected!==null?'anteiliges Tabellenentgelt':'Vollzeit-Tabellenentgelt');
   if(projected!==null){reason='Teilzeitanteil '+weekly+' / '+fulltime+' Wochenstunden = '+Math.round(weekly/fulltime*1000)/10+' %. Vollzeit '+euro(amount)+'.';}
  }
@@ -751,7 +751,19 @@ get('salarySave').onclick=()=>{
 
 const center=document.querySelector('.sch-wheel-center');center.setAttribute('role','button');center.setAttribute('tabindex','0');center.setAttribute('aria-label','Gehaltsdetails öffnen');center.addEventListener('click',open);center.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
 function moneyText(t){if(!t||!t.includes('€'))return null;const m=t.match(/([\d.]+,\d{2})\s*€/);return m?Number(m[1].replace(/\./g,'').replace(',','.')):null}
-function base(){const t=get('tariffBaseValue')?.textContent||'';return moneyText(t)}
+function base(){
+ const w=data.setupOptions||{},profile=data.profile||{};
+ const tariff=w.tariff||profile.tariff||'',group=w.group||profile.group||'',level=w.level||profile.level||'';
+ // Read the tariff module's dedicated base value, never the wheel center,
+ // because the wheel center is overwritten with the allowance-inclusive total.
+ const el=get('tariffBaseValue');
+ if(el?.dataset.baseAmount!==undefined){
+  const n=Number(el.dataset.baseAmount);return Number.isFinite(n)?n:null;
+ }
+ const t=el?.textContent||'';
+ return moneyText(t);
+}
+
 function fixed(){let sum=0;const cfg=data.salaryAllowances||{};for(const [k] of labels){if(cfg[k]?.enabled)sum+=Number(cfg[k].value)||0}return Math.round(sum*100)/100}
 function variable(){const cfg=data.bonusPreview||{};if(!Number.isFinite(Number(cfg.Hourly))||Number(cfg.Hourly)<=0)return null;
  const rows=[...document.querySelectorAll('#bonusRows .bonus-row')];let sum=0,count=0;
