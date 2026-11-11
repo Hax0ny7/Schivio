@@ -266,6 +266,7 @@ body[data-theme="light"] .sch-wheel-center{z-index:5!important}
 #salarySheet .salary-modal h2{margin:0 0 12px}#salarySheet .salary-modal label{display:block;margin:13px 0 5px;font-size:13px}#salarySheet .salary-modal input{width:100%;box-sizing:border-box}
 #salarySheet .salary-modal .salary-allowance{display:grid;grid-template-columns:minmax(0,1fr) 120px;align-items:center;gap:10px;padding:8px 0}#salarySheet .salary-modal .salary-allowance input[type=checkbox]{width:19px;height:19px}
 #salarySheet .salary-modal .salary-allowance input[type=number]{min-width:0}
+#salarySheet .salary-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border,#48505b)}#salarySheet .salary-line strong{white-space:nowrap}
 #salarySheet .salary-modal p{font-size:12px;opacity:.8;line-height:1.5}#salarySheet .salary-modal .salary-buttons{display:flex;gap:10px;margin-top:14px}#salarySheet .salary-modal .salary-buttons button{flex:1}
 </style><style>
 #tariffRates{margin:14px 0;padding:16px;border:1px solid var(--border,#555);border-radius:16px;background:var(--card,#25272b);color:var(--text,#eee)}
@@ -298,7 +299,7 @@ body[data-theme="light"] .sch-wheel-center{z-index:5!important}
 #schPayCompact button{width:100%;margin-top:8px}
 #schSimplePayBody>.sch-simple-explain{display:none}
 </style></head><body><main><header><img alt="Schivio Logo" class="brandicon" src="./icon-192.png"/><div><h1>schivio</h1><small>Dein Dienstplan. Dein Gehalt.</small></div></header><nav aria-label="Hauptnavigation" class="tabs bottom-tabs"><button class="active" id="tabPlan"><span class="tab-icon">▦</span>Kalender</button><button class="secondary" id="tabHours"><span class="tab-icon">▥</span>Auswertung</button><button class="secondary" id="tabShare"><span class="tab-icon">♧</span>Teilen</button><button class="secondary" id="tabTemplates"><span class="tab-icon">◷</span>Schichten</button><button class="secondary" id="tabSettings"><span class="tab-icon">☰</span>Mehr</button></nav><section id="plan"><div class="calendar-shell"><div class="sticky-month"><strong id="month"></strong><button class="today-button" id="jumpToday" type="button">Heute</button></div><div class="week"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div><div class="month-scroll" id="monthScroll"><div class="calendar-months" id="calendar"></div></div><button aria-label="Planungsmodus öffnen" aria-pressed="false" class="floating-edit" id="togglePlanner" title="Planungsmodus" type="button">✎</button><div class="planner-bar hidden" id="plannerBar"><div class="planner-title"><span>Dienst wählen · Tage antippen oder ziehen</span><button class="mode-button" id="plannerDone">Fertig</button></div><div class="planner-items" id="plannerItems"></div></div></div><div class="hidden"><span id="shiftCount"></span><span id="hours"></span><span id="freeDays"></span><p id="targetDetail"></p><p id="balanceDetail"></p></div><div class="modal-backdrop hidden" id="modalBackdrop"><div aria-labelledby="selectedDate" aria-modal="true" class="modal-dialog" role="dialog"><div class="card" id="editor"><h2 id="selectedDate"></h2><p class="note" id="rangeHint"></p><div class="field"><label for="shift">Dienst</label><button aria-controls="shiftChoices" aria-expanded="false" class="shift-trigger" id="shiftTrigger" type="button"><span id="shiftLabel">Dienst auswählen</span><span aria-hidden="true">⌄</span></button><div aria-label="Dienst auswählen" class="shift-choices hidden" id="shiftChoices" role="group"><button data-shift="" type="button">Einträge löschen / frei lassen</button><button data-shift="F" type="button">Frühdienst</button><button data-shift="S" type="button">Spätdienst</button><button data-shift="N" type="button">Nachtdienst</button><button data-shift="U" type="button">Urlaub</button><button data-shift="K" type="button">Krank</button><button data-shift="T" type="button">Fortbildung</button><button data-shift="A" type="button">Überstundenabbau</button><button data-shift="X" type="button">Sonstiger Dienst</button></div></div><div class="row"><button id="save">Für Auswahl speichern</button><button class="secondary" id="cancel">Schließen</button></div></div></div></div><div class="modal-backdrop hidden" id="agendaBackdrop"><div aria-labelledby="agendaTitle" aria-modal="true" class="modal-dialog" role="dialog"><div class="card"><h2 id="agendaTitle">Tagesübersicht</h2><div id="agendaItems"></div><div class="row"><button id="agendaPlan">Dienst eintragen</button><button class="secondary" id="agendaClose">Schließen</button></div></div></div></div></section><section class="hidden" id="hoursPanel"><div class="section-title"><h2>Auswertung</h2><p>Arbeitszeit und Gehalt</p></div><div class="sch-dashboard"><div aria-label="Auswertung – Funktionsmenü" class="sch-wheel">
-<div class="sch-wheel-center"><span class="sch-eyebrow">Tarifliches Grundentgelt</span><strong id="tariffBaseValue">–</strong><small id="tariffBaseInfo">Tarifprofil einrichten</small></div>
+<div class="sch-wheel-center"><span class="sch-eyebrow" id="wheelEyebrow">Tarifliches Grundentgelt</span><strong id="wheelAmount">–</strong><small id="wheelInfo">Tarifprofil einrichten</small><span id="tariffBaseValue" hidden>–</span><span id="tariffBaseInfo" hidden>Tarifprofil einrichten</span></div>
 <button class="sch-sector sch-sector-0" data-panel="work" type="button"><span class="sch-symbol">◷</span><span>Arbeitszeit</span><em id="schRingWork">–</em></button>
 <button class="sch-sector sch-sector-1" data-panel="balance" type="button"><span class="sch-symbol">◉</span><span>Zeitguthaben</span><em id="schRingBalance">–</em></button>
 <button class="sch-sector sch-sector-2" data-panel="target" type="button"><span class="sch-symbol">◎</span><span>Monatssoll</span><em id="schRingTarget">–</em></button>
@@ -488,7 +489,7 @@ $('saveManualTarget').onclick=()=>{const raw=$('manualTarget').value.trim().repl
 $('savePaidHours').onclick=()=>{const n=Number($('paidHours').value.replace(',','.'));if(!Number.isFinite(n)||n<0||n>500){$('payoutStatus').textContent='Bitte 0 bis 500 Stunden eingeben.';return}const k=monthKey(shown.getFullYear(),shown.getMonth());if(n===0)delete data.hourPayouts[k];else data.hourPayouts[k]=n;persist();render();$('payoutStatus').textContent='Ausgezahlte Stunden gespeichert.'};
 $('saveOpening').onclick=()=>{const v=Number($('openingBalance').value);if(!Number.isFinite(v)||Math.abs(v)>1000){alert('Startguthaben muss zwischen -1000 und 1000 Stunden liegen.');return}data.openingBalance=v;persist();render()};$('saveAdjust').onclick=()=>{const value=Number($('adjustHours').value.replace(',','.'));if(!Number.isFinite(value)||Math.abs(value)>500){$('adjustStatus').textContent='Bitte eine gültige Zahl zwischen -500 und 500 eingeben.';return}data.adjustments[dateKey(shown.getFullYear(),shown.getMonth(),1).slice(0,7)]=value;persist();render();$('adjustStatus').textContent='Korrektur gespeichert.'};
 $('save').onclick=()=>{if(!selectionStart)return;const s=selectedShift;for(const k of daysBetween(selectionStart,selectionEnd)){if(s)data.shifts[k]=s;else delete data.shifts[k]}persist();closeEditor();selectionStart='';selectionEnd='';render()};$('cancel').onclick=()=>{closeEditor();selectionStart='';selectionEnd='';render()};
-function populateProfile(){for(const id of ['tariff','group','level','weekly','state','workdays'])$(id).value=data.profile[id]??(id==='state'?'NW':id==='workdays'?'5':'')}populateProfile();$('saveSettings').onclick=()=>{const weekly=$('weekly').value;if(weekly&&(Number(weekly)<=0||Number(weekly)>60)){alert('Bitte gültige Wochenstunden angeben.');return}for(const id of ['tariff','group','level','weekly','state','workdays'])data.profile[id]=$(id).value;persist();render();alert('Profil lokal gespeichert. Sollstunden aktualisiert.')};
+function populateProfile(){for(const id of ['tariff','group','level','weekly','state','workdays'])$(id).value=data.profile[id]??(id==='state'?'NW':id==='workdays'?'5':'')}populateProfile();$('saveSettings').onclick=()=>{const weekly=$('weekly').value;if(weekly&&(Number(weekly)<=0||Number(weekly)>60)){alert('Bitte gültige Wochenstunden angeben.');return}for(const id of ['tariff','group','level','weekly','state','workdays'])data.profile[id]=$(id).value;if(data.setupOptions){const w=data.setupOptions;w.tariff=data.profile.tariff;w.group=data.profile.group;w.level=data.profile.level;w.region=data.profile.state;if(Number(data.profile.weekly)>0){w.hoursMode='weekly';w.hoursValue=Number(data.profile.weekly);delete data.profile.fixedMonthlyTarget}}persist();render();alert('Profil lokal gespeichert. Sollstunden aktualisiert.')};
 function renderTemplates(){
  const root=$('templateFields');root.replaceChildren();
  for(const type of types){
@@ -602,7 +603,7 @@ render();
 (function(){
 const el=id=>document.getElementById(id), overlay=el('setupOverlay');let step=0;
 function sync(){el('setupHoursFields').hidden=!el('setupHoursEnabled').checked;el('setupSalaryFields').hidden=!el('setupSalaryEnabled').checked;el('setupTariffFields').hidden=!el('setupSalaryEnabled').checked;for(let i=1;i<=3;i++)el('setupStep'+i).hidden=i!==step+1;el('setupProgress').textContent='Schritt '+(step+1)+' von 3';el('setupHeading').textContent=['Arbeitszeitprognose','Gehaltsprognose','Tarifprofil'][step];el('setupBack').textContent=step?'Zurück':'Abbrechen';el('setupNext').textContent=step===2?'Speichern':'Weiter'}
-function open(){const w=data.setupOptions||{};el('setupHoursEnabled').checked=w.hoursEnabled!==false;el('setupSalaryEnabled').checked=!!w.salaryEnabled;el('setupHoursMode').value=w.hoursMode||'weekly';el('setupHoursValue').value=w.hoursValue||data.profile.weekly||39;el('setupWorkplace').value=w.workplace||'hospital';el('setupTariff').value=w.tariff||data.profile.tariff||'';el('setupRegion').value=w.region||data.profile.state||'NW';el('setupFulltime').value=w.fulltime||'';el('setupGroup').value=w.group||data.profile.group||'';el('setupLevel').value=w.level||data.profile.level||'';step=0;sync();overlay.classList.remove('hidden');overlay.setAttribute('aria-hidden','false')}
+function open(){const w=data.setupOptions||{};el('setupHoursEnabled').checked=w.hoursEnabled!==false;el('setupSalaryEnabled').checked=!!w.salaryEnabled;el('setupHoursMode').value=w.hoursMode||'weekly';el('setupHoursValue').value=(w.hoursMode==='monthly'?w.hoursValue:data.profile.weekly||w.hoursValue)||39;el('setupWorkplace').value=w.workplace||'hospital';el('setupTariff').value=data.profile.tariff||w.tariff||'';el('setupRegion').value=data.profile.state||w.region||'NW';el('setupFulltime').value=w.fulltime||'';el('setupGroup').value=data.profile.group||w.group||'';el('setupLevel').value=data.profile.level||w.level||'';step=0;sync();overlay.classList.remove('hidden');overlay.setAttribute('aria-hidden','false')}
 function close(){overlay.classList.add('hidden');overlay.setAttribute('aria-hidden','true')}
 el('setupHoursEnabled').onchange=sync;el('setupSalaryEnabled').onchange=sync;
 el('setupBack').onclick=()=>{if(step){step--;sync()}else close()};
@@ -624,7 +625,7 @@ function refreshTariff(){
  const w=data.setupOptions||{}, value=document.getElementById('tariffBaseValue'), info=document.getElementById('tariffBaseInfo'), expl=document.getElementById('tariffExplanation');
  if(!value||!info||!expl)return;
  const enabled=!!w.salaryEnabled;
- const tariff=w.tariff||data.profile.tariff||'',group=String(w.group||data.profile.group||'').replace(/\s+/g,'').toUpperCase(),level=Number(w.level||data.profile.level),region=w.region||data.profile.state||'NW';
+ const tariff=data.profile.tariff||w.tariff||'',group=String(data.profile.group||w.group||'').replace(/\s+/g,'').toUpperCase(),level=Number(data.profile.level||w.level),region=data.profile.state||w.region||'NW';
  const y=shown.getFullYear(),m=shown.getMonth()+1,ym=y*100+m;
  value.textContent='–';delete value.dataset.baseAmount;info.textContent=enabled?'Tarifdaten prüfen':'Gehaltsprognose deaktiviert';expl.hidden=!enabled;
  if(!enabled)return;
@@ -639,9 +640,9 @@ function refreshTariff(){
  }else reason='Für diesen Tarifvertrag ist die Entgelttabelle noch nicht integriert.';
  const amount=from&&P_TABLE[group]&&Number.isInteger(level)&&level>=1&&level<=6?P_TABLE[group][level-1]:null;
  if(amount){
-  const weekly=w.hoursEnabled!==false&&w.hoursMode==='weekly'?Number(w.hoursValue):Number(data.profile.weekly);
+  const weekly=Number(data.profile.weekly)>0?Number(data.profile.weekly):(w.hoursMode==='weekly'?Number(w.hoursValue):NaN);
   const fulltime=Number(w.fulltime);
-  const canProrate=Number.isFinite(weekly)&&weekly>0&&Number.isFinite(fulltime)&&fulltime>=30&&fulltime<=45&&weekly<=fulltime;
+  const canProrate=Number.isFinite(weekly)&&weekly>0&&Number.isFinite(fulltime)&&fulltime>=30&&fulltime<=45&&weekly<fulltime;
   const projected=canProrate?Math.round(amount*weekly/fulltime*100)/100:null;
   value.textContent=euro(projected??amount);value.dataset.baseAmount=String(projected??amount);
   info.textContent=group+' · Stufe '+level+' · '+(projected!==null?'anteiliges Tabellenentgelt':'Vollzeit-Tabellenentgelt');
@@ -676,7 +677,7 @@ function draw(){
  const w=data.setupOptions||{},status=el('bonusStatus'),rows=el('bonusRows');rows.replaceChildren();
  if(!w.salaryEnabled){panel.hidden=true;return}panel.hidden=false;
  const y=shown.getFullYear(),m=shown.getMonth(),monthStart=new Date(y,m,1).getTime(),monthEnd=new Date(y,m+1,1).getTime();
- const state=w.region||data.profile.state||'NW',cache={};const holidays=year=>(cache[year]??=holidaySet(year,state));
+ const state=data.profile.state||w.region||'NW',cache={};const holidays=year=>(cache[year]??=holidaySet(year,state));
  let total=0,night=0,sunday=0,holiday=0,shifts=0;
  const nightFrom=minutes((data.bonusPreview||{}).nightFrom||'21:00'),nightTo=minutes((data.bonusPreview||{}).nightTo||'06:00');
  for(const [day,code] of Object.entries(data.shifts||{})){
@@ -753,15 +754,14 @@ const center=document.querySelector('.sch-wheel-center');center.setAttribute('ro
 function moneyText(t){if(!t||!t.includes('€'))return null;const m=t.match(/([\d.]+,\d{2})\s*€/);return m?Number(m[1].replace(/\./g,'').replace(',','.')):null}
 function base(){
  const w=data.setupOptions||{},profile=data.profile||{};
- const tariff=w.tariff||profile.tariff||'',group=w.group||profile.group||'',level=w.level||profile.level||'';
+ const tariff=profile.tariff||w.tariff||'',group=profile.group||w.group||'',level=profile.level||w.level||'';
  // Read the tariff module's dedicated base value, never the wheel center,
  // because the wheel center is overwritten with the allowance-inclusive total.
  const el=get('tariffBaseValue');
  if(el?.dataset.baseAmount!==undefined){
   const n=Number(el.dataset.baseAmount);return Number.isFinite(n)?n:null;
  }
- const t=el?.textContent||'';
- return moneyText(t);
+ return null;
 }
 
 function fixed(){let sum=0;const cfg=data.salaryAllowances||{};for(const [k] of labels){if(cfg[k]?.enabled)sum+=Number(cfg[k].value)||0}return Math.round(sum*100)/100}
@@ -772,13 +772,14 @@ function variable(){const cfg=data.bonusPreview||{};if(!Number.isFinite(Number(c
 }
 function addLine(parent,label,value){const line=document.createElement('div');line.className='salary-line';const a=document.createElement('span');a.textContent=label;const b=document.createElement('strong');b.textContent=value;line.append(a,b);parent.append(line)}
 function renderBreakdown(){const box=get('salarySheetBreakdown');box.replaceChildren();const b=base(),f=fixed(),v=null;addLine(box,'Grundentgelt',b===null?'Noch nicht verfügbar':euro(b));addLine(box,'Feste Zulagen',euro(f));addLine(box,'Variable Testzuschläge',v===null?'Nicht vollständig berechnet':euro(v));if(b!==null)addLine(box,'Zwischensumme (ohne offene Zuschläge)',euro(b+f+(v||0)))}
-function refresh(){const enabled=!!data.setupOptions?.salaryEnabled;summary.hidden=!enabled;if(!enabled)return;
+function setCenter(eyebrowText,amountText,infoText){const e=get('wheelEyebrow'),a=get('wheelAmount'),i=get('wheelInfo');if(e)e.textContent=eyebrowText;if(a)a.textContent=amountText;if(i)i.textContent=infoText}
+function refresh(){const enabled=!!data.setupOptions?.salaryEnabled;summary.hidden=!enabled;if(!enabled){setCenter('Gehaltsprognose','–','Deaktiviert · Mehr → Einrichtung');return}
  const b=base(),f=fixed(),v=null,hasAll=false;
  const lines=get('salarySummaryLines');lines.replaceChildren();addLine(lines,'Grundentgelt',b===null?'–':euro(b));addLine(lines,'Feste Zulagen',euro(f));addLine(lines,'Zuschläge (Testwerte)',v===null?'Noch offen':euro(v));
  get('salarySummaryTotal').textContent=b===null?'–':euro(b+f+(v||0))+(hasAll?' *':' +');
  get('salarySummaryNote').textContent=b===null?'Tarifprofil vervollständigen.':hasAll?'* Unverbindliche Testsumme: Zuschlagsregeln, Überschneidungen, Steuerfreiheit und Abrechnungszeitraum sind noch nicht tariflich geprüft.':'Zwischensumme ohne nicht berechnete Zuschläge. Keine vollständige Gehaltsprognose.';
- const eyebrow=center.querySelector('.sch-eyebrow'),amount=center.querySelector('strong'),info=center.querySelector('small');
- if(b!==null){eyebrow.textContent=hasAll?'Brutto · Testprognose':'Brutto · Zwischensumme';amount.textContent=euro(b+f+(v||0));info.textContent=hasAll?'Tippen für Details · unverbindlich':'Zuschläge noch offen · Details';}
+ if(b!==null)setCenter(hasAll?'Brutto · Testprognose':'Brutto · Zwischensumme',euro(b+f+(v||0)),hasAll?'Tippen für Details · unverbindlich':'Zuschläge noch offen · Details');
+ else setCenter('Tarifliches Grundentgelt','–',get('tariffBaseInfo')?.textContent||'Tarifprofil einrichten');
  renderBreakdown();
 }
 const oldRender=render;render=function(){oldRender();refresh()};const oldStats=renderStatsOnly;renderStatsOnly=function(){oldStats();refresh()};
@@ -797,7 +798,7 @@ refresh();
  mode.value=data.tariffHolidayMode||'unknown';mode.onchange=()=>{data.tariffHolidayMode=mode.value;persist();draw()};
  function add(name,value){const r=document.createElement('div');r.className='tr-row';const a=document.createElement('span');a.textContent=name;const b=document.createElement('strong');b.textContent=value;r.append(a,b);rates.append(r)}
  function draw(){const w=data.setupOptions||{};card.hidden=!w.salaryEnabled;if(card.hidden)return;
-  const tariff=w.tariff||data.profile.tariff||'',region=w.region||data.profile.state||'NW',ym=shown.getFullYear()*100+shown.getMonth()+1;
+  const tariff=data.profile.tariff||w.tariff||'',region=data.profile.state||w.region||'NW',ym=shown.getFullYear()*100+shown.getMonth()+1;
   rates.replaceChildren();
   if(tariff==='AVR Caritas'&&region==='NW'&&ym>=202602&&ym<=202703&&w.workplace==='hospital'){
    intro.textContent='AVR Caritas · Anlage 31 (Krankenhaus) · NRW · Tarifliche Zeitzuschläge';
@@ -854,12 +855,12 @@ refresh();
  const line=(parent,label,value)=>{const r=document.createElement('div');r.className='sch-pay-line';const a=document.createElement('span');a.textContent=label;const b=document.createElement('strong');b.textContent=value;r.append(a,b);parent.append(r)};
  function draw(){
   const pay=document.getElementById('schPayLines'),rates=document.getElementById('schPayRates');pay.replaceChildren();rates.replaceChildren();
-  const base=document.getElementById('tariffBaseValue')?.textContent?.trim()||'Nicht verfügbar';
+  const baseEl=document.getElementById('tariffBaseValue'),baseNum=Number(baseEl?.dataset.baseAmount);const base=baseEl?.dataset.baseAmount!==undefined&&Number.isFinite(baseNum)?euro(baseNum):'Nicht verfügbar';
   const fixedRow=[...document.querySelectorAll('#salarySummaryLines .salary-line')].find(x=>x.textContent.includes('Feste Zulagen'));
   const fixed=fixedRow?.querySelector('strong')?.textContent||'0,00 €';
   line(pay,'Tarifliches Grundentgelt',base);
   line(pay,'Individuell hinterlegte Zulagen',fixed);
-  const w=data.setupOptions||{},t=w.tariff||data.profile.tariff||'',reg=w.region||data.profile.state||'NW',ym=shown.getFullYear()*100+shown.getMonth()+1;
+  const w=data.setupOptions||{},t=data.profile.tariff||w.tariff||'',reg=data.profile.state||w.region||'NW',ym=shown.getFullYear()*100+shown.getMonth()+1;
   const supported=t==='AVR Caritas'&&reg==='NW'&&w.workplace==='hospital'&&ym>=202602&&ym<=202703;
   const raw=document.querySelectorAll('#bonusRows .bonus-row');
   const hours={};for(const r of raw){const m=r.textContent.match(/^(Nacht|Sonntag|Feiertag):\s*([\d.,]+)\s*h/);if(m)hours[m[1]]=m[2]+' h'}
