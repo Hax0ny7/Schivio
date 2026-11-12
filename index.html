@@ -633,13 +633,13 @@ if(el('setupSalaryEnabled').checked && el('setupFulltime').value && (Number(el('
 const w={hoursEnabled:el('setupHoursEnabled').checked,salaryEnabled:el('setupSalaryEnabled').checked,hoursMode:el('setupHoursMode').value,hoursValue:Number(el('setupHoursValue').value),workplace:el('setupWorkplace').value,tariff:el('setupTariff').value,region:el('setupRegion').value,fulltime:Number(el('setupFulltime').value)||null,_ft:(data.profile.fulltime=el('setupFulltime').value||''),group:el('setupGroup').value.trim(),level:el('setupLevel').value.trim()};data.setupOptions=w;data.setupWizardDone=true;if(w.hoursEnabled){if(w.hoursMode==='weekly'){data.profile.weekly=String(w.hoursValue);delete data.profile.fixedMonthlyTarget}else{data.profile.fixedMonthlyTarget=w.hoursValue;data.profile.weekly=''}}data.profile.state=w.region;if(w.salaryEnabled){data.profile.tariff=w.tariff;data.profile.group=w.group;data.profile.level=w.level}persist();populateProfile();render();applyVisibility();close()};
 function applyVisibility(){const w=data.setupOptions||{};const on=w.hoursEnabled!==false;const dash=document.querySelector('#hoursPanel .sch-dashboard');if(dash)dash.hidden=!on;let note=el('setupHoursNotice');if(!note){note=document.createElement('div');note.id='setupHoursNotice';note.className='card';el('hoursPanel').insertBefore(note,dash)}note.hidden=on;note.textContent='Die Arbeitszeitprognose ist deaktiviert. Unter Mehr → Einrichtung kannst du sie jederzeit aktivieren.'}
 const settings=el('settings');const button=document.createElement('button');button.id='setupOpen';button.className='secondary';button.textContent='Einrichtung · Arbeitszeit & Gehalt';button.onclick=open;settings.insertBefore(button,settings.children[1]||null);
-applyVisibility();
+applyVisibility();window.__applySetupVisibility=applyVisibility;
 // Show only on a genuinely fresh install, after theme onboarding.
-if(!data.setupWizardDone&&!data.themeOnboardingDone){el('onboardingConfirm').addEventListener('click',()=>setTimeout(open,0),{once:true})}
+if(!data.setupWizardDone&&!data.themeOnboardingDone){el('onboardingConfirm').addEventListener('click',()=>setTimeout(()=>window.SchivioFlow?window.SchivioFlow.open():open(),0),{once:true})}
 })();
 </script>
 <script>
-/* Schivio v1.0.50 – Rechenkern Gehalt.
+/* Schivio v1.0.51 – Rechenkern Gehalt.
    Eine zentrale Stelle für Tarifdaten und Berechnung. Alle Anzeigen lesen von hier,
    nie aus angezeigtem Text. Neue Tarife werden nur in TARIFFS ergänzt. */
 window.SchivioPay=(function(){
@@ -1271,4 +1271,151 @@ refresh();
  if(mehr){const op=populateProfile;populateProfile=function(){op();mehr(data.profile?.group||'',data.profile?.level||'')};mehr(data.profile?.group||'',data.profile?.level||'')}
  if(wiz){window.__wizFill=()=>wiz(data.profile?.group||data.setupOptions?.group||'',data.profile?.level||data.setupOptions?.level||'');window.__wizFill()}
 })();
-</script></body></html>
+</script><style id="flowStyle">
+#flow{position:fixed;inset:0;z-index:10000;background:#18191b;display:flex;flex-direction:column;color:var(--text,#f3f4f6);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#flow[hidden]{display:none}
+#flow .fl-top{display:flex;align-items:center;gap:12px;padding:14px 18px 6px}
+#flow .fl-back,#flow .fl-close{background:none!important;border:0!important;color:inherit!important;font-size:1.5rem;line-height:1;width:40px;height:40px;border-radius:50%;padding:0;opacity:.8;flex:none}
+#flow .fl-back[disabled]{visibility:hidden}
+#flow .fl-bar{flex:1;height:4px;border-radius:4px;background:color-mix(in srgb,currentColor 15%,transparent);overflow:hidden}
+#flow .fl-bar i{display:block;height:100%;width:0;background:var(--accent-bright,#64d3cf);border-radius:4px;transition:width .45s cubic-bezier(.22,1,.36,1)}
+#flow .fl-stage{position:relative;flex:1;overflow:hidden}
+#flow .fl-step{position:absolute;inset:0;overflow-y:auto;padding:18px 20px 28px;display:flex;flex-direction:column;transition:transform .48s cubic-bezier(.22,1,.36,1),opacity .38s ease;will-change:transform,opacity}
+#flow .fl-step.below{transform:translateY(56px);opacity:0}
+#flow .fl-step.above{transform:translateY(-56px);opacity:0}
+#flow h2{font-size:1.55rem;line-height:1.2;margin:8px 0 6px;font-weight:700}
+#flow .fl-sub{opacity:.7;margin:0 0 20px;font-size:.98rem;line-height:1.4}
+#flow .fl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+#flow .fl-list{display:grid;gap:10px}
+#flow .fl-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:112px;padding:14px 10px;border-radius:20px;border:1px solid color-mix(in srgb,currentColor 14%,transparent)!important;background:color-mix(in srgb,currentColor 6%,transparent)!important;color:inherit!important;font:inherit;text-align:center;cursor:pointer;transition:transform .15s ease,background .2s ease,border-color .2s ease;-webkit-tap-highlight-color:transparent}
+#flow .fl-tile:active{transform:scale(.96)}
+#flow .fl-tile.sel{border-color:var(--accent-bright,#64d3cf)!important;background:color-mix(in srgb,var(--accent-bright,#64d3cf) 18%,transparent)!important}
+#flow .fl-tile svg{width:38px;height:38px;stroke:var(--accent-bright,#64d3cf);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#flow .fl-tile b{font-size:1rem;font-weight:650}
+#flow .fl-tile small{opacity:.65;font-size:.8rem;margin-top:-4px}
+#flow .fl-row{flex-direction:row;justify-content:flex-start;min-height:62px;text-align:left;gap:14px;padding:12px 16px}
+#flow .fl-row svg{width:28px;height:28px;flex:none}
+#flow .fl-row span{display:flex;flex-direction:column}
+#flow .fl-row small{margin-top:2px}
+#flow .fl-pop{animation:flpop .5s cubic-bezier(.34,1.56,.64,1) .12s both}
+@keyframes flpop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+#flow .fl-chips{display:flex;flex-wrap:wrap;gap:8px}
+#flow .fl-chip{border-radius:999px;padding:9px 14px;border:1px solid color-mix(in srgb,currentColor 18%,transparent)!important;background:transparent!important;color:inherit!important;font:inherit;font-size:.92rem}
+#flow .fl-chip.sel{border-color:var(--accent-bright,#64d3cf)!important;background:color-mix(in srgb,var(--accent-bright,#64d3cf) 20%,transparent)!important}
+#flow .fl-more{margin:18px 0 10px;background:none!important;border:0!important;color:var(--accent-bright,#64d3cf)!important;font:inherit;padding:6px 0;text-align:left}
+#flow .fl-input{width:100%;font-size:1.4rem;padding:14px 16px;border-radius:16px;border:1px solid color-mix(in srgb,currentColor 20%,transparent);background:color-mix(in srgb,currentColor 6%,transparent);color:inherit;box-sizing:border-box}
+#flow .fl-spacer{flex:1;min-height:20px}
+#flow .fl-next{width:100%;padding:16px;border-radius:16px;font-size:1.05rem;font-weight:650;border:0!important;background:var(--accent-bright,#64d3cf)!important;color:#0b1a1c!important;margin-top:16px}
+#flow .fl-next[disabled]{opacity:.35}
+#flow .fl-note{font-size:.88rem;opacity:.7;line-height:1.45;margin:14px 0 0}
+#flow .fl-result{margin:16px 0 6px;font-size:1.05rem}
+#flow .fl-result b{color:var(--accent-bright,#64d3cf)}
+#flow .fl-sum{display:grid;gap:2px;border-radius:18px;overflow:hidden}
+#flow .fl-sum div{display:flex;justify-content:space-between;gap:12px;padding:13px 16px;background:color-mix(in srgb,currentColor 6%,transparent)}
+#flow .fl-sum span{opacity:.7}
+#flow .fl-sum b{text-align:right}
+@media (prefers-reduced-motion:reduce){#flow .fl-step{transition:opacity .25s ease}#flow .fl-step.below,#flow .fl-step.above{transform:none}#flow .fl-pop{animation:flfade .25s ease both}@keyframes flfade{from{opacity:0}to{opacity:1}}}
+</style>
+<div id="flow" hidden role="dialog" aria-modal="true" aria-label="Einrichtung"><div class="fl-top"><button class="fl-back" type="button" aria-label="Zurück">‹</button><div class="fl-bar"><i></i></div><button class="fl-close" type="button" aria-label="Schließen">×</button></div><div class="fl-stage"></div></div>
+<script>
+/* v1.0.51: Einrichtung mit Berufsgruppen – eine Frage pro Bildschirm */
+(function(){
+ const root=document.getElementById('flow'),stage=root.querySelector('.fl-stage'),bar=root.querySelector('.fl-bar i'),backBtn=root.querySelector('.fl-back'),closeBtn=root.querySelector('.fl-close');
+ const P=window.SchivioPay;const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const eur=n=>Number(n).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+ const I={bed:'<path d="M3 18V7"/><path d="M3 14h18v4"/><path d="M21 14v-1.5A3.5 3.5 0 0 0 17.5 9H11v5"/><circle cx="7" cy="11" r="1.8"/>',
+  home:'<path d="M4 11l8-7 8 7v9H4z"/><path d="M12 17.2s-3-1.8-3-3.7a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 1.9-3 3.7-3 3.7z"/>',
+  amb:'<path d="M2.5 16V8a1 1 0 0 1 1-1H13v9"/><path d="M13 10h4.2L21 13.6V16h-8"/><circle cx="7" cy="17" r="1.9"/><circle cx="17" cy="17" r="1.9"/><path d="M7.5 9.2v3.6M5.7 11h3.6"/>',
+  steth:'<path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 12v3a5 5 0 0 0 10 0v-2.2"/><circle cx="20" cy="10.6" r="2"/>',
+  clip:'<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 3h6v3H9z"/><path d="M12 10v5M9.5 12.5h5"/>',
+  baby:'<circle cx="12" cy="13" r="7"/><path d="M12 6c0-1.6 1.2-2.6 2.6-2.2"/><path d="M9.5 12.3h.01M14.5 12.3h.01"/><path d="M10.2 15.6a2.6 2.6 0 0 0 3.6 0"/>',
+  micro:'<path d="M8.5 3.5l4 2-2.8 5.6-4-2z"/><path d="M11.4 8.4a5.5 5.5 0 0 1 3.2 9.6"/><path d="M5 21h14M8 18h7"/><path d="M8 11.5l-1 2"/>',
+  flame:'<path d="M12 2.8c.9 3.2 5.3 5.3 5.3 10.4a5.3 5.3 0 0 1-10.6 0c0-2.2 1.1-3.8 2.2-4.8 0 2 1 3.2 2.1 3.2 0-3.2-.9-5.4 1-8.8z"/>',
+  shield:'<path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6z"/><path d="M12 8.2l1.1 2.3 2.5.4-1.8 1.7.4 2.5-2.2-1.2-2.2 1.2.4-2.5-1.8-1.7 2.5-.4z"/>',
+  dots:'<circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',euro:'<path d="M17.5 6.5A7 7 0 1 0 17.5 17.5"/><path d="M4 10.5h9M4 13.5h9"/>',
+  no:'<circle cx="12" cy="12" r="8.5"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7"/>',city:'<path d="M3 21h18"/><path d="M5 21V9l5-3v15"/><path d="M10 21V4l9 4v13"/><path d="M13 10h3M13 13h3M13 16h3"/>',
+  uni:'<path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.5V16c0 1.4 2.2 2.6 5 2.6s5-1.2 5-2.6v-4.5"/>',cross:'<path d="M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5z"/>',
+  dove:'<path d="M4 14c3 0 5-2 6-5 1 3 3 5 7 5-1.5 3.5-4.5 5-7.5 5S4.5 17 4 14z"/><path d="M10 9c0-3 1.8-5 4-5 1.6 0 2.4 1 2.4 2"/>',red:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M10 7h4v3.5h3.5v4H14V18h-4v-3.5H6.5v-4H10z"/>',
+  build:'<path d="M4 21V5l8-2v18"/><path d="M12 9h8v12"/><path d="M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-3.8 3.9-6 7.5-6s6.7 2.2 7.5 6"/>',
+  full:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none" opacity=".25"/>',part:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12h8.5"/>',
+  map:'<path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',bund:'<path d="M5 21V4"/><path d="M5 5h13l-2.5 4L18 13H5"/>'};
+ const svg=k=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+(I[k]||I.dots)+'</svg>';
+ const JOBS=[['pflege','Pflege','Krankenhaus','bed','hospital'],['alten','Altenpflege','Heim & ambulant','home','nursing'],['rettung','Rettungsdienst','','amb','other'],['arzt','Ärztin / Arzt','','steth','hospital'],['mfa','MFA','Praxis & Klinik','clip','other'],['hebamme','Hebamme','','baby','hospital'],['mtr','Medizintechnik','& Therapie','micro','hospital'],['feuerwehr','Feuerwehr','','flame','other'],['polizei','Polizei','','shield','other'],['sonst','Sonstiges','','dots','other']];
+ const STATES=[['BW','Baden-Württemberg'],['BY','Bayern'],['BE','Berlin'],['BB','Brandenburg'],['HB','Bremen'],['HH','Hamburg'],['HE','Hessen'],['MV','Mecklenburg-Vorpommern'],['NI','Niedersachsen'],['NW','Nordrhein-Westfalen'],['RP','Rheinland-Pfalz'],['SL','Saarland'],['SN','Sachsen'],['ST','Sachsen-Anhalt'],['SH','Schleswig-Holstein'],['TH','Thüringen']];
+ const DIAKONIE={BY:'AVR Bayern',BW:'AVR Württemberg I',NW:'BAT-KF',NI:'TV DN',HH:'KTD',SH:'KTD',MV:'KTD',BE:'AVR DWBO West',BB:'AVR DWBO Ost',ST:'AVR Mitteldeutschland',TH:'AVR Mitteldeutschland',HB:'AVR DD',RP:'AVR DD',SL:'AVR DD'};
+ // Häufige Eingruppierungen (nur als Vorschlag; angezeigt wird nur, was es im Tarif gibt)
+ const SUG={tvoed:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz'],['P5','Pflegehilfe']],rettung:[['N','Notfallsanitäter:in'],['E4','Rettungssanitäter:in']],hebamme:[['P8','Hebamme']],mtr:[['E9A','MTR / MTL'],['E8','Physio- / Ergotherapie']],mfa:[['E6','MFA']]},
+  caritas:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz']]},
+  dd:{pflege:[['7','Pflegefachkraft']]},bay:{pflege:[['7','Pflegefachkraft']]},tvdn:{pflege:[['8','Pflegefachkraft']]},
+  arzt:{arzt:[['Ä1','Assistenzärztin / -arzt'],['Ä2','Fachärztin / -arzt'],['Ä3','Oberärztin / -arzt']]}};
+ SUG.tvoed.alten=SUG.tvoed.pflege;SUG.caritas.alten=SUG.caritas.pflege;SUG.dd.alten=SUG.dd.pflege;SUG.bay.alten=SUG.bay.pflege;SUG.tvdn.alten=SUG.tvdn.pflege;
+ function sugFamily(k){if(k==='tvoed-vka-p'||k==='avr-wue-1')return 'tvoed';if(k==='avr-caritas-p')return 'caritas';if(['avr-dd','avr-wue-4','avr-dwbo-w','avr-dwbo-o','avr-dwm'].includes(k))return 'dd';if(k==='avr-bayern')return 'bay';if(k==='tv-dn')return 'tvdn';if(/aerzte/.test(k))return 'arzt';return ''}
+ let s={},hist=[],cur=null,firstRun=false;
+ function employers(){const j=s.job;
+  if(j==='feuerwehr')return [['beamte','Verbeamtet','Beamtin / Beamter','shield'],['oed','Angestellt','öffentlicher Dienst','city'],['privat','Anderer Arbeitgeber','eigene Werte','build']];
+  if(j==='polizei')return [['beamte','Landespolizei','verbeamtet','shield'],['bund','Bundespolizei','verbeamtet','bund'],['oed','Angestellt','Tarifbeschäftigte','city']];
+  if(j==='arzt')return [['oed','Kommunale Klinik','Stadt oder Kreis','city'],['uni','Uniklinik','Land','uni'],['privat','Andere Klinik oder Praxis','eigene Werte','build']];
+  const l=[['oed','Öffentlicher Dienst','Stadt, Kreis, Kommune','city'],['uni','Uniklinik / Land','','uni'],['caritas','Caritas','','cross'],['diakonie','Diakonie','','dove'],['drk','Rotes Kreuz','DRK','red'],['privat','Privat / anderer','eigene Werte','build']];
+  if(j==='mfa')l.unshift(['praxis','Arztpraxis','eigene Werte','clip']);return l}
+ function tariff(){const e=s.emp,j=s.job;if(e==='beamte'||e==='bund')return 'Beamte';if(e==='privat'||e==='praxis')return 'Individuell';
+  if(j==='arzt')return e==='uni'?'TV-Ärzte/TdL':'TV-Ärzte/VKA';if(e==='oed')return j==='polizei'?'TV-L':'TVöD-P';if(e==='uni')return 'TV-L';if(e==='caritas')return 'AVR Caritas';if(e==='drk')return 'DRK';
+  if(e==='diakonie')return DIAKONIE[s.state]||'Individuell';return 'Individuell'}
+ const tkey=()=>P.normalizeTariff(tariff()),T=()=>P.TARIFFS[tkey()];
+ const workplace=()=>(JOBS.find(x=>x[0]===s.job)||[])[4]||'other';
+ function fulltime(){const c=P.catalog(tariff(),s.state);const ft=c?((workplace()==='hospital'&&c.fulltimeHospital)?c.fulltimeHospital:c.fulltime):(s.emp==='beamte'||s.emp==='bund'?41:39);return ft||39}
+ function steps(){const l=['job','hours','salary','state'];if(s.salary){l.push('emp');const t=T();if(t?.individual)l.push('pay');else l.push('group','level');l.push('scope')}else if(s.hours)l.push('weekly');l.push('done');return l}
+ function progress(id){const l=steps();bar.style.width=Math.round((l.indexOf(id)+1)/l.length*100)+'%'}
+ function tile(cls,icon,title,sub,on,sel){const b=document.createElement('button');b.type='button';b.className='fl-tile fl-pop '+cls+(sel?' sel':'');b.innerHTML=svg(icon)+(cls.includes('fl-row')?'<span><b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</span>':'<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':''));b.onclick=()=>{b.parentElement.querySelectorAll('.fl-tile').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');setTimeout(on,170)};return b}
+ function view(id){const d=document.createElement('div');d.className='fl-step';const h=(t,sub)=>{d.insertAdjacentHTML('beforeend','<h2>'+esc(t)+'</h2>'+(sub?'<p class="fl-sub">'+esc(sub)+'</p>':''))};
+  const next=(label,ok,fn)=>{const sp=document.createElement('div');sp.className='fl-spacer';const b=document.createElement('button');b.type='button';b.className='fl-next';b.textContent=label;b.disabled=!ok;b.onclick=fn;d.append(sp,b);return b};
+  if(id==='job'){h('In welchem Bereich arbeitest du?','Damit passt die App alles Weitere an deinen Beruf an.');const g=document.createElement('div');g.className='fl-grid';JOBS.forEach(([k,t,sub,ic])=>g.append(tile('',ic,t,sub,()=>{s.job=k;go('hours')},s.job===k)));d.append(g)}
+  else if(id==='hours'||id==='salary'){const hrs=id==='hours';h(hrs?'Möchtest du deine Arbeitszeit erfassen?':'Möchtest du eine Gehaltsprognose?',hrs?'Die App rechnet dein Soll, Plus- und Minusstunden aus deinen Diensten.':'Die App schätzt dein Bruttogehalt inklusive Zuschlägen für Nacht, Sonn- und Feiertage.');const g=document.createElement('div');g.className='fl-list';
+   g.append(tile('fl-row',hrs?'clock':'euro','Ja, gerne','',()=>{s[id]=true;go(hrs?'salary':'state')},s[id]===true),tile('fl-row','no','Nein, danke','',()=>{s[id]=false;go(hrs?'salary':'state')},s[id]===false));d.append(g)}
+  else if(id==='state'){h('In welchem Bundesland arbeitest du?','Wichtig für Feiertage'+(s.salary?' und den passenden Tarif.':'.'));const g=document.createElement('div');g.className='fl-chips';STATES.forEach(([k,t])=>{const b=document.createElement('button');b.type='button';b.className='fl-chip fl-pop'+(s.state===k?' sel':'');b.textContent=t;b.onclick=()=>{g.querySelectorAll('.fl-chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');s.state=k;setTimeout(()=>go(next1()),170)};g.append(b)});d.append(g)}
+  else if(id==='emp'){h('Wer ist dein Arbeitgeber?','Daraus ergibt sich dein Tarifvertrag.');const g=document.createElement('div');g.className='fl-list';employers().forEach(([k,t,sub,ic])=>g.append(tile('fl-row',ic,t,sub,()=>{if(s.emp!==k){s.group='';s.level=''}s.emp=k;go(T()?.individual?'pay':'group')},s.emp===k)));d.append(g)}
+  else if(id==='pay'){const bea=T()?.beamte;h(bea?'Wie hoch ist dein Grundgehalt?':'Wie hoch ist dein Monatsgehalt?','Brutto laut Gehaltsabrechnung'+(bea?' bzw. Bezügemitteilung':'')+', ohne Zulagen.');const i=document.createElement('input');i.className='fl-input';i.type='text';i.inputMode='decimal';i.placeholder='z. B. 3.600';i.value=s.pay?String(s.pay).replace('.',','):'';d.append(i);
+   if(s.emp==='diakonie')d.insertAdjacentHTML('beforeend','<p class="fl-note">Für die Diakonie in deinem Bundesland ist noch keine Tabelle hinterlegt. Mit deinem Gehalt rechnet die App trotzdem.</p>');
+   if(bea){const pre={NW:'Nordrhein-Westfalen',BE:'Berlin',NI:'Niedersachsen',BW:'Baden-Württemberg'};d.insertAdjacentHTML('beforeend','<p class="fl-note">'+(s.emp==='bund'?'Zulagen für Nacht-, Wochenend- und Feiertagsdienste rechnet die App mit den Sätzen des Bundes.':pre[s.state]?'Zulagen für Nacht-, Wochenend- und Feiertagsdienste rechnet die App mit den Sätzen von '+pre[s.state]+'.':'Die Zulagensätze deines Landes trägst du später unter Gehalt → Zuschläge ein.')+'</p>')}
+   const val=()=>Number(i.value.replace(/\s|€/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));const b=next('Weiter',val()>0,()=>{s.pay=val();go('scope')});i.oninput=()=>{b.disabled=!(val()>0)};setTimeout(()=>i.focus(),500)}
+  else if(id==='group'){const c=P.catalog(tariff(),s.state);h('Welche Tätigkeit trifft auf dich zu?','Die genaue Entgeltgruppe steht auf deiner Gehaltsabrechnung.');
+   if(!c||!c.groups.length){d.insertAdjacentHTML('beforeend','<p class="fl-note">Für diesen Tarif ist noch keine Tabelle hinterlegt.</p>');next('Weiter',true,()=>go('scope'))}
+   else{const fam=SUG[sugFamily(tkey())]||{};const sug=(fam[s.job]||[]).filter(([g])=>c.groups.some(x=>x.key===g));const pick=g=>{s.group=g;s.level='';go('level')};
+    if(sug.length){const l=document.createElement('div');l.className='fl-list';sug.forEach(([g,t])=>{const G=c.groups.find(x=>x.key===g);const lo=G.levels[0];l.append(tile('fl-row','user',t,G.label.replace(/ \(.*\)$/,'')+' · ab '+eur(lo.amount),()=>pick(g),s.group===g))});d.append(l)}
+    const all=document.createElement('div');all.className='fl-chips';c.groups.forEach(G=>{const b=document.createElement('button');b.type='button';b.className='fl-chip'+(s.group===G.key?' sel':'');b.textContent=G.label;b.onclick=()=>{all.querySelectorAll('.fl-chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');setTimeout(()=>pick(G.key),170)};all.append(b)});
+    if(sug.length){const m=document.createElement('button');m.type='button';m.className='fl-more';m.textContent='Andere Entgeltgruppe wählen';all.hidden=!(s.group&&!sug.some(x=>x[0]===s.group));m.onclick=()=>{all.hidden=!all.hidden};d.append(m,all)}else d.append(all)}}
+  else if(id==='level'){const c=P.catalog(tariff(),s.state);const G=c&&c.groups.find(x=>x.key===s.group);h('Wie lange arbeitest du schon in deinem Beruf?','Daraus ergibt sich deine Stufe. Du kannst sie unten anpassen.');
+   const B=[['Unter 1 Jahr',0],['1 bis 3 Jahre',1],['3 bis 6 Jahre',2],['6 bis 10 Jahre',3],['10 bis 15 Jahre',4],['Über 15 Jahre',5]];const g=document.createElement('div');g.className='fl-chips';const res=document.createElement('div');res.className='fl-result';const lv=document.createElement('div');lv.className='fl-chips';let btn;
+   const show=()=>{const L=G?.levels.find(x=>String(x.n)===String(s.level));res.innerHTML=L?'Deine Stufe: <b>'+esc(L.label)+'</b> · '+eur(L.amount):'';lv.replaceChildren();(G?.levels||[]).forEach(x=>{const b=document.createElement('button');b.type='button';b.className='fl-chip'+(String(x.n)===String(s.level)?' sel':'');b.textContent=x.label;b.onclick=()=>{s.level=x.n;show()};lv.append(b)});lv.hidden=!L;if(btn)btn.disabled=!L};
+   B.forEach(([t,i])=>{const b=document.createElement('button');b.type='button';b.className='fl-chip fl-pop'+(s.exp===i?' sel':'');b.textContent=t;b.onclick=()=>{g.querySelectorAll('.fl-chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');s.exp=i;s.level=suggest(G,i);show()};g.append(b)});
+   d.append(g,res,lv);btn=next('Weiter',false,()=>go('scope'));show()}
+  else if(id==='scope'||id==='weekly'){const ft=fulltime();h(id==='weekly'?'Wie viele Stunden arbeitest du pro Woche?':'Arbeitest du Vollzeit?',id==='weekly'?'Laut Arbeitsvertrag.':'Vollzeit sind bei deinem Tarif '+String(ft).replace('.',',')+' Stunden pro Woche.');
+   const i=document.createElement('input');i.className='fl-input';i.type='text';i.inputMode='decimal';i.placeholder='z. B. 30';const val=()=>Number(i.value.replace(',','.'));let b;
+   if(id==='scope'){const g=document.createElement('div');g.className='fl-list';g.append(tile('fl-row','full','Vollzeit',String(ft).replace('.',',')+' Std. pro Woche',()=>{s.part=false;s.weekly=ft;go('done')},s.part===false),tile('fl-row','part','Teilzeit','eigene Stundenzahl',()=>{s.part=true;i.hidden=false;b.hidden=false;i.focus()},s.part===true));d.append(g);i.hidden=s.part!==true;i.style.marginTop='16px';i.value=s.part?String(s.weekly||'').replace('.',','):'';d.append(i);b=next('Weiter',s.part&&val()>0,()=>{s.weekly=val();go('done')});b.hidden=s.part!==true}
+   else{i.value=String(s.weekly||ft).replace('.',',');d.append(i);b=next('Weiter',true,()=>{s.weekly=val();go('done')})}
+   i.oninput=()=>{b.disabled=!(val()>0&&val()<=60)}}
+  else if(id==='done'){h('Alles bereit','Das hat die App für dich eingestellt. Ändern kannst du alles jederzeit unter Mehr.');const rows=[['Beruf',(JOBS.find(x=>x[0]===s.job)||[])[1]],['Bundesland',(STATES.find(x=>x[0]===s.state)||[])[1]],['Arbeitszeit erfassen',s.hours?'Ja':'Nein'],['Gehaltsprognose',s.salary?'Ja':'Nein']];
+   if(s.salary){const t=T(),c=P.catalog(tariff(),s.state);rows.push(['Tarif',t?.beamte?'Beamtenbesoldung':(k0=>k0==='individual'?'Eigene Werte':(t?.name||'Eigene Werte'))(tkey())]);if(t?.individual)rows.push([t.beamte?'Grundgehalt':'Monatsgehalt',eur(s.pay)]);else{const G=c?.groups.find(x=>x.key===s.group);const L=G?.levels.find(x=>String(x.n)===String(s.level));if(G)rows.push(['Gruppe',G.label.replace(/ \(.*\)$/,'')]);if(L)rows.push(['Stufe',L.label+' · '+eur(L.amount)])}}
+   if(s.weekly)rows.push(['Wochenstunden',String(s.weekly).replace('.',',')+(s.salary?(s.part?' (Teilzeit)':' (Vollzeit)'):'')]);
+   d.insertAdjacentHTML('beforeend','<div class="fl-sum fl-pop">'+rows.map(([a,b])=>'<div><span>'+esc(a)+'</span><b>'+esc(b)+'</b></div>').join('')+'</div>'+(s.salary?'<p class="fl-note">Weitere Zulagen wie Schicht-, Pflege- oder Polizeizulage ergänzt du später unter Gehalt.</p>':''));next('Los geht’s',true,save)}
+  return d}
+ function next1(){return s.salary?'emp':(s.hours?'weekly':'done')}
+ function suggest(G,b){if(!G)return '';const k=tkey();let map=[1,2,3,4,5,6];if(['avr-dd','avr-wue-4','avr-dwbo-w','avr-dwbo-o','avr-dwm'].includes(k))map=[1,2,2,3,4,5];else if(k==='avr-bayern')map=[1,2,3,3,4,5];else if(k==='ktd')map=[1,1,2,3,4,4];else if(/aerzte/.test(k))map=[1,2,4,5,6,6];else if(k==='avr-caritas-p'&&/^VG/.test(s.group))map=[1,2,3,5,7,9];
+  const want=map[b];const ns=G.levels.map(x=>x.n);const le=ns.filter(n=>n<=want);return le.length?Math.max(...le):Math.min(...ns)}
+ function go(id,back){const old=cur;const nv=view(id);if(old&&!back)hist.push(old.dataset.id);nv.dataset.id=id;nv.classList.add(back?'above':'below');stage.append(nv);void nv.offsetWidth;requestAnimationFrame(()=>{nv.classList.remove('above','below');if(old){old.classList.add(back?'below':'above');setTimeout(()=>old.remove(),500)}});cur=nv;progress(id);backBtn.disabled=!hist.length}
+ function goBack(){if(!hist.length)return;go(hist.pop(),true)}
+ backBtn.onclick=goBack;closeBtn.onclick=()=>close();
+ let tx=0,ty=0;stage.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});stage.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(dx>70&&Math.abs(dy)<50&&tx<60)goBack()},{passive:true});
+ function save(){const t=tariff(),k=tkey(),T0=P.TARIFFS[k];const old=data.setupOptions||{};const weekly=s.weekly||(s.salary?fulltime():null);
+  data.setupOptions={...old,hoursEnabled:!!s.hours,salaryEnabled:!!s.salary,hoursMode:'weekly',hoursValue:weekly||old.hoursValue||39,workplace:workplace(),region:s.state,profession:s.job,employer:s.emp||'',tariff:s.salary?t:(old.tariff||''),group:s.group||'',level:s.level?String(s.level):'',fulltime:null};
+  data.setupWizardDone=true;data.profile=data.profile||{};data.profile.state=s.state;if(weekly){data.profile.weekly=String(weekly);delete data.profile.fixedMonthlyTarget}
+  if(s.salary){data.profile.tariff=t;data.profile.fulltime='';if(T0?.individual){data.profile.group='';data.profile.level='';data.individualPay={...(data.individualPay||{}),monthly:s.pay};if(T0.beamte){const m={NW:'nw',BE:'be',NI:'ni',BW:'bw'};data.individualPay.duzPreset=s.emp==='bund'?'bund':(m[s.state]||'own');delete data.individualPay.duzSun;delete data.individualPay.duzSat;delete data.individualPay.duzNight}}else{data.profile.group=s.group||'';data.profile.level=s.level?String(s.level):''}}
+  persist();try{populateProfile()}catch(e){}render();window.__applySetupVisibility&&window.__applySetupVisibility();close(true)}
+ function open(){const o=data.setupOptions||{},p=data.profile||{};s={job:o.profession||'',hours:data.setupWizardDone?o.hoursEnabled!==false:undefined,salary:data.setupWizardDone?!!o.salaryEnabled:undefined,state:p.state||o.region||'',emp:o.employer||'',group:p.group||'',level:p.level||'',weekly:Number(p.weekly)||0,pay:Number(data.individualPay?.monthly)||0};s.part=s.weekly&&o.salaryEnabled?undefined:undefined;
+  firstRun=!data.setupWizardDone;hist=[];stage.replaceChildren();cur=null;{const op=c=>c&&!/rgba\(0, 0, 0, 0\)|transparent/.test(c);const cb=getComputedStyle(document.body).backgroundColor,ch=getComputedStyle(document.documentElement).backgroundColor;root.style.background=op(cb)?cb:(op(ch)?ch:'#18191b')}root.hidden=false;document.body.classList.add('modal-open');go('job')}
+ function close(){root.hidden=true;document.body.classList.remove('modal-open');stage.replaceChildren();cur=null}
+ window.SchivioFlow={open,close};
+ const btn=document.getElementById('setupOpen');if(btn){btn.textContent='Einrichtung neu starten';btn.onclick=open}
+})();
+</script>
+</body></html>
