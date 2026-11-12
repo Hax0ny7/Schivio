@@ -311,7 +311,7 @@ body[data-theme="light"] .sch-wheel-center{z-index:5!important}
 <button class="sch-sector sch-sector-4" data-panel="adjust" type="button"><span class="sch-symbol">☷</span><span>Korrektur</span><em id="schRingAdjust">–</em></button>
 <button class="sch-sector sch-sector-5" data-panel="history" type="button"><span class="sch-symbol">▤</span><span>Monatsverlauf</span></button></div><div id="tariffExplanation" class="card" style="margin:10px 0;font-size:13px;line-height:1.55" hidden></div><div class="sch-quick"><div><small>Geplant</small><strong id="schPlanned">–</strong></div><div><small>Monatssaldo</small><strong id="schMonth">–</strong></div><div><small>Zeitguthaben</small><strong id="schTotal">–</strong></div></div><p class="sch-disclaimer">Prognose aus eingetragenen Diensten – keine verbindliche Abrechnung.</p></div><div aria-hidden="true" class="sch-sheet-backdrop hidden" id="schSheet"><div aria-labelledby="schSheetTitle" aria-modal="true" class="sch-sheet" role="dialog"><div class="sch-sheet-top"><h2 id="schSheetTitle">Details</h2><button aria-label="Schließen" id="schClose" type="button">✕</button></div><div class="sch-sheet-hint">Werte ansehen oder gezielt bearbeiten</div><div id="schSheetContent"></div></div></div><div class="hidden" id="schCardStore"><div class="card hero" data-sch-card="work"><h2>Arbeitszeitprognose</h2><div class="kpis"><div class="kpi"><small>Geplant</small><strong id="workedDetail">–</strong></div><div class="kpi"><small>Gutschriften</small><strong id="creditDetail">–</strong></div><div class="kpi"><small>Saldo</small><strong id="balanceDetailHours">–</strong></div></div><p class="note" id="hoursInfo"></p></div><div class="card" data-sch-card="balance"><h2>Voraussichtliches Zeitguthaben</h2><div class="kpis"><div class="kpi"><small>Bis Vormonat</small><strong id="carryPrevious">–</strong></div><div class="kpi"><small>Dieser Monat</small><strong id="carryCurrent">–</strong></div><div class="kpi"><small>Prognose gesamt</small><strong id="carryTotal">–</strong></div></div><p class="note" id="carryInfo"></p><div class="field"><label for="openingBalance">Startguthaben bei Beginn der Erfassung (Stunden)</label><input id="openingBalance" max="1000" min="-1000" step="0.1" type="number" value="0"/></div><button id="saveOpening">Startguthaben speichern</button></div><div class="card" data-sch-card="target"><h2>Monatssoll</h2><p class="note">Das Soll wird aus Wochenstunden, Arbeitstagen und gesetzlichen Feiertagen berechnet. Bei abweichenden Vorgaben des Arbeitgebers kannst du es nur für diesen Monat überschreiben.</p><p class="note" id="targetModeInfo"></p><div class="field"><label for="manualTarget">Monatssoll manuell (Stunden; leer = automatisch)</label><input id="manualTarget" max="300" min="0" placeholder="Automatisch" step="0.1" type="number"/></div><button id="saveManualTarget">Monatssoll übernehmen</button><p class="note" id="targetStatus" role="status"></p></div><div class="card" data-sch-card="payout"><h2>Ausgezahlte Stunden</h2><p class="note">Hier nur tatsächlich ausgezahlte Stunden erfassen. Sie werden im gewählten Monat vom prognostizierten Zeitguthaben abgezogen, nicht von den geplanten Dienststunden.</p><div class="field"><label for="paidHours">Ausgezahlte Stunden im angezeigten Monat</label><input id="paidHours" max="500" min="0" step="0.25" type="number" value="0"/></div><button id="savePaidHours">Auszahlung speichern</button><p class="note" id="payoutStatus" role="status"></p></div><div class="card" data-sch-card="adjust"><h2>Stundenkorrektur</h2><p class="note">Manuelle Korrektur für den angezeigten Monat, z. B. ein vom Arbeitgeber mitgeteilter abweichender Zeitstand. Werte werden zum rechnerischen Saldo addiert.</p><div class="field"><label for="adjustHours">Korrektur in Stunden (z. B. -2 oder 1,5)</label><input id="adjustHours" max="500" min="-500" step="0.25" type="number" value="0"/></div><button id="saveAdjust">Korrektur speichern</button><p class="note" id="adjustStatus"></p></div><div class="card" data-sch-card="history"><h2>Monatsverlauf</h2><p class="note">Alle eingetragenen Dienste fließen automatisch in die Prognose ein – auch zukünftige. Änderungen werden sofort berücksichtigt.</p><div class="history" id="monthHistory"></div></div><div class="card" data-sch-card="absence"><h2>Abwesenheiten im ausgewählten Monat</h2><div class="history" id="absenceBreakdown"></div><p class="note">Urlaub, Krankheit und Fortbildung werden bei regelmäßigen Arbeitstagen mit dem Tageswert gutgeschrieben. Überstundenabbau erzeugt keine Arbeitszeitgutschrift; der geschätzte Abbau wird gesondert angezeigt und nicht doppelt vom Saldo abgezogen. Tarifliche Sonderfälle sind noch nicht berücksichtigt.</p></div></div></section><section class="hidden" id="payPanel"><div class="card"><h2>Gehaltsprognose</h2><div class="big">In Vorbereitung</div><p class="note">Tarifregeln, Tabellenstände und Zuschläge müssen vor einer verlässlichen Berechnung geprüft werden.</p></div></section><section class="hidden" id="sharePanel"><div class="card"><h2>Kalender teilen</h2><p class="note">Gemeinsame Kalender für Paare und Familien sind für Schivio Pro geplant. Aktuell werden alle Einträge ausschließlich lokal gespeichert und nicht synchronisiert.</p></div></section><section class="hidden" id="templatesPanel"><div class="section-title"><h2>Schichten</h2><p>Arbeitszeiten und Pausen verwalten</p></div></section><section class="hidden" id="settings"><div class="section-title"><h2>Mehr</h2><p>Tarifprofil, Einstellungen und Backup</p></div><div class="card" id="themeSettings"><h2>Farbschema</h2><p class="note">Wähle Anthrazit, Hell oder eine Farbvariante. Die Dienstfarben bleiben unabhängig davon einstellbar.</p><div aria-label="Designart" class="theme-category" role="group"><button data-mode="anthracite" type="button">Anthrazit</button><button data-mode="light" type="button">Hell</button><button data-mode="colored" type="button">Farbig</button></div><div id="themeColorPicker"><div aria-label="Farbschema auswählen" class="theme-picker" role="group"><button aria-pressed="true" class="theme-option" data-palette="emerald" type="button"><span class="theme-swatch" style="--swatch:#16924c"></span>Emerald</button><button aria-pressed="false" class="theme-option" data-palette="blue" type="button"><span class="theme-swatch" style="--swatch:#1977b9"></span>Blau</button><button aria-pressed="false" class="theme-option" data-palette="violet" type="button"><span class="theme-swatch" style="--swatch:#8654ba"></span>Violett</button><button aria-pressed="false" class="theme-option" data-palette="amber" type="button"><span class="theme-swatch" style="--swatch:#ba8731"></span>Gold</button><button aria-pressed="false" class="theme-option" data-palette="teal" type="button"><span class="theme-swatch" style="--swatch:#148f8c"></span>Türkis</button><button aria-pressed="false" class="theme-option" data-palette="rose" type="button"><span class="theme-swatch" style="--swatch:#b45d79"></span>Rosé</button></div></div></div><div class="card" id="shiftIntensitySettings"><h2>Dienstfarben</h2><p class="note">Darstellung der Schichtfarben im Kalender</p><div class="shift-intensity-picker"><button aria-pressed="false" data-intensity="subtle" type="button">Dezent</button><button aria-pressed="false" data-intensity="vivid" type="button">Kräftig</button></div></div><div class="card"><h2>Dein Tarifprofil</h2><div class="field"><label for="tariff">Tarifwerk</label><select id="tariff"><option value="">Bitte auswählen</option><option value="TVöD-P">TVöD (VKA) · Kommunen</option><option value="AVR Caritas">AVR Caritas</option><option value="AVR DD">AVR Diakonie Deutschland (AVR DD)</option><option value="BAT-KF">BAT-KF (Diakonie Rheinland-Westfalen-Lippe)</option><option value="AVR Bayern">AVR Bayern (Diakonie Bayern)</option><option value="AVR Württemberg I">AVR Württemberg Buch I (wie TVöD)</option><option value="AVR Württemberg IV">AVR Württemberg Buch IV (wie AVR DD)</option><option value="AVR DWBO West">AVR DWBO West (Berlin-Brandenburg)</option><option value="AVR DWBO Ost">AVR DWBO Ost (Berlin-Brandenburg)</option><option value="KTD">KTD (Diakonie Nordkirche: HH, SH, MV)</option><option value="TV DN">TV DN (Diakonie Niedersachsen)</option><option value="AVR Mitteldeutschland">AVR Diakonie Mitteldeutschland (ST, TH, Teile SN/BB)</option><option value="AVR Diakonie">AVR Diakonie – anderes Regelwerk (folgt)</option><option value="TV-L">TV-L · Länder &amp; Unikliniken</option><option value="TV-Ärzte/VKA">TV-Ärzte/VKA · Ärzte kommunal</option><option value="TV-Ärzte/TdL">TV-Ärzte/TdL · Ärzte Unikliniken</option><option value="DRK">DRK-Reformtarifvertrag (Rotes Kreuz)</option><option value="Beamte">Beamte (Feuerwehr, Polizei, Kommune)</option><option value="Individuell">Individuelle Vergütung (eigene Werte)</option></select></div><div class="field"><label for="group" id="groupLabel">Entgeltgruppe (z. B. P9)</label><input id="group" maxlength="20" placeholder="P9"/></div><div class="field"><label for="level">Erfahrungsstufe</label><select id="level"><option value="">Bitte auswählen</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div><div class="field"><label for="state">Bundesland (Feiertage)</label><select id="state">
 <option value="NW">Nordrhein-Westfalen</option><option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option><option value="BE">Berlin</option><option value="BB">Brandenburg</option><option value="HB">Bremen</option><option value="HH">Hamburg</option><option value="HE">Hessen</option><option value="MV">Mecklenburg-Vorpommern</option><option value="NI">Niedersachsen</option><option value="RP">Rheinland-Pfalz</option><option value="SL">Saarland</option><option value="SN">Sachsen</option><option value="ST">Sachsen-Anhalt</option><option value="SH">Schleswig-Holstein</option><option value="TH">Thüringen</option></select></div>
-<div class="field"><label for="workdays">Regelmäßige Arbeitstage pro Woche</label><select id="workdays"><option value="5">5 Tage (Mo–Fr)</option><option value="6">6 Tage (Mo–Sa)</option></select></div>
+<div class="field"><label for="workdays">Regelmäßige Arbeitstage pro Woche</label><select id="workdays"><option value="5">5 Tage (Mo–Fr)</option><option value="6">6 Tage (Mo–Sa)</option><option value="m:1234">Eigene Arbeitstage</option></select></div>
 <div class="field"><label for="weekly">Vertragliche Wochenstunden</label><input id="weekly" max="60" min="1" placeholder="38.5" step="0.5" type="number"/></div><div class="field"><label for="fulltime">Tarifliche Vollzeit (Std./Woche)</label><input id="fulltime" max="45" min="30" placeholder="leer = Tarifwert (TVöD 39, Caritas 38,5)" step="0.1" type="number"/></div><button id="saveSettings">Profil speichern</button><p class="note">Das Profil wird nur lokal auf diesem Gerät gespeichert. Keine Übertragung an einen Server.</p></div><div class="card"><h2>Schichtvorlagen</h2><p class="note">Uhrzeiten und unbezahlte Pausen festlegen. Schichten über Mitternacht werden automatisch erkannt. Diese Zeiten gelten für die Stundenübersicht aller entsprechend eingetragenen Dienste.</p><div id="templateFields"></div><button id="saveHours" class="hidden">Vorlagen speichern</button><p class="note" id="templateStatus" role="status"></p><hr/><h3>Eigene Schichten</h3><p class="note">Beliebig viele Dienste mit individuellen Zeiten anlegen. Auch im Planungsmodus verfügbar.</p><div id="customShiftList"></div><div class="custom-form"><label class="full">Bezeichnung<input id="customName" maxlength="30" placeholder="z. B. Bereitschaft"/></label><label>Beginn<input id="customStart" type="time" value="08:00"/></label><label>Ende<input id="customEnd" type="time" value="16:00"/></label><label>Pause (Min.)<input id="customBreak" max="180" min="0" type="number" value="30"/></label><label>Farbe<input id="customColor" type="color" value="#45b4ca"/></label><label>Art<select id="customBd"><option value="">Normale Arbeitszeit</option><option value="I">Bereitschaftsdienst Stufe I (Krankenhaus)</option><option value="II">Bereitschaftsdienst Stufe II (Krankenhaus)</option><option value="III">Bereitschaftsdienst Stufe III (Krankenhaus)</option><option value="A">Bereitschaftsdienst Stufe A (Heim/TV-L)</option><option value="B">Bereitschaftsdienst Stufe B (Heim/TV-L)</option><option value="C">Bereitschaftsdienst Stufe C (Heim/TV-L)</option><option value="D">Bereitschaftsdienst Stufe D (Heim/TV-L)</option><option value="RB">Rufbereitschaft</option></select></label><label>Bereitschaft ab<input id="customBdFrom" type="time"/></label></div><p class="note">Bereitschaft ab: leer = ganze Schicht ist Bereitschaftsdienst. Mit Uhrzeit ist die Zeit davor normale Arbeitszeit. Bei Rufbereitschaft trägst du die Einsatzzeit später im Kalender beim jeweiligen Tag ein.</p><button id="addCustomShift">Schicht hinzufügen</button><p class="note" id="customStatus"></p></div><div class="card"><h2>Datensicherung</h2><p class="note">Exportiere deine Dienste, Einstellungen und Vorlagen als JSON-Datei. Der Import ersetzt die lokal gespeicherten Daten.</p><div class="row"><button class="secondary" id="exportData">Backup exportieren</button><button class="secondary" id="importButton">Backup importieren</button></div><input accept="application/json,.json" class="hidden" id="importFile" type="file"/><p class="note" id="backupStatus" role="status"></p></div></section><p class="foot">Schivio · PWA v1.0.13 · Keine verbindliche Gehaltsberechnung</p></main><div aria-labelledby="onboardingTitle" aria-modal="true" class="theme-onboarding hidden" id="themeOnboarding" role="dialog"><div class="theme-onboarding-card"><div style="font-size:34px">▦</div><h2 id="onboardingTitle">Willkommen bei Schivio</h2><p>Wähle dein bevorzugtes Design. Du kannst es später jederzeit in den Einstellungen ändern.</p><div class="onboarding-choices"><button aria-pressed="true" class="onboarding-choice" data-choice="anthracite" type="button"><span class="preview"></span><strong>Standard</strong><span>Anthrazit</span></button><button aria-pressed="false" class="onboarding-choice" data-choice="light" type="button"><span class="preview"></span><strong>Hell</strong><span>Weiß</span></button><button aria-pressed="false" class="onboarding-choice" data-choice="emerald" type="button"><span class="preview"></span><strong>Farbig</strong><span>Farbe wählen</span></button></div><div class="onboarding-color-options hidden" id="onboardingColors"><button aria-label="Emerald" data-color="emerald" style="--swatch:#16924c"></button><button aria-label="Blau" data-color="blue" style="--swatch:#1977b9"></button><button aria-label="Violett" data-color="violet" style="--swatch:#8654ba"></button><button aria-label="Türkis" data-color="teal" style="--swatch:#148f8c"></button><button aria-label="Gold" data-color="amber" style="--swatch:#ba8731"></button><button aria-label="Rosé" data-color="rose" style="--swatch:#b45d79"></button></div><button id="onboardingConfirm" type="button">Weiter</button></div></div><script>
 const $=id=>document.getElementById(id), key='schivio-v01';
 let data;try{data=JSON.parse(localStorage.getItem(key))||{}}catch{data={}}
@@ -326,7 +326,11 @@ const types=['F','S','N','X'],labels={F:'Früh',S:'Spät',N:'Nacht',U:'Urlaub',K
 const defaultColors={F:'#176f68',S:'#493078',N:'#620b0b',X:'#28536c',U:'#3e7653',K:'#824657',T:'#33658b',A:'#556477'};
 function shiftTitle(code){return data.customShifts?.[code]?.name||data.shiftMeta?.[code]?.name||labels[code]||code}
 function shiftColor(code){return data.customShifts?.[code]?.color||data.shiftMeta?.[code]?.color||defaultColors[code]||'#36536a'}
-function displayShiftColor(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return hex;const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));const vivid=data.shiftIntensity!=='subtle';const target=vivid?Math.max(...rgb):0;const boosted=rgb.map(v=>vivid?Math.min(255,Math.round(v*1.24+(v===target?15:0))):Math.round(v*.78+18));return '#'+boosted.map(v=>v.toString(16).padStart(2,'0')).join('')}
+function displayShiftColor(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return hex;const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));const toHex=a=>'#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+if(data.shiftIntensity!=='subtle'){const target=Math.max(...rgb);return toHex(rgb.map(v=>Math.min(255,v*1.24+(v===target?15:0))))}
+/* Dezent: Farbton bleibt, Sättigung und Helligkeit werden einheitlich gedämpft */
+const [r,g,b]=rgb.map(v=>v/255),mx=Math.max(r,g,b),mn=Math.min(r,g,b),l0=(mx+mn)/2,d=mx-mn;let h=0,s0=0;if(d){s0=d/(1-Math.abs(2*l0-1));h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}
+const light=document.body&&document.body.dataset.theme==='light';const s1=Math.min(s0*.45,.3),l1=light?.85:.33;const c=(1-Math.abs(2*l1-1))*s1,x=c*(1-Math.abs((h/60)%2-1)),m0=l1-c/2;const [r1,g1,b1]=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];return toHex([r1+m0,g1+m0,b1+m0].map(v=>v*255))}
 function updateIntensityUI(){document.querySelectorAll('[data-intensity]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.intensity===(data.shiftIntensity||'vivid'))))}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-intensity]');if(!b)return;data.shiftIntensity=b.dataset.intensity;persist();updateIntensityUI();renderCalendarMonths()});
 function contrastColor(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return '#fff';const c=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return c[0]*.2126+c[1]*.7152+c[2]*.0722>.32?'#172027':'#fff'}
@@ -355,8 +359,9 @@ if(state==='SN'){const d=new Date(y,10,23,12);d.setDate(23-((d.getDay()+4)%7));h
 if(state==='TH')add(9,20);
 if(state==='BB'){move(0);move(49)}
 return h}
-function monthTarget(y,m){const manual=Number(data.monthTargets?.[dateKey(y,m,1).slice(0,7)]);const hasManual=Object.prototype.hasOwnProperty.call(data.monthTargets||{},dateKey(y,m,1).slice(0,7))&&Number.isFinite(manual)&&manual>=0&&manual<=300;const weekly=Number(data.profile.weekly),workdays=Number(data.profile.workdays||5),state=data.profile.state||'NW';const fixed=Number(data.profile.fixedMonthlyTarget),hasFixed=Number.isFinite(fixed)&&fixed>0&&fixed<=300;if(!(weekly>0&&weekly<=60)&&!hasManual&&!hasFixed)return null;const holidays=holidaySet(y,state),days=new Date(y,m+1,0).getDate();let planned=0,holidayCount=0;for(let d=1;d<=days;d++){const wd=new Date(y,m,d,12).getDay();if(wd!==0&&(workdays===6||wd!==6)){const k=dateKey(y,m,d);if(holidays.has(k))holidayCount++;else planned++}}return {target:hasManual?manual:(hasFixed?fixed:planned*weekly/workdays),days:planned,holidays:holidayCount,weekly:hasFixed?fixed*workdays/Math.max(planned,1):weekly,workdays,manual:hasManual}}
-function monthStats(y,m){let worked=0,credit=0,absence=0;const target=monthTarget(y,m),holidays=holidaySet(y,data.profile.state||'NW');const workdays=Number(data.profile.workdays||5);for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const k=dateKey(y,m,d),t=data.shifts[k];if(types.includes(t))worked+=duration(data.templates[t])||0;else if(data.customShifts?.[t])worked+=data.customShifts[t].bd?.stage==='RB'?(Number(data.rbWork?.[k])||0):(duration(data.customShifts[t])||0);else if(['U','K','T'].includes(t)){const wd=new Date(y,m,d,12).getDay();if(target&&wd!==0&&(workdays===6||wd!==6)&&!holidays.has(k)){credit+=target.weekly/workdays;absence++}}}return {worked,credit,absence,total:worked+credit+Number(data.adjustments[dateKey(y,m,1).slice(0,7)]||0)}}
+function workdayList(){const w=String(data.profile?.workdays||'5');if(w==='6')return [1,2,3,4,5,6];const mt=/^m:([0-6]{1,7})$/.exec(w);if(mt){const l=[...new Set(mt[1].split('').map(Number))].sort();if(l.length)return l}return [1,2,3,4,5]}
+function monthTarget(y,m){const manual=Number(data.monthTargets?.[dateKey(y,m,1).slice(0,7)]);const hasManual=Object.prototype.hasOwnProperty.call(data.monthTargets||{},dateKey(y,m,1).slice(0,7))&&Number.isFinite(manual)&&manual>=0&&manual<=300;const weekly=Number(data.profile.weekly),wdl=workdayList(),workdays=wdl.length,state=data.profile.state||'NW';const fixed=Number(data.profile.fixedMonthlyTarget),hasFixed=Number.isFinite(fixed)&&fixed>0&&fixed<=300;if(!(weekly>0&&weekly<=60)&&!hasManual&&!hasFixed)return null;const holidays=holidaySet(y,state),days=new Date(y,m+1,0).getDate();let planned=0,holidayCount=0;for(let d=1;d<=days;d++){const wd=new Date(y,m,d,12).getDay();if(wdl.includes(wd)){const k=dateKey(y,m,d);if(holidays.has(k))holidayCount++;else planned++}}return {target:hasManual?manual:(hasFixed?fixed:planned*weekly/workdays),days:planned,holidays:holidayCount,weekly:hasFixed?fixed*workdays/Math.max(planned,1):weekly,workdays,manual:hasManual}}
+function monthStats(y,m){let worked=0,credit=0,absence=0;const target=monthTarget(y,m),holidays=holidaySet(y,data.profile.state||'NW');const wdl=workdayList(),workdays=wdl.length;for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const k=dateKey(y,m,d),t=data.shifts[k];if(types.includes(t))worked+=duration(data.templates[t])||0;else if(data.customShifts?.[t])worked+=data.customShifts[t].bd?.stage==='RB'?(Number(data.rbWork?.[k])||0):(duration(data.customShifts[t])||0);else if(['U','K','T'].includes(t)){const wd=new Date(y,m,d,12).getDay();if(target&&wdl.includes(wd)&&!holidays.has(k)){credit+=target.weekly/workdays;absence++}}}return {worked,credit,absence,total:worked+credit+Number(data.adjustments[dateKey(y,m,1).slice(0,7)]||0)}}
 function monthHours(y,m){return monthStats(y,m).total}
 function fmtHours(n){return n.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})}
 function monthKey(y,m){return dateKey(y,m,1).slice(0,7)}
@@ -381,7 +386,7 @@ function carryAt(y,m){
   return {sum,first:months[0]||null,gaps:missing,months:count};
 }
 function accumulated(y,m){return carryAt(y,m)}
-function renderAbsences(y,m){const root=$('absenceBreakdown');root.replaceChildren();const target=monthTarget(y,m),holidays=holidaySet(y,data.profile.state||'NW'),workdays=Number(data.profile.workdays||5);const kinds=[['K','Krankheit'],['U','Urlaub'],['T','Fortbildung'],['A','Überstundenabbau']];for(const [code,label] of kinds){let count=0,eligible=0;for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const k=dateKey(y,m,d);if(data.shifts[k]!==code)continue;count++;const wd=new Date(y,m,d,12).getDay();if(wd!==0&&(workdays===6||wd!==6)&&!holidays.has(k))eligible++}if(!count)continue;const item=document.createElement('div');item.className='history-row';const left=document.createElement('div'),title=document.createElement('strong'),detail=document.createElement('small'),right=document.createElement('strong');title.textContent=label;detail.textContent=count+' Kalendertag(e) · '+eligible+' reguläre Arbeitstage'+(code==='A'?' · geschätzter Zeitabbau, nicht zusätzlich verrechnet':'');right.textContent=code==='A'?(target?'−'+fmtHours(eligible*target.weekly/workdays)+' h*':'Profil fehlt'):target?fmtHours(eligible*target.weekly/workdays)+' h':'Profil fehlt';left.append(title,detail);item.append(left,right);root.append(item)}if(!root.children.length){const note=document.createElement('p');note.className='note';note.textContent='Keine Abwesenheiten im ausgewählten Monat erfasst.';root.append(note)}if(!target){const note=document.createElement('p');note.className='note';note.textContent='Für Stundengutschriften bitte Wochenstunden im Profil speichern.';root.append(note)}}
+function renderAbsences(y,m){const root=$('absenceBreakdown');root.replaceChildren();const target=monthTarget(y,m),holidays=holidaySet(y,data.profile.state||'NW'),wdl=workdayList(),workdays=wdl.length;const kinds=[['K','Krankheit'],['U','Urlaub'],['T','Fortbildung'],['A','Überstundenabbau']];for(const [code,label] of kinds){let count=0,eligible=0;for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const k=dateKey(y,m,d);if(data.shifts[k]!==code)continue;count++;const wd=new Date(y,m,d,12).getDay();if(wdl.includes(wd)&&!holidays.has(k))eligible++}if(!count)continue;const item=document.createElement('div');item.className='history-row';const left=document.createElement('div'),title=document.createElement('strong'),detail=document.createElement('small'),right=document.createElement('strong');title.textContent=label;detail.textContent=count+' Kalendertag(e) · '+eligible+' reguläre Arbeitstage'+(code==='A'?' · geschätzter Zeitabbau, nicht zusätzlich verrechnet':'');right.textContent=code==='A'?(target?'−'+fmtHours(eligible*target.weekly/workdays)+' h*':'Profil fehlt'):target?fmtHours(eligible*target.weekly/workdays)+' h':'Profil fehlt';left.append(title,detail);item.append(left,right);root.append(item)}if(!root.children.length){const note=document.createElement('p');note.className='note';note.textContent='Keine Abwesenheiten im ausgewählten Monat erfasst.';root.append(note)}if(!target){const note=document.createElement('p');note.className='note';note.textContent='Für Stundengutschriften bitte Wochenstunden im Profil speichern.';root.append(note)}}
 function renderHistory(){const root=$('monthHistory');root.replaceChildren();const y=shown.getFullYear(),m=shown.getMonth();for(let back=5;back>=0;back--){const date=new Date(y,m-back,1),yy=date.getFullYear(),mm=date.getMonth(),prefix=dateKey(yy,mm,1).slice(0,7);const hasData=hasEntriesOrComplete(yy,mm);if(!hasData&&back!==0)continue;const t=monthTarget(yy,mm),v=monthStats(yy,mm),delta=t?v.total-t.target:null;const item=document.createElement('div');item.className='history-row'+(back===0?' current':'');const left=document.createElement('div'),title=document.createElement('strong'),detail=document.createElement('small');title.textContent=date.toLocaleDateString('de-DE',{month:'short',year:'numeric'});detail.textContent=`Prognose · Geplant ${fmtHours(v.worked)} h · Gutschrift ${fmtHours(v.credit)} h · Korrektur ${fmtHours(Number(data.adjustments[prefix]||0))} h · Auszahlung ${fmtHours(Number(data.hourPayouts?.[prefix]||0))} h`;left.append(title,detail);const right=document.createElement('strong');right.textContent=displaySaldoText(delta===null?null:delta-Number(data.hourPayouts?.[prefix]||0));item.append(left,right);root.append(item)}if(!root.children.length)root.textContent='Noch keine Monate erfasst.'}
 function updateSelection(){const keys=selectionStart?daysBetween(selectionStart,selectionEnd):[];document.querySelectorAll('.day[data-date]').forEach(b=>b.classList.toggle('selected',keys.includes(b.dataset.date)));return keys}
 function closeEditor(){$('shiftChoices').classList.add('hidden');$('shiftTrigger').setAttribute('aria-expanded','false');$('modalBackdrop').classList.add('hidden');document.body.classList.remove('modal-open')}
@@ -541,9 +546,16 @@ function renderPlannerItems(){const root=$('plannerItems');root.replaceChildren(
  let timer=null,started=false,x0=0,y0=0,lastX=0,raf=0;
  const clear=()=>{clearTimeout(timer);timer=null};
  const autoScroll=()=>{if(!started)return;const r=root.getBoundingClientRect(),edge=40;if(lastX<r.left+edge)root.scrollLeft-=8;else if(lastX>r.right-edge)root.scrollLeft+=8;moveTo(lastX);raf=requestAnimationFrame(autoScroll)};
- const moveTo=x=>{const others=[...root.querySelectorAll('button[data-code]:not([data-code=""])')].filter(o=>o!==b);let before=null;for(const o of others){const r=o.getBoundingClientRect();if(x<r.left+r.width/2){before=o;break}}const del=root.querySelector('button[data-code=""]');const ref=before||del;if(ref!==b.nextSibling)root.insertBefore(b,ref)};
- const begin=()=>{started=true;b.classList.add('reordering');document.body.classList.add('planner-reordering');if(navigator.vibrate)navigator.vibrate(18);raf=requestAnimationFrame(autoScroll)};
- const end=commit=>{clear();cancelAnimationFrame(raf);b.classList.remove('reordering');document.body.classList.remove('planner-reordering');if(!started)return;started=false;suppressPlannerClick=true;setTimeout(()=>{suppressPlannerClick=false},150);if(commit){const order=[...root.querySelectorAll('button[data-code]')].map(x=>x.dataset.code).filter(Boolean);data.plannerOrder=order;persist()}renderPlannerItems()};
+ let grab=0,tx=0;
+ const ease='cubic-bezier(.2,.85,.25,1)';
+ const natLeft=()=>b.getBoundingClientRect().left-tx;
+ const follow=x=>{tx=x-grab-natLeft();b.style.transform='translateX('+tx+'px) scale(1.08)'};
+ const moveTo=x=>{const list=[...root.querySelectorAll('button[data-code]:not([data-code=""])')].filter(o=>o!==b);let before=null;for(const o of list){const r=o.getBoundingClientRect();const mid=r.left+r.width/2;if(x<mid){before=o;break}}const del=root.querySelector('button[data-code=""]');const ref=before||del;
+  if(ref!==b.nextSibling){const others=[...root.querySelectorAll('button[data-code]')].filter(o=>o!==b);const first=new Map(others.map(o=>[o,o.getBoundingClientRect().left]));root.insertBefore(b,ref);
+   others.forEach(o=>{const dx=first.get(o)-o.getBoundingClientRect().left;if(Math.abs(dx)<1)return;o.style.transition='none';o.style.transform='translateX('+dx+'px)';void o.offsetWidth;o.style.transition='transform .3s '+ease;o.style.transform=''});if(navigator.vibrate)navigator.vibrate(6)}
+  follow(x)};
+ const begin=()=>{const r=b.getBoundingClientRect();grab=x0-r.left;tx=0;started=true;b.classList.add('reordering');b.style.transition='transform .18s '+ease+',box-shadow .2s';b.style.transform='scale(1.08)';document.body.classList.add('planner-reordering');if(navigator.vibrate)navigator.vibrate(18);raf=requestAnimationFrame(autoScroll)};
+ const end=commit=>{clear();cancelAnimationFrame(raf);document.body.classList.remove('planner-reordering');if(!started){b.classList.remove('reordering');return}started=false;suppressPlannerClick=true;setTimeout(()=>{suppressPlannerClick=false},150);b.style.transition='transform .28s '+ease+',box-shadow .2s';b.style.transform='';tx=0;if(commit){const order=[...root.querySelectorAll('button[data-code]')].map(x=>x.dataset.code).filter(Boolean);data.plannerOrder=order;persist()}setTimeout(()=>{b.classList.remove('reordering');renderPlannerItems()},290)};
  b.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;x0=lastX=e.clientX;y0=e.clientY;started=false;clear();timer=setTimeout(begin,400)});
  b.addEventListener('pointermove',e=>{lastX=e.clientX;if(!started){if(Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10)clear();return}e.preventDefault()});
  // Nach dem langen Drücken das Scrollen der Leiste blockieren, sonst bricht der Browser die Geste ab.
@@ -1346,7 +1358,7 @@ refresh();
    '<button class="gp-row" type="button" id="gpZuToggle" aria-expanded="false"'+(lines.length?'':' disabled')+'><i class="gp-dot"></i><span>Zuschläge<small>'+(lines.length?'für Nacht, Wochenende & Feiertage':'keine in diesem Monat')+'</small></span><b>'+eur(zu)+'</b>'+(lines.length?'<em class="gp-chev">▾</em>':'')+'</button>'+
    '<div class="gp-sub" id="gpZuLines" hidden>'+lines.map(x=>'<div><span>'+esc(short(x.label))+'<em>'+num(x.hours)+' Std.</em></span><b>'+eur(x.euro)+'</b></div>').join('')+'</div>'+
    warns.map(n=>'<div class="gp-warn">'+esc(n)+'</div>').join('')+
-   '<button class="gp-btn" type="button" data-gp-open>Zulagen & Einstellungen</button>'+
+   '<button class="gp-btn" type="button" data-gp-open>Gehalt anpassen</button>'+
    '<details class="gp-how"><summary>Wie wird gerechnet?</summary><ul>'+(r.notes||[]).filter(n=>!warns.includes(n)).map(n=>'<li>'+esc(n)+'</li>').join('')+'<li>Prognose aus deinen eingetragenen Diensten – keine verbindliche Abrechnung.</li></ul></details>';
   card.querySelectorAll('[data-gp-open]').forEach(b=>b.onclick=open);
   const t=card.querySelector('#gpZuToggle');if(t&&lines.length)t.onclick=()=>{const o=t.getAttribute('aria-expanded')!=='true';t.setAttribute('aria-expanded',o);card.querySelector('#gpZuLines').hidden=!o}}
@@ -1969,6 +1981,33 @@ body[data-theme="light"] .bottom-tabs button.active .tab-icon{color:var(--sx-b)}
 .sx-sw[aria-checked="true"]{background:var(--sx-b)!important}
 .sx-sw[aria-checked="true"]::after{transform:translateX(20px)}
 
+.sx-ds .ex{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-4px 0 2px 78px;animation:sxUp .4s var(--sx-ease) both}
+.sx-ds .ex .tb,.sx-ds .ph .tb{width:48px!important;height:48px!important;min-height:0!important;padding:0!important;margin:0!important;border-radius:12px!important;overflow:hidden;border:1px solid var(--sx-line)!important;background:var(--sx-bg)!important;box-shadow:none!important;flex:none}
+.sx-ds .tb img{width:100%;height:100%;object-fit:cover;display:block}
+.sx-ds .mp,.sx-ds .ch2{display:inline-flex!important;align-items:center;gap:6px;height:36px!important;min-height:0!important;padding:0 12px!important;margin:0!important;border-radius:99px!important;border:1px solid var(--sx-line)!important;background:color-mix(in srgb,var(--sx-text) 6%,transparent)!important;color:var(--sx-text)!important;font:inherit;font-size:13px!important;font-weight:700!important;box-shadow:none!important;width:auto!important}
+.sx-ds .mp svg,.sx-ds .ch2 svg{width:15px;height:15px;color:var(--sx-a)}
+.sx-ds .loc{display:flex;flex-direction:column;gap:8px}
+.sx-ds .loc .lb{display:flex;flex-wrap:wrap;gap:6px}
+.sx-ds .loc .hint{font-size:12px;color:var(--sx-muted);line-height:1.4}
+.sx-ds .ph{display:flex;flex-wrap:wrap;gap:8px}
+.sx-ds .ph .pt{position:relative;animation:sxDot .35s var(--sx-ease) both}
+.sx-ds .ph .pt .tb{width:68px!important;height:68px!important;border-radius:14px!important}
+.sx-ds .ph .rmv{position:absolute!important;top:-6px;right:-6px;width:24px!important;height:24px!important;min-height:0!important;padding:0!important;margin:0!important;border-radius:50%!important;border:2px solid var(--sx-sheet)!important;background:var(--sx-text)!important;color:var(--sx-sheet)!important;display:grid!important;place-items:center;box-shadow:none!important}
+.sx-ds .ph .rmv svg{width:12px;height:12px}
+.sx-ds .ph .add{width:68px;height:68px;border-radius:14px;border:1.5px dashed color-mix(in srgb,var(--sx-text) 30%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--sx-muted);font-size:11.5px;font-weight:700;cursor:pointer;margin:0}
+.sx-ds .ph .add svg{width:22px;height:22px;color:var(--sx-a)}
+.sx-lb{position:fixed;inset:0;z-index:1400;background:rgba(0,0,0,.92);display:grid;place-items:center;opacity:0;transition:opacity .25s}
+.sx-lb.on{opacity:1}.sx-lb[hidden]{display:none}
+.sx-lb img{max-width:96vw;max-height:84vh;border-radius:10px;object-fit:contain}
+.sx-lb img.in{animation:sxZoom .3s var(--sx-ease) both}
+@keyframes sxZoom{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.sx-lb button{position:absolute!important;width:46px!important;height:46px!important;min-height:0!important;padding:0!important;margin:0!important;border-radius:50%!important;border:0!important;background:rgba(255,255,255,.14)!important;color:#fff!important;display:grid!important;place-items:center;box-shadow:none!important}
+.sx-lb button[hidden]{display:none!important}
+.sx-lb button svg{width:22px;height:22px}
+.sx-lb .lx{top:max(14px,env(safe-area-inset-top));right:14px}
+.sx-lb .lp{left:10px;top:50%}.sx-lb .ln2{right:10px;top:50%}.sx-lb .ln2 svg{transform:scaleX(-1)}
+.sx-lb .lc{position:absolute;bottom:max(18px,env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#fff;font-size:13px;font-weight:600;opacity:.8}
+
 /* ---------- Reiter „Mehr“ ---------- */
 #settings.sx-mx>*:not(.mx){display:none!important}
 #settings .mx{display:flex;flex-direction:column;gap:22px;padding:4px 0 28px;color:var(--sx-text)}
@@ -2041,6 +2080,14 @@ body[data-theme="light"] .mx .th button.on{border-color:var(--sx-b)!important}
 .sx-toast.on{transform:translate(-50%,0);opacity:1}
 body.modal-open .sx-toast{bottom:auto;top:calc(env(safe-area-inset-top) + 14px);transform:translate(-50%,-20px)}body.modal-open .sx-toast.on{transform:translate(-50%,0)}
 
+.mxp .wd{display:flex;flex-direction:column;gap:10px}
+.mxp .wdc{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;animation:sxUp .3s var(--sx-ease) both}
+.mxp .wdc button{height:40px!important;min-height:0!important;padding:0!important;margin:0!important;border-radius:11px!important;border:1px solid var(--sx-line)!important;background:var(--sx-bg)!important;color:var(--sx-muted)!important;font:inherit;font-size:13px!important;font-weight:800!important;box-shadow:none!important;width:auto!important;transition:background .2s,color .2s,transform .15s}
+.mxp .wdc button.on{background:linear-gradient(135deg,var(--sx-a),var(--sx-b))!important;color:var(--sx-on)!important;border-color:transparent!important}
+.mxp .wdc button:active{transform:scale(.92)}
+.mxp .wdi{margin:0;font-size:12.5px;line-height:1.45;color:var(--sx-muted)}
+#plannerItems button.reordering{position:relative;z-index:5;box-shadow:0 12px 26px rgba(0,0,0,.45)!important}
+
 /* Unterseiten (Tarifprofil, Prognose) */
 .mxp{position:fixed;inset:0;z-index:1100;background:var(--sx-bg);color:var(--sx-text);overflow-y:auto;overscroll-behavior:contain;transform:translateX(100%);transition:transform .42s var(--sx-ease);box-shadow:-20px 0 40px rgba(0,0,0,.35)}
 body:not([data-theme="light"]) .mxp{background:var(--surface-deep,#191a1d)}
@@ -2102,7 +2149,7 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
 <script>
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.55';
+ const VERSION='1.0.56';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -2119,6 +2166,9 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
   chev:'<svg class="ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
   cv:'<svg class="cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
   chevD:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+  map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+  loc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>',
+  cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
   F:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></svg>',
@@ -2176,11 +2226,32 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
  let menuOpen=false;
  function setMenu(on){menuOpen=on;fab.classList.toggle('sx-open',on);scrim.classList.toggle('on',on);menu.classList.toggle('on',on);paintFab();if(on){buzz();setTimeout(()=>menu.querySelector('button')?.focus({preventScroll:true}),60)}}
  if(fab){fab.onclick=()=>{if(plannerActive){setPlanner(false);return}setMenu(!menuOpen)};paintFab()}
- scrim.addEventListener('click',()=>setMenu(false));
+ scrim.addEventListener('click',()=>setMenu(false));window.SchivioFab={isOpen:()=>menuOpen,close:()=>setMenu(false)};
  menu.addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;buzz();setMenu(false);if(b.dataset.a==='plan')setTimeout(()=>setPlanner(true),120);else{const n=new Date(),inShown=n.getFullYear()===shown.getFullYear()&&n.getMonth()===shown.getMonth();DS.openEvent(inShown?todayKey():dateKey(shown.getFullYear(),shown.getMonth(),1))}});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&menuOpen)setMenu(false)});
  const oldSP=setPlanner;setPlanner=function(on){if(menuOpen)setMenu(false);const r=oldSP.apply(this,arguments);paintFab();return r};
  const oldRPI=renderPlannerItems;renderPlannerItems=function(){const r=oldRPI.apply(this,arguments);document.querySelectorAll('#plannerItems button[data-code]').forEach(b=>{const c=b.dataset.code;if(c){b.style.setProperty('--c',sColor(c));b.style.borderLeft=''}});return r};
+
+ /* ---------- Fotos (IndexedDB) & Karten ---------- */
+ const Media=(()=>{let p=null;const db=()=>p||(p=new Promise((res,rej)=>{const r=indexedDB.open('schivio-media',1);r.onupgradeneeded=()=>r.result.createObjectStore('img');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+  const run=(mode,fn)=>db().then(d=>new Promise((res,rej)=>{const t=d.transaction('img',mode);const q=fn(t.objectStore('img'));t.oncomplete=()=>res(q?.result);t.onerror=()=>rej(t.error)}));
+  const load=file=>new Promise((res,rej)=>{const u=URL.createObjectURL(file);const i=new Image();i.onload=()=>{res(i);setTimeout(()=>URL.revokeObjectURL(u),500)};i.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};i.src=u});
+  const canvas=(img,max,square)=>{const w=img.naturalWidth,h=img.naturalHeight;const c=document.createElement('canvas');if(square){const sz=Math.min(w,h);c.width=c.height=max;c.getContext('2d').drawImage(img,(w-sz)/2,(h-sz)/2,sz,sz,0,0,max,max)}else{const r=Math.min(1,max/Math.max(w,h));c.width=Math.round(w*r);c.height=Math.round(h*r);c.getContext('2d').drawImage(img,0,0,c.width,c.height)}return c};
+  return {
+   async prepare(file){const img=await load(file);const thumb=canvas(img,160,true).toDataURL('image/jpeg',.72);const blob=await new Promise(r=>canvas(img,1600,false).toBlob(r,'image/jpeg',.82));return {id:'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),thumb,blob}},
+   put:(k,v)=>run('readwrite',s=>s.put(v,k)),get:k=>run('readonly',s=>s.get(k)).catch(()=>null),del:k=>run('readwrite',s=>s.delete(k)).catch(()=>{})
+  }})();
+ const Lightbox=(()=>{const n=el('<div class="sx-lb" hidden role="dialog" aria-modal="true" aria-label="Foto"><button type="button" class="lx" aria-label="Schließen">'+ICON.x+'</button><img alt=""><button type="button" class="lp" aria-label="Vorheriges Foto">'+ICON.back+'</button><button type="button" class="ln2" aria-label="Nächstes Foto">'+ICON.back+'</button><span class="lc"></span></div>');document.body.append(n);
+  const img=n.querySelector('img');let list=[],idx=0,url=null,open=false;
+  async function show(i){idx=(i+list.length)%list.length;const it=list[idx];if(url){URL.revokeObjectURL(url);url=null}img.src=it.thumb;img.classList.remove('in');void img.offsetWidth;img.classList.add('in');n.querySelector('.lc').textContent=list.length>1?(idx+1)+' / '+list.length:'';n.querySelectorAll('.lp,.ln2').forEach(b=>b.hidden=list.length<2);
+   const blob=it.blob||await Media.get(it.id);if(blob&&list[idx]===it&&open){url=URL.createObjectURL(blob);img.src=url}}
+  function close(){if(!open)return;open=false;n.classList.remove('on');setTimeout(()=>{n.hidden=true;img.removeAttribute('src');if(url){URL.revokeObjectURL(url);url=null}},reduce?0:260)}
+  n.querySelector('.lx').onclick=close;n.querySelector('.lp').onclick=e=>{e.stopPropagation();show(idx-1)};n.querySelector('.ln2').onclick=e=>{e.stopPropagation();show(idx+1)};n.addEventListener('click',e=>{if(e.target===n)close()});
+  let sx=0,sy=0;n.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});n.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(dy>90&&Math.abs(dy)>Math.abs(dx))close();else if(Math.abs(dx)>60&&list.length>1)show(idx+(dx<0?1:-1))},{passive:true});
+  return {open(l,i){if(!l.length)return;list=l;open=true;n.hidden=false;void n.offsetWidth;n.classList.add('on');show(i)},close,isOpen:()=>open}})();
+ const mapQuery=e=>e.mapUrl?e.mapUrl:e.geo?e.geo.lat+','+e.geo.lng:(e.place&&e.place!=='Aktueller Standort'?e.place:'');
+ function openMap(e){const q=mapQuery(e);if(!q)return;const url=/^https?:/i.test(q)?q:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);window.open(url,'_blank','noopener')}
+ window.SchivioLightbox=Lightbox;
 
  /* ---------- Tages-Sheet ---------- */
  const DS=(()=>{
@@ -2222,12 +2293,13 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
    let html=head(wkday(k),dTitle(k),{hol:holidayName(k)});
    if(items.length){html+='<div class="tl">';items.forEach((it,i)=>{const ic=it.kind==='event'?ICON.pin:(ICON[it.code]||ICON.X);const id=it.kind==='event'?it.ev.id:it.kind;
      html+='<button type="button" class="it'+(it.kind==='prev'?' ghost':'')+(flashId&&flashId===id?' flash':'')+'" data-x="'+(it.kind==='event'?'ev':it.kind==='prev'?'prev':'shift')+'" data-id="'+esc(id)+'" style="--c:'+esc(it.color)+';animation-delay:'+(i*45)+'ms" aria-label="'+esc(it.title+', '+it.sub+', bearbeiten')+'"><span class="tm"><b>'+esc(it.t1)+'</b><small>'+esc(it.t2)+'</small></span><span class="nd"><i></i></span><span class="cd"><span class="ic">'+ic+'</span><span class="tx"><b>'+esc(it.title)+'</b><small>'+esc(it.sub)+'</small></span><span class="kd">'+(it.kind==='event'?'Termin':'Dienst')+'</span>'+ICON.chev+'</span></button>';
+     if(it.kind==='event'){const e=it.ev,imgs=Array.isArray(e.images)?e.images:[];const mq=mapQuery(e);if(imgs.length||mq){html+='<div class="ex" style="animation-delay:'+(i*45+60)+'ms">'+(mq?'<button type="button" class="mp" data-x="map" data-id="'+esc(e.id)+'">'+ICON.map+'Karte</button>':'')+imgs.slice(0,6).map((im,j)=>'<button type="button" class="tb" data-x="img" data-id="'+esc(e.id)+'" data-i="'+j+'" aria-label="Foto '+(j+1)+' ansehen"><img alt="" src="'+esc(im.thumb)+'"></button>').join('')+'</div>'}}
      if(it.rb)html+='<label class="rb">Einsatzzeit in der Rufbereitschaft (Std., aufgerundet) <input type="number" min="0" max="24" step="1" inputmode="numeric" data-rb value="'+esc(data.rbWork?.[k]||'')+'" placeholder="0"></label>'});html+='</div>'}
    else html+='<div class="em"><span>'+ICON.cal+'</span><b>Noch nichts geplant</b><small>Trage einen Dienst oder Termin ein.</small></div>';
    html+='<div class="ac">'+(c?'':'<button type="button" class="bt" data-x="addShift">'+ICON.A+'Dienst</button>')+'<button type="button" class="bt pr" data-x="addEv">'+ICON.plus+'Termin</button></div>';
    const node=el('<div>'+html+'</div>');
    const rb=node.querySelector('[data-rb]');if(rb)rb.onchange=()=>{const v=Math.max(0,Math.min(24,Math.ceil(Number(rb.value)||0)));data.rbWork=data.rbWork||{};if(v)data.rbWork[k]=v;else delete data.rbWork[k];rb.value=v||'';persist();render()};
-   wire(node,{shift:()=>swap(shiftView(k,k),1),prev:b=>swap(shiftView(pk,k),1),addShift:()=>swap(shiftView(k,k),1),addEv:()=>swap(eventView(k,null,k),1),ev:b=>{const e=evList(k).find(x=>x.id===b.dataset.id);if(e)swap(eventView(k,e,k),1)}});
+   wire(node,{shift:()=>swap(shiftView(k,k),1),prev:b=>swap(shiftView(pk,k),1),addShift:()=>swap(shiftView(k,k),1),addEv:()=>swap(eventView(k,null,k),1),ev:b=>{const e=evList(k).find(x=>x.id===b.dataset.id);if(e)swap(eventView(k,e,k),1)},map:b=>{const e=evList(k).find(x=>x.id===b.dataset.id);if(e)openMap(e)},img:b=>{const e=evList(k).find(x=>x.id===b.dataset.id);if(e)Lightbox.open(e.images||[],Number(b.dataset.i)||0)}});
    return node}
 
   /* Dienst wählen / ändern */
@@ -2248,35 +2320,54 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
     '<label>Datum<input type="date" data-f="date" value="'+esc(k)+'"></label>'+
     '<div class="sw"><span>Ganztägig</span><button type="button" class="sx-sw" role="switch" aria-checked="'+allDay+'" aria-label="Ganztägig" data-x="ad"></button></div>'+
     '<div class="r2" data-times'+(allDay?' hidden':'')+'><label>Beginn<input type="time" data-f="start" value="'+esc(s)+'"></label><label>Ende<input type="time" data-f="end" value="'+esc(e)+'"></label></div>'+
-    '<label>Ort (optional)<input data-f="place" maxlength="80" placeholder="z. B. Praxis Dr. Meier" value="'+esc(ev?.place||'')+'"></label>'+
-    '<label>Notiz (optional)<textarea data-f="note" maxlength="300" placeholder="">'+esc(ev?.note||'')+'</textarea></label>'+
+    '<div class="loc"><label>Ort (optional)<input data-f="place" maxlength="300" placeholder="Adresse oder Google-Maps-Link" value="'+esc(ev?.mapUrl||ev?.place||'')+'"></label><div class="lb"><button type="button" class="ch2" data-x="mapsearch">'+ICON.map+'In Google Maps suchen</button><button type="button" class="ch2" data-x="geo">'+ICON.loc+'Aktueller Standort</button></div><small class="hint" data-geo>'+(ev?.geo?'Standort gespeichert':'Tipp: In Google Maps einen Ort teilen → „Link kopieren“ → hier einfügen.')+'</small></div>'+
+    '<label>Notiz (optional)<textarea data-f="note" maxlength="500" placeholder="">'+esc(ev?.note||'')+'</textarea></label>'+
+    '<div><span style="display:block;font-size:12.5px;font-weight:700;color:var(--sx-muted);margin-bottom:8px">Fotos (optional)</span><div class="ph" data-ph></div></div>'+
     '<div><span style="display:block;font-size:12.5px;font-weight:700;color:var(--sx-muted);margin-bottom:8px">Farbe</span><div class="cl">'+EV_COLORS.map(c=>'<button type="button" data-x="col" data-c="'+c+'" class="'+(c===col?'on':'')+'" style="--c:'+c+'" aria-label="Farbe '+c+'"></button>').join('')+'</div></div>'+
     '<div class="er" data-err></div></div>'+
     '<div class="ac">'+(isNew?'':'<button type="button" class="bt dg" data-x="del">'+ICON.trash+'Löschen</button>')+'<button type="button" class="bt pr" data-x="save">'+ICON.check+'Speichern</button></div>';
    const node=el('<div>'+html+'</div>');const f=n=>node.querySelector('[data-f="'+n+'"]');const err=node.querySelector('[data-err]');
+   let geo=ev?.geo||null;const imgs=(Array.isArray(ev?.images)?ev.images:[]).map(x=>({...x}));const removed=[];
+   const ph=node.querySelector('[data-ph]');
+   const paintPh=()=>{ph.innerHTML=imgs.map((im,j)=>'<span class="pt"><button type="button" class="tb" data-x="pv" data-i="'+j+'" aria-label="Foto '+(j+1)+' ansehen"><img alt="" src="'+esc(im.thumb)+'"></button><button type="button" class="rmv" data-x="prm" data-i="'+j+'" aria-label="Foto entfernen">'+ICON.x+'</button></span>').join('')+(imgs.length<6?'<label class="add"><input type="file" accept="image/*" multiple hidden data-file>'+ICON.cam+'<span>'+(imgs.length?'Mehr':'Foto')+'</span></label>':'');
+    ph.querySelector('[data-file]')?.addEventListener('change',async e2=>{const files=[...e2.target.files].slice(0,6-imgs.length);e2.target.value='';for(const file of files){try{const r=await Media.prepare(file);imgs.push(r);paintPh()}catch(x){toast('Dieses Bild konnte nicht geladen werden.')}}})};
+   paintPh();
+   f('place').addEventListener('input',()=>{if(geo&&f('place').value.trim()!==ev?.place){geo=null;node.querySelector('[data-geo]').textContent='Tipp: In Google Maps einen Ort teilen → „Link kopieren“ → hier einfügen.'}});
    wire(node,{back:()=>swap(dayView(ret),-1),
+    mapsearch:()=>{const q=f('place').value.trim();if(!q){toast('Gib zuerst eine Adresse oder einen Namen ein.');f('place').focus();return}openMap({place:q})},
+    geo:b=>{if(!navigator.geolocation){toast('Standort ist auf diesem Gerät nicht verfügbar.');return}const hint=node.querySelector('[data-geo]');hint.textContent='Standort wird ermittelt …';navigator.geolocation.getCurrentPosition(p=>{geo={lat:Math.round(p.coords.latitude*1e5)/1e5,lng:Math.round(p.coords.longitude*1e5)/1e5};if(!f('place').value.trim())f('place').value='Aktueller Standort';hint.textContent='Standort gespeichert ✓'},()=>{hint.textContent='Standort konnte nicht ermittelt werden. Bitte Freigabe prüfen.'},{enableHighAccuracy:true,timeout:12000})},
+    pv:b=>Lightbox.open(imgs,Number(b.dataset.i)||0),
+    prm:b=>{const j=Number(b.dataset.i);const [x]=imgs.splice(j,1);if(x&&!x.blob)removed.push(x.id);paintPh()},
     ad:b=>{const on=b.getAttribute('aria-checked')!=='true';b.setAttribute('aria-checked',String(on));const tb=node.querySelector('[data-times]');tb.hidden=on;if(!on)tb.animate?.([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:reduce?0:260,easing:'ease-out'})},
     col:b=>{col=b.dataset.c;node.querySelectorAll('.cl button').forEach(x=>x.classList.toggle('on',x===b))},
-    del:()=>{if(!confirm('Diesen Termin löschen?'))return;const list=evList(k).filter(x=>x.id!==ev.id);if(list.length)data.events[k]=list;else delete data.events[k];persist();render();toast('Termin gelöscht');swap(dayView(ret),-1)},
-    save:()=>{const title=f('title').value.trim(),date=f('date').value,ad=node.querySelector('.sx-sw').getAttribute('aria-checked')==='true',st=f('start').value,en=f('end').value;err.textContent='';
+    del:()=>{if(!confirm('Diesen Termin löschen?'))return;(ev.images||[]).forEach(im=>Media.del(im.id));const list=evList(k).filter(x=>x.id!==ev.id);if(list.length)data.events[k]=list;else delete data.events[k];persist();render();toast('Termin gelöscht');swap(dayView(ret),-1)},
+    save:async()=>{const title=f('title').value.trim(),date=f('date').value,ad=node.querySelector('.sx-sw').getAttribute('aria-checked')==='true',st=f('start').value,en=f('end').value;err.textContent='';
      const bad=(m,inp)=>{err.textContent=m;inp?.focus();const box=inp?.closest('label')||err;box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake')};
      if(!title)return bad('Bitte gib einen Titel ein.',f('title'));if(!/^\d{4}-\d\d-\d\d$/.test(date))return bad('Bitte wähle ein Datum.',f('date'));
      if(!ad){if(!st)return bad('Bitte gib eine Beginnzeit ein.',f('start'));if(en&&mm(en)<=mm(st))return bad('Das Ende muss nach dem Beginn liegen.',f('end'))}
-     const item={id:ev?.id||('e'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),title,allDay:ad,start:ad?'':st,end:ad?'':en,color:col,place:f('place').value.trim(),note:f('note').value.trim()};
+     const rawPlace=f('place').value.trim(),isUrl=/^https?:\/\//i.test(rawPlace);
+     for(const im of imgs){if(im.blob){try{await Media.put(im.id,im.blob)}catch(x){}delete im.blob}}removed.forEach(id=>Media.del(id));
+     const item={id:ev?.id||('e'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),title,allDay:ad,start:ad?'':st,end:ad?'':en,color:col,place:isUrl?'Google-Maps-Ort':rawPlace,note:f('note').value.trim()};
+     if(isUrl)item.mapUrl=rawPlace;if(geo)item.geo=geo;if(imgs.length)item.images=imgs.map(x=>({id:x.id,thumb:x.thumb}));
      if(ev){const list=evList(k).filter(x=>x.id!==ev.id);if(list.length)data.events[k]=list;else delete data.events[k]}
      data.events[date]=[...evList(date),item].sort((a,b)=>(a.allDay?-1:mm(a.start))-(b.allDay?-1:mm(b.start)));
-     if(!persist())return;render();popDots(date);toast(isNew?'Termin gespeichert':'Termin aktualisiert');swap(dayView(date,item.id),-1)}});
+     if(!persist()){err.textContent='Speicher voll – bitte weniger oder kleinere Fotos verwenden.';return}render();popDots(date);toast(isNew?'Termin gespeichert':'Termin aktualisiert');swap(dayView(date,item.id),-1)}});
    if(isNew)setTimeout(()=>{try{f('title').focus({preventScroll:true})}catch(_){}},reduce?0:380);
    return node}
 
   return {
+   head,wire,swap,show,
+   isOpen:()=>isOpen,
+   view:()=>view,
+   node(fn){show();swap(fn(),0)},
    open(k){show();swap(dayView(k),0)},
    openEvent(k){show();swap(eventView(k,null,k),0)},
    refresh(){if(isOpen&&view&&day&&view.querySelector('.tl,.em'))swap(dayView(day),0)},
+   sheet:sh,scroller:sc,
    close
   };
  })();
- window.SchivioDay=DS;
+ window.SchivioDay=DS;window.SchivioToast=toast;
  openAgenda=function(day){DS.open(day)};
 
  /* ---------- Backup inkl. Termine ---------- */
@@ -2306,6 +2397,7 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
   const sec=$('settings');if(!sec)return {render(){}};
   sec.classList.add('sx-mx');const box=document.createElement('div');box.className='mx';sec.prepend(box);
   const page=document.createElement('div');page.className='mxp';page.hidden=true;page.setAttribute('role','dialog');page.setAttribute('aria-modal','true');document.body.append(page);
+  const openPay=()=>{const b=document.querySelector('[data-gp-open]');if(b)b.click();else toast('Bitte zuerst ein Tarifprofil wählen.')};
   const opt=(id)=>{const s=$(id);return s?.selectedOptions?.[0]?.textContent||''};
   const tariffShort=()=>{const t=opt('tariff');return !$('tariff')?.value?'Kein Tarif gewählt':t.split(' · ')[0]};
   const levelInfo=()=>{const t=opt('level');const p=t.split(' · ');return {label:p[0]||'',amount:p[1]||''}};
@@ -2320,13 +2412,13 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
    const ind=$('group')?.hidden;
    const chips=[ind?'Eigene Werte':((p.group||'')+(lv.label?' · '+lv.label:'')),weekly,stateName()].filter(Boolean).map(t=>'<span>'+esc(t)+'</span>').join('');
    const bk=data.lastBackup?new Date(data.lastBackup):null;
-   const workdaysTxt=opt('workdays');
+   const wdl0=typeof workdayList==='function'?workdayList():[1,2,3,4,5];const wn=['So','Mo','Di','Mi','Do','Fr','Sa'];const workdaysTxt=String(p.workdays||'5').startsWith('m:')?wdl0.length+'-Tage-Woche ('+wdl0.map(d=>wn[d]).join(', ')+')':opt('workdays');
    box.innerHTML='<h1>Mehr</h1>'+
     '<button type="button" class="pc" data-m="tarif"><span class="top"><span class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span><span class="nm"><small>DEIN PROFIL</small><b>'+esc(tariffShort())+'</b></span>'+ICON.cv+'</span><span class="chips">'+chips+'</span>'+(lv.amount?'<span class="ft"><span>Tarifliches Grundentgelt</span><b>'+esc(lv.amount)+'</b></span>':'')+'</button>'+
     '<section><h3>Arbeit &amp; Gehalt</h3><div class="gp">'+
      R('var(--sx-a)','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/></svg>','Tarif &amp; Eingruppierung',esc(ind?tariffShort()+' · eigene Werte':[tariffShort(),p.group,lv.label].filter(Boolean).join(' · ')),'tarif')+
      R('#8fb0ff',ICON.A,'Arbeitszeit &amp; Soll',esc([weekly.replace(' / Woche',''),workdaysTxt,stateName()&&'Feiertage '+(p.state||'')].filter(Boolean).join(' · ')),'hours')+
-     (salaryOn?R('#4ade80','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.5"/></svg>','Zulagen &amp; Zuschläge',allowances?allowances+' Zulage'+(allowances>1?'n':'')+' hinterlegt':'Noch keine Zulagen eingetragen','pay',allowances?'':'<span class="bdg">Prüfen</span>'):'')+
+     (salaryOn?R('#4ade80','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.5"/></svg>','Gehalt anpassen',(allowances?allowances+' Zulage'+(allowances>1?'n':'')+' · ':'Zulagen, ')+'Schichtmodell, Feiertage','pay',allowances?'':'<span class="bdg">Prüfen</span>'):'')+
      '<button type="button" class="rw" data-m="shifts"><span class="ri" style="--k:#b79cff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span><span class="rt"><b>Dienstarten</b><span class="bars">'+['F','S','N','U'].map(c=>'<i style="--c:'+esc(sColor(c))+'"></i>').join('')+'</span></span>'+ICON.cv+'</button>'+
     '</div></section>'+
     '<section><h3>Darstellung</h3><div class="gp pd"><span class="lbl">Farbschema</span><div class="th">'+
@@ -2349,7 +2441,7 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
     '</div></section><p class="foot">Dein Dienstplan. Dein Gehalt.</p>'}
   box.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;buzz();const a=b.dataset.m,v=b.dataset.v;
    if(a==='tarif')openPage('tarif');else if(a==='hours')openPage('tarif','hours');
-   else if(a==='pay'){$('tabHours')?.click();setTimeout(()=>$('salaryDetailsOpen')?.click(),80)}
+   else if(a==='pay')openPay()
    else if(a==='shifts')$('tabTemplates')?.click();
    else if(a==='mode'){document.querySelector('#themeSettings [data-mode="'+v+'"]')?.click();setTimeout(render,30)}
    else if(a==='pal'){document.querySelector('#themeSettings .theme-option[data-palette="'+v+'"]')?.click();setTimeout(render,30)}
@@ -2370,7 +2462,7 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
   function renderHelp(){page.innerHTML='<div class="in">'+top('So funktioniert die Prognose')+'<div class="bx txt">'+
    '<p><b>Grundlage sind deine eingetragenen Dienste.</b> Schivio zählt alle Dienste des Monats – auch zukünftige – und berechnet daraus Arbeitszeit, Zeitguthaben und eine Brutto-Prognose.</p>'+
    '<p><b>Das Gehalt kommt aus deinem Tarifprofil.</b> Tarifwerk, Entgeltgruppe und Stufe bestimmen das Grundentgelt. Bei Teilzeit wird es anteilig nach deinen Wochenstunden berechnet.</p>'+
-   '<p><b>Zuschläge werden automatisch ergänzt</b> – etwa für Nacht-, Sonntags- und Feiertagsarbeit, soweit dein Tarif sie vorsieht. Feste Zulagen trägst du einmalig unter „Zulagen &amp; Zuschläge“ ein.</p>'+
+   '<p><b>Zuschläge werden automatisch ergänzt</b> – etwa für Nacht-, Sonntags- und Feiertagsarbeit, soweit dein Tarif sie vorsieht. Feste Zulagen trägst du einmalig unter „Gehalt anpassen“ ein.</p>'+
    '<p><b>Das Monatssoll</b> ergibt sich aus Wochenstunden, Arbeitstagen und den Feiertagen deines Bundeslandes. Urlaub, Krankheit und Fortbildung werden gutgeschrieben.</p>'+
    '<p><b>Wichtig:</b> Die Prognose zeigt Brutto, nicht Netto, und ist keine verbindliche Abrechnung. Maßgeblich ist deine Gehaltsabrechnung.</p></div></div>';wireP()}
   function renderTarif(){const p=data.profile||{};const tS=$('tariff'),gS=$('group'),lS=$('level'),sS=$('state'),wS=$('workdays');const ind=gS?.hidden;
@@ -2386,11 +2478,16 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
     '<section data-sec="hours"><h3>Arbeitszeit</h3><div class="bx">'+
      '<div class="ln"><span class="rt"><b>Wochenstunden</b><small data-share>'+esc(share)+'</small></span><span class="stp"><button type="button" data-p="minus" aria-label="Weniger Stunden">−</button><input type="number" inputmode="decimal" step="0.5" min="1" max="60" data-p-in="weekly" value="'+esc(weekly)+'" aria-label="Wochenstunden"><button type="button" data-p="plus" aria-label="Mehr Stunden">+</button></span></div>'+
      '<div class="hr"></div><div class="ln ft2"><span class="rt"><b>Tarifliche Vollzeit</b><small>leer = Tarifwert ('+fmtH(ftDef)+' h)</small></span><input type="number" inputmode="decimal" step="0.1" min="30" max="45" data-p-in="fulltime" value="'+esc(ft?.value||'')+'" placeholder="'+fmtH(ftDef)+'" aria-label="Tarifliche Vollzeit"></div>'+
-     '<div class="hr"></div><div class="ln"><span class="rt"><b>Arbeitstage</b></span>'+(wOpts.length&&wOpts.length<=3?'<span class="seg">'+wOpts.map(o=>'<button type="button" data-p="w" data-v="'+esc(o.value)+'" class="'+(o.value===wS.value?'on':'')+'">'+esc(o.textContent.replace(/\s*Tage\s*/,' ').replace(/\(|\)/g,'').trim())+'</button>').join('')+'</span>':'<span class="sel">'+esc(opt('workdays'))+ICON.chevD+'</span><select class="ov" data-p-sel="workdays" aria-label="Arbeitstage">'+wOpts.map(o=>'<option value="'+esc(o.value)+'"'+(o.value===wS?.value?' selected':'')+'>'+esc(o.textContent)+'</option>').join('')+'</select>')+'</div>'+
+     '<div class="hr"></div>'+workdaysHTML()+
      '<div class="hr"></div><div class="ln"><span class="rt"><b>Bundesland</b><small>für Feiertage</small></span><span class="sel">'+esc(stateName())+ICON.chevD+'</span><select class="ov" data-p-sel="state" aria-label="Bundesland">'+[...(sS?.options||[])].map(o=>'<option value="'+esc(o.value)+'"'+(o.value===sS.value?' selected':'')+'>'+esc(o.textContent)+'</option>').join('')+'</select></div>'+
      '<div class="er" data-perr></div>'+
     '</div></section></div>';
    wireP()}
+  function workdaysHTML(){const w=String($('workdays')?.value||data.profile?.workdays||'5');const mode=w==='6'?'6':w.startsWith('m:')?'m':'5';const mask=typeof workdayList==='function'?workdayList():[1,2,3,4,5];const wk=Number($('weekly')?.value)||0;
+   const info=mode==='5'?'Üblich im Schichtdienst (TVöD, TV-L, AVR): Das Monatssoll wird auf Basis Mo–Fr berechnet – auch wenn du am Wochenende arbeitest.':mode==='6'?'Nur wählen, wenn dein Vertrag eine 6-Tage-Woche (Mo–Sa) vorsieht.':'Für feste Arbeitstage laut Vertrag, z. B. 4-Tage-Woche Mo–Do.'+(wk&&mask.length?' Pro Arbeitstag: '+fmtH(Math.round(wk/mask.length*100)/100)+' h.':'');
+   return '<div class="wd"><div class="ln"><span class="rt"><b>Arbeitstage</b><small>für Monatssoll &amp; Gutschriften</small></span><span class="seg">'+[['5','Mo–Fr'],['6','Mo–Sa'],['m','Eigene']].map(([v,l])=>'<button type="button" data-p="wm" data-v="'+v+'" class="'+(mode===v?'on':'')+'" aria-pressed="'+(mode===v)+'">'+l+'</button>').join('')+'</span></div>'+
+    (mode==='m'?'<div class="wdc">'+['Mo','Di','Mi','Do','Fr','Sa','So'].map((l,i)=>{const d=(i+1)%7,on=mask.includes(d);return '<button type="button" data-p="wdd" data-v="'+d+'" class="'+(on?'on':'')+'" aria-pressed="'+on+'">'+l+'</button>'}).join('')+'</div>':'')+'<p class="wdi">'+esc(info)+'</p></div>'}
+  function setWorkdays(v){const s2=$('workdays');if(!s2)return;if(![...s2.options].some(o=>o.value===v)){const o=document.createElement('option');o.value=v;o.textContent='Eigene Arbeitstage';s2.append(o)}s2.value=v;saveProfile();rerender()}
   function setSel(id,v){const s=$(id);if(!s)return;s.value=v;s.dispatchEvent(new Event('change',{bubbles:true}))}
   function saveProfile(){const err=page.querySelector('[data-perr]');const weekly=$('weekly').value;if(err)err.textContent='';
    if(weekly&&(Number(weekly)<=0||Number(weekly)>60)){if(err)err.textContent='Bitte gültige Wochenstunden (bis 60) angeben.';return}
@@ -2407,19 +2504,285 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
     else if(a==='t'){setSel('tariff',v);saveProfile();renderTarif()}
     else if(a==='g'){setSel('group',v);saveProfile();rerender()}
     else if(a==='l'){setSel('level',v);saveProfile();rerender()}
-    else if(a==='w'){setSel('workdays',v);saveProfile();rerender()}
+    else if(a==='wm'){if(v==='m'){const cur=String($('workdays').value);setWorkdays(cur.startsWith('m:')?cur:'m:1234')}else setWorkdays(v)}
+    else if(a==='wdd'){const d=Number(v);let l=typeof workdayList==='function'?workdayList():[1,2,3,4];l=l.includes(d)?l.filter(x=>x!==d):[...l,d];if(!l.length){toast('Mindestens ein Arbeitstag ist nötig.');return}setWorkdays('m:'+l.sort().join(''))}
     else if(a==='minus'||a==='plus'){const i=page.querySelector('[data-p-in="weekly"]');let n=Number(i.value)||0;n=Math.round((n+(a==='plus'?.5:-.5))*2)/2;n=Math.max(.5,Math.min(60,n));i.value=String(n);$('weekly').value=String(n);upShare();queueSave()}
-    else if(a==='pay'){closePage();setTimeout(()=>{$('tabHours')?.click();setTimeout(()=>$('salaryDetailsOpen')?.click(),80)},200)}};
+    else if(a==='pay'){closePage();setTimeout(openPay,200)}};
    page.querySelectorAll('[data-p-in]').forEach(i=>i.addEventListener('input',()=>{$(i.dataset.pIn).value=i.value;upShare();queueSave(700)}));
    page.querySelectorAll('[data-p-sel]').forEach(s=>s.addEventListener('change',()=>{setSel(s.dataset.pSel,s.value);saveProfile();rerender()}))}
   function upShare(){const el2=page.querySelector('[data-share]');if(!el2)return;const ft=$('fulltime');const def=Number(ft.value)||Number((ft.placeholder||'').match(/[\d,]+/)?.[0]?.replace(',','.'))||39;const v=Number($('weekly').value);el2.textContent=v>0?(v>=def-0.001?'Vollzeit ('+fmtH(def)+' h)':'Teilzeit · '+fmtH(Math.round(v/def*1000)/10)+' % von '+fmtH(def)+' h'):'Bitte Wochenstunden eintragen'}
   $('tabSettings')?.addEventListener('click',()=>render());
   render();
-  return {render};
+  return {render,close:closePage,isOpen:()=>!page.hidden&&page.classList.contains('on'),page};
  })();
 
+ window.SchivioMore=MX;
  /* Termine erscheinen sofort im Kalender */
  try{decorate()}catch(e){}
+})();
+</script>
+
+<style id="sx56Style">
+/* v1.0.56: Auswertungs-Fenster, Schichten-Reiter, Wischgesten */
+.sx-ds .kp{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:20px;background:color-mix(in srgb,var(--sx-a) 10%,transparent);border:1px solid color-mix(in srgb,var(--sx-a) 25%,transparent);margin-bottom:14px;animation:sxUp .4s var(--sx-ease) both}
+.sx-ds .kp .big{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.sx-ds .kp .big b{font-size:34px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1}
+.sx-ds .kp .big b{color:var(--sx-text)!important}.sx-ds .kp .big b.pos{color:var(--sx-pos)!important}.sx-ds .kp .big b.neg{color:var(--sx-neg)!important}
+.sx-ds .kp .big small{font-size:13.5px;color:var(--sx-muted);font-weight:600}
+.sx-ds .kp .bar{height:8px;border-radius:9px;background:color-mix(in srgb,var(--sx-text) 10%,transparent);overflow:hidden}
+.sx-ds .kp .bar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--sx-b),var(--sx-a));transition:width 1s var(--sx-ease)}
+.sx-ds .kp .row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--sx-muted)}
+.sx-ds .pl{font-size:12px;font-weight:800;padding:3px 9px;border-radius:99px;background:color-mix(in srgb,var(--sx-text) 9%,transparent);color:var(--sx-text);white-space:nowrap}
+.sx-ds .pl.pos{color:var(--sx-pos);background:color-mix(in srgb,var(--sx-pos) 15%,transparent)}
+.sx-ds .pl.neg{color:var(--sx-neg);background:color-mix(in srgb,var(--sx-neg) 15%,transparent)}
+.sx-ds h4{margin:18px 2px 8px!important;font-size:12px!important;font-weight:800!important;letter-spacing:.9px;text-transform:uppercase;color:var(--sx-muted)!important}
+.sx-ds .ls{border-radius:18px;background:color-mix(in srgb,var(--sx-text) 4%,transparent);border:1px solid var(--sx-line);overflow:hidden;animation:sxUp .45s var(--sx-ease) both;animation-delay:.05s}
+.sx-ds .ls .r{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--sx-line);font-size:14.5px}
+.sx-ds .ls .r:last-child{border-bottom:0}
+.sx-ds .ls .r>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.sx-ds .ls .r small{font-size:12px;color:var(--sx-muted)}
+.sx-ds .ls .r b{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.sx-ds .ls .r b.pos{color:var(--sx-pos)}.sx-ds .ls .r b.neg{color:var(--sx-neg)}
+.sx-ds .ls .r.sum{background:color-mix(in srgb,var(--sx-text) 4%,transparent)}
+.sx-ds .ls .r.sum span{font-weight:800}
+.sx-ds .ls .r .dot{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.sx-ds .ls button.r{width:100%!important;margin:0!important;border:0!important;border-bottom:1px solid var(--sx-line)!important;border-radius:0!important;background:none!important;color:var(--sx-text)!important;font:inherit;text-align:left;box-shadow:none!important;height:auto!important;min-height:0!important}
+.sx-ds .ls button.r:last-child{border-bottom:0!important}
+.sx-ds .ls button.r:active{background:color-mix(in srgb,var(--sx-text) 6%,transparent)!important}
+.sx-ds .ls .r .ch{width:16px;height:16px;opacity:.4;flex:none}
+.sx-ds .nt{margin:12px 2px 16px!important;font-size:12.5px!important;line-height:1.5;color:var(--sx-muted)!important}
+.sx-ds .calc{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:16px;background:color-mix(in srgb,var(--sx-text) 4%,transparent);border:1px dashed var(--sx-line);font-variant-numeric:tabular-nums;font-size:14px;font-weight:700}
+.sx-ds .calc span{display:flex;flex-direction:column;align-items:center;gap:1px}
+.sx-ds .calc small{font-size:10.5px;font-weight:700;color:var(--sx-muted);text-transform:uppercase;letter-spacing:.5px}
+.sx-ds .calc i{font-style:normal;color:var(--sx-muted);font-weight:600}
+.sx-ds .seg2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:color-mix(in srgb,var(--sx-text) 6%,transparent);border-radius:14px;padding:4px;gap:4px;margin:4px 0 12px}
+.sx-ds .seg2 button{height:40px!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:11px!important;background:transparent!important;color:var(--sx-muted)!important;font:inherit;font-size:14px!important;font-weight:700!important;box-shadow:none!important;transition:background .25s,color .25s}
+.sx-ds .seg2 button.on{background:var(--sx-sheet)!important;color:var(--sx-text)!important;box-shadow:0 2px 8px rgba(0,0,0,.25)!important}
+.sx-ds .stp2{display:flex;align-items:center;gap:8px;margin:4px 0 6px}
+.sx-ds .stp2 button{width:52px!important;height:52px!important;min-height:0!important;flex:none;padding:0!important;margin:0!important;border-radius:16px!important;border:1px solid var(--sx-line)!important;background:color-mix(in srgb,var(--sx-text) 6%,transparent)!important;color:var(--sx-text)!important;font-size:24px!important;font-weight:600!important;box-shadow:none!important;transition:transform .12s}
+.sx-ds .stp2 button:active{transform:scale(.92)}
+.sx-ds .stp2 label{flex:1;position:relative;margin:0}
+.sx-ds .stp2 input{width:100%;box-sizing:border-box;height:52px;text-align:center;border-radius:16px!important;border:1.5px solid var(--sx-line)!important;background:color-mix(in srgb,var(--sx-text) 5%,transparent)!important;color:var(--sx-text)!important;font:inherit;font-size:22px!important;font-weight:800!important;padding:0 34px 0 12px!important;margin:0!important;box-shadow:none!important}
+.sx-ds .stp2 input:focus{outline:0;border-color:var(--sx-a)!important}
+.sx-ds .stp2 label em{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-style:normal;font-weight:700;color:var(--sx-muted);pointer-events:none}
+.sx-ds .pv{font-size:13px;color:var(--sx-muted);text-align:center;min-height:18px;margin:2px 0 14px}
+.sx-ds .pv b{color:var(--sx-text)}
+.sx-ds .hb{display:flex;align-items:center;gap:10px;width:100%!important;padding:10px 14px!important;margin:0!important;border:0!important;border-bottom:1px solid var(--sx-line)!important;border-radius:0!important;background:none!important;color:var(--sx-text)!important;font:inherit;text-align:left;box-shadow:none!important;height:auto!important;min-height:0!important}
+.sx-ds .hb:last-child{border-bottom:0!important}
+.sx-ds .hb.cur{background:color-mix(in srgb,var(--sx-a) 9%,transparent)!important}
+.sx-ds .hb .mn{width:66px;flex:none;font-size:13.5px;font-weight:700}
+.sx-ds .hb .mn small{display:block;font-size:11px;color:var(--sx-muted);font-weight:600}
+.sx-ds .hb .tr{flex:1;height:10px;position:relative}
+.sx-ds .hb .tr::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--sx-line)}
+.sx-ds .hb .tr i{position:absolute;top:0;height:100%;border-radius:6px;background:var(--sx-pos);transition:width .8s var(--sx-ease)}
+.sx-ds .hb .tr i.neg{background:var(--sx-neg)}
+.sx-ds .hb b{width:70px;flex:none;text-align:right;font-variant-numeric:tabular-nums;font-size:13.5px}
+.sx-ds .hb b.pos{color:var(--sx-pos)}.sx-ds .hb b.neg{color:var(--sx-neg)}
+.sx-ds .fm .cl2{display:flex;flex-wrap:wrap;gap:9px}
+.sx-ds .fm .cl2 button,.sx-ds .fm .cl2 label{width:34px!important;height:34px!important;min-height:0!important;padding:0!important;margin:0!important;border-radius:50%!important;border:3px solid var(--sx-sheet)!important;background:var(--c)!important;box-shadow:0 0 0 1.5px transparent!important;transition:box-shadow .2s,transform .15s;position:relative;overflow:hidden;cursor:pointer;box-sizing:border-box}
+.sx-ds .fm .cl2 .on{box-shadow:0 0 0 2px var(--c)!important;transform:scale(1.08)}
+.sx-ds .fm .cl2 label{background:conic-gradient(#ef4444,#f59e0b,#22c55e,#06b6d4,#6366f1,#ec4899,#ef4444)!important}
+.sx-ds .fm .cl2 label input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;padding:0!important;border:0!important}
+.sx-ds .sm{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--c,var(--sx-a)) 14%,transparent);border:1px solid color-mix(in srgb,var(--c,var(--sx-a)) 35%,transparent);font-size:14px;font-weight:600;transition:background .3s}
+.sx-ds .sm .ic{width:36px;height:36px;border-radius:11px;flex:none;display:grid;place-items:center;background:var(--c);color:#fff;transition:background .3s}
+.sx-ds .sm .ic svg{width:18px;height:18px}
+.sx-ds .sm small{display:block;font-size:12px;color:var(--sx-muted);font-weight:500}
+.sx-ds .fm select{width:100%;min-height:48px;padding:0 12px!important;border-radius:14px!important;border:1.5px solid var(--sx-line)!important;background:color-mix(in srgb,var(--sx-text) 5%,transparent)!important;color:var(--sx-text)!important;font:inherit;font-size:15px!important;margin:0!important}
+.sx-ds .fm .r3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 76px;gap:8px}
+.sx-ds .fm [hidden]{display:none!important}
+
+/* Schichten-Reiter */
+#templatesPanel.sx-sk>*:not(.sk){display:none!important}
+#templatesPanel .sk{display:flex;flex-direction:column;gap:22px;padding:4px 0 28px;color:var(--sx-text)}
+.sk h1{margin:4px 2px 0;font-size:30px;font-weight:800;letter-spacing:-.5px;color:var(--sx-text)}
+.sk .sub{margin:-16px 2px 0;font-size:13.5px;color:var(--sx-muted)}
+.sk h3{margin:0 4px 8px!important;font-size:12.5px!important;font-weight:700!important;letter-spacing:.9px;color:var(--sx-muted)!important;text-transform:uppercase}
+.sk .sl{display:flex;flex-direction:column;gap:8px}
+.sk .c2{position:relative;display:flex!important;align-items:center;gap:12px;width:100%!important;padding:12px 14px 12px 12px!important;margin:0!important;border-radius:18px!important;border:1px solid var(--sx-line)!important;background:var(--sx-card)!important;color:var(--sx-text)!important;text-align:left;font:inherit;box-shadow:none!important;height:auto!important;min-height:0!important;overflow:hidden;animation:sxUp .45s var(--sx-ease) both;transition:transform .15s}
+.sk .c2:active{transform:scale(.98)}
+.sk .c2::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.sk .c2 .ic{width:42px;height:42px;border-radius:13px;flex:none;display:grid;place-items:center;background:var(--c);color:#fff;margin-left:4px}
+.sk .c2 .ic svg{width:20px;height:20px}
+.sk .c2 .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sk .c2 .tx b{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sk .c2 .tx small{font-size:12.5px;color:var(--sx-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sk .c2 .hh{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;flex:none}
+.sk .c2 .bg2{font-size:10.5px;font-weight:800;letter-spacing:.4px;padding:3px 8px;border-radius:99px;background:color-mix(in srgb,var(--sx-warn) 18%,transparent);color:var(--sx-warn);flex:none}
+.sk .c2 .ch{width:16px;height:16px;opacity:.4;flex:none}
+.sk .c2.flash{animation:sxFlash 1.1s ease}
+.sk .ab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sk .ab .c2{padding:10px 12px 10px 10px!important}
+.sk .ab .c2 .ic{width:34px;height:34px;border-radius:11px}
+.sk .ab .c2 .ic svg{width:17px;height:17px}
+.sk .ab .c2 .tx b{font-size:14.5px}
+.sk .add{display:flex!important;align-items:center;justify-content:center;gap:8px;height:52px!important;min-height:0!important;width:100%!important;margin:2px 0 0!important;padding:0!important;border-radius:16px!important;border:1.5px dashed color-mix(in srgb,var(--sx-a) 55%,transparent)!important;background:color-mix(in srgb,var(--sx-a) 8%,transparent)!important;color:var(--sx-a)!important;font:inherit;font-size:15px!important;font-weight:800!important;box-shadow:none!important;transition:transform .15s}
+body[data-theme="light"] .sk .add{color:var(--sx-b)!important}
+.sk .add:active{transform:scale(.98)}
+.sk .add svg{width:18px;height:18px}
+.sk .tip{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px 14px;border-radius:16px;background:var(--sx-card);border:1px solid var(--sx-line);font-size:13px;line-height:1.45;color:var(--sx-muted)}
+.sk .tip svg{width:18px;height:18px;flex:none;color:var(--sx-a);margin-top:1px}
+.sx-swipe{transition:transform .28s var(--sx-ease)!important}
+</style>
+<script>
+/* v1.0.56: Zurück-Taste, Wischgesten, Auswertungs-Fenster, Schichten-Reiter */
+(function(){
+ const DS=window.SchivioDay,toast=window.SchivioToast||(()=>{});if(!DS)return;
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const el=html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
+ const H=v=>fmtHours(v)+' h';
+ const sgn=v=>v===null||v===undefined?'–':(v>=0.05?'+':'')+fmtHours(v)+' h';
+ const cls=v=>v===null?'':v>=0.05?'pos':v<=-0.05?'neg':'';
+ const num=v=>{const n=Number(String(v).trim().replace(',','.'));return String(v).trim()===''?NaN:n};
+ const chev='<svg class="ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+ const ICO={F:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></svg>',S:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 19h20M6.5 19a5.5 5.5 0 0 1 11 0M12 3v4.5M4.2 9.7l2.2 2.2M19.8 9.7l-2.2 2.2"/></svg>',N:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z"/></svg>',U:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 22V11M12 11c-3-4-7-4-9.5-2M12 11c3-4 7-4 9.5-2M12 11c-1-4-4-7.5-7.5-7.5M12 11c1-4 4-7.5 7.5-7.5"/></svg>',K:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg>',T:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5"/></svg>',A:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',X:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg>',BD:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg>',plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg>',check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>'};
+ const sCol=c=>typeof displayShiftColor==='function'?displayShiftColor(shiftColor(c)):shiftColor(c);
+ const monthName=(y,m)=>new Date(y,m,1).toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+ const prevYM=(y,m)=>{const d=new Date(y,m-1,1);return [d.getFullYear(),d.getMonth()]};
+ const afterSave=()=>{persist();render();try{renderStatsOnly()}catch(e){}};
+
+ /* ---------- Arbeitstage: gespeicherte eigene Tage auswählbar machen ---------- */
+ (function(){const w=String(data.profile?.workdays||'');const s=$('workdays');if(s&&w.startsWith('m:')){if(![...s.options].some(o=>o.value===w)){const o=document.createElement('option');o.value=w;o.textContent='Eigene Arbeitstage';s.append(o)}s.value=w}})();
+
+ /* ---------- Auswertung: neue Detail-Fenster ---------- */
+ function stepper(val,unit='h'){return '<div class="stp2"><button type="button" data-x="dec" aria-label="Weniger">−</button><label><input type="text" inputmode="decimal" data-f="v" value="'+esc(val)+'" aria-label="Wert in Stunden"><em>'+unit+'</em></label><button type="button" data-x="inc" aria-label="Mehr">+</button></div>'}
+ function wireStep(node,step,onChange){const i=node.querySelector('[data-f="v"]');const bump=d=>{let n=num(i.value);if(!Number.isFinite(n))n=0;n=Math.round((n+d)*100)/100;i.value=String(n).replace('.',',');onChange&&onChange()};return {dec:()=>bump(-step),inc:()=>bump(step),input:i}}
+ const P={
+  work(){const y=shown.getFullYear(),m=shown.getMonth(),t=monthTarget(y,m),st=monthStats(y,m),saldo=displaySaldo(y,m),adj=Number(data.adjustments?.[monthKey(y,m)]||0);
+   const per={};let n=0;for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const k=dateKey(y,m,d),c=data.shifts[k];if(!c)continue;let h=0;if(types.includes(c))h=duration(data.templates[c])||0;else if(data.customShifts?.[c])h=data.customShifts[c].bd?.stage==='RB'?(Number(data.rbWork?.[k])||0):(duration(data.customShifts[c])||0);else continue;per[c]=per[c]||{n:0,h:0};per[c].n++;per[c].h+=h;n++}
+   const pct=t&&t.target>0?Math.min(100,st.total/t.target*100):0;
+   let h=DS.head(monthName(y,m),'Arbeitszeit')+'<div class="kp"><div class="big"><b>'+H(st.total)+'</b><small>'+(t?'von '+H(t.target)+' Soll':'kein Monatssoll')+'</small></div><div class="bar"><i data-w="'+pct.toFixed(1)+'"></i></div><div class="row"><span>'+(t?Math.round(st.total/t.target*100)+' % erreicht':'')+'</span>'+(saldo!==null?'<span class="pl '+cls(saldo)+'">Saldo '+sgn(saldo)+'</span>':'')+'</div></div>';
+   h+='<div class="ls"><div class="r"><span>Geplante Dienste<small>'+n+' Dienst'+(n===1?'':'e')+'</small></span><b>'+H(st.worked)+'</b></div><div class="r"><span>Gutschriften<small>'+(st.absence?st.absence+' Tag'+(st.absence===1?'':'e')+' Urlaub, Krank, Fortbildung':'keine in diesem Monat')+'</small></span><b>+ '+H(st.credit)+'</b></div>'+(adj?'<div class="r"><span>Korrektur</span><b>'+sgn(adj)+'</b></div>':'')+'<div class="r sum"><span>Gesamt</span><b>'+H(st.total)+'</b></div>'+(t?'<div class="r"><span>Monatssoll</span><b>− '+H(t.target)+'</b></div><div class="r sum"><span>Saldo</span><b class="'+cls(saldo)+'">'+sgn(saldo)+'</b></div>':'')+'</div>';
+   const codes=Object.keys(per).sort((a,b)=>per[b].h-per[a].h);
+   if(codes.length)h+='<h4>Nach Dienstart</h4><div class="ls">'+codes.map(c=>'<div class="r"><i class="dot" style="--c:'+esc(sCol(c))+'"></i><span>'+esc(shiftTitle(c))+'<small>'+per[c].n+'×</small></span><b>'+H(per[c].h)+'</b></div>').join('')+'</div>';
+   h+='<p class="nt">Alle eingetragenen Dienste zählen mit – auch zukünftige. Dienste änderst du im Kalender.</p><div class="ac"><button type="button" class="bt pr" data-x="cal">'+ICO.cal+'Im Kalender ansehen</button></div>';
+   const node=el('<div>'+h+'</div>');DS.wire(node,{cal:()=>{DS.close();$('tabPlan').click()}});return node},
+  target(mode){const y=shown.getFullYear(),m=shown.getMonth(),mk=monthKey(y,m),t=monthTarget(y,m);const manual=Object.prototype.hasOwnProperty.call(data.monthTargets||{},mk);mode=mode||(manual?'manual':'auto');
+   const wdl=typeof workdayList==='function'?workdayList():[1,2,3,4,5];const wn=['So','Mo','Di','Mi','Do','Fr','Sa'];const wdTxt=wdl.length===5&&wdl.join('')==='12345'?'Mo–Fr':wdl.length===6&&wdl.join('')==='123456'?'Mo–Sa':wdl.map(d=>wn[d]).join(', ');
+   let h=DS.head(monthName(y,m),'Monatssoll')+'<div class="kp"><div class="big"><b>'+(t?H(t.target):'–')+'</b><small>'+(manual?'eigener Wert':'automatisch berechnet')+'</small></div></div>';
+   h+='<div class="seg2" role="tablist"><button type="button" data-x="auto" class="'+(mode==='auto'?'on':'')+'">Automatisch</button><button type="button" data-x="manual" class="'+(mode==='manual'?'on':'')+'">Eigener Wert</button></div>';
+   if(mode==='auto'){const w=Number(data.profile?.weekly);if(w>0){const days=(()=>{let c=0,hol=0;const hs=holidaySet(y,data.profile.state||'NW');for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const wd=new Date(y,m,d,12).getDay();if(wdl.includes(wd)){if(hs.has(dateKey(y,m,d)))hol++;else c++}}return {c,hol}})();const perDay=w/wdl.length;
+     h+='<div class="calc"><span><small>Arbeitstage</small>'+days.c+'</span><i>×</i><span><small>Std./Tag</small>'+fmtHours(perDay)+'</span><i>=</i><span><small>Soll</small>'+H(days.c*perDay)+'</span></div><p class="nt">Gezählt werden die Arbeitstage ('+esc(wdTxt)+') im '+new Date(y,m,1).toLocaleDateString('de-DE',{month:'long'})+'. '+(days.hol?days.hol+' Feiertag'+(days.hol>1?'e':'')+' auf Arbeitstagen '+(days.hol>1?'sind':'ist')+' bereits abgezogen. ':'')+'Grundlage: '+fmtHours(w)+' h pro Woche.</p>'+(manual?'<div class="ac"><button type="button" class="bt pr" data-x="useAuto">'+ICO.check+'Automatisch verwenden</button></div>':'')}
+    else h+='<p class="nt">Für die automatische Berechnung fehlen deine Wochenstunden. Trage sie unter „Mehr“ › „Tarif &amp; Eingruppierung“ ein.</p>'}
+   else{h+='<p class="nt" style="margin-top:0!important">Nur nötig, wenn dein Arbeitgeber für '+esc(new Date(y,m,1).toLocaleDateString('de-DE',{month:'long'}))+' ein anderes Soll vorgibt.</p>'+stepper(manual?String(data.monthTargets[mk]).replace('.',','):(t?String(Math.round(t.target*10)/10).replace('.',','):''))+'<div class="er" data-err style="text-align:center;margin-bottom:10px"></div><div class="ac"><button type="button" class="bt pr" data-x="save">'+ICO.check+'Speichern</button></div>'}
+   const node=el('<div>'+h+'</div>');const st=mode==='manual'?wireStep(node,1):{};
+   DS.wire(node,{auto:()=>DS.swap(P.target('auto'),-1),manual:()=>DS.swap(P.target('manual'),1),...st,
+    useAuto:()=>{delete data.monthTargets[mk];afterSave();toast('Monatssoll wird wieder automatisch berechnet');DS.swap(P.target('auto'),0)},
+    save:()=>{const n=num(st.input.value),err=node.querySelector('[data-err]');if(!Number.isFinite(n)||n<0||n>300){err.textContent='Bitte 0 bis 300 Stunden eingeben.';return}data.monthTargets=data.monthTargets||{};data.monthTargets[mk]=n;afterSave();toast('Monatssoll gespeichert');DS.swap(P.target('manual'),0)}});
+   return node},
+  balance(edit){const y=shown.getFullYear(),m=shown.getMonth(),[py,pm]=prevYM(y,m),tot=carryAt(y,m),prev=carryAt(py,pm),saldo=displaySaldo(y,m),pay=Number(data.hourPayouts?.[monthKey(y,m)]||0),open=Number(data.openingBalance||0);
+   let h=DS.head('Stand Ende '+new Date(y,m,1).toLocaleDateString('de-DE',{month:'long',year:'numeric'}),'Zeitguthaben')+'<div class="kp"><div class="big"><b class="'+cls(tot.sum)+'">'+sgn(tot.sum)+'</b><small>gesamt</small></div></div>';
+   h+='<div class="ls"><div class="r"><span>Bis Ende '+esc(new Date(py,pm,1).toLocaleDateString('de-DE',{month:'long'}))+'<small>inkl. Startguthaben</small></span><b class="'+cls(prev.sum)+'">'+sgn(prev.sum)+'</b></div><div class="r"><span>Saldo '+esc(new Date(y,m,1).toLocaleDateString('de-DE',{month:'long'}))+'</span><b class="'+cls(saldo)+'">'+sgn(saldo)+'</b></div>'+(pay?'<div class="r"><span>Ausgezahlt</span><b>− '+H(pay)+'</b></div>':'')+'<div class="r sum"><span>Zeitguthaben</span><b class="'+cls(tot.sum)+'">'+sgn(tot.sum)+'</b></div></div>';
+   h+='<h4>Startguthaben</h4>';
+   if(!edit)h+='<div class="ls"><button type="button" class="r" data-x="edit"><span>Stand vor Schivio<small>z. B. laut Zeitnachweis deines Arbeitgebers</small></span><b class="'+cls(open)+'">'+sgn(open)+'</b>'+chev+'</button></div>';
+   else h+=stepper(String(open).replace('.',','))+'<div class="er" data-err style="text-align:center;margin-bottom:10px"></div><div class="ac"><button type="button" class="bt" data-x="cancel">Abbrechen</button><button type="button" class="bt pr" data-x="save">'+ICO.check+'Speichern</button></div>';
+   if(tot.gaps)h+='<p class="nt">'+tot.gaps+' Monat'+(tot.gaps>1?'e':'')+' ohne Monatssoll '+(tot.gaps>1?'werden':'wird')+' nicht mitgerechnet.</p>';else h+='<p class="nt">Berechnet aus allen Monaten mit eingetragenen Diensten – auch zukünftigen.</p>';
+   const node=el('<div>'+h+'</div>');const st=edit?wireStep(node,1):{};
+   DS.wire(node,{edit:()=>DS.swap(P.balance(true),1),cancel:()=>DS.swap(P.balance(false),-1),...st,
+    save:()=>{const n=num(st.input.value),err=node.querySelector('[data-err]');if(!Number.isFinite(n)||Math.abs(n)>1000){err.textContent='Bitte einen Wert zwischen −1000 und 1000 Stunden eingeben.';return}data.openingBalance=n;afterSave();toast('Startguthaben gespeichert');DS.swap(P.balance(false),-1)}});
+   return node},
+  history(){const y=shown.getFullYear(),m=shown.getMonth();const rows=[];for(let b=11;b>=0;b--){const d=new Date(y,m-b,1),yy=d.getFullYear(),mm=d.getMonth();const v=displaySaldo(yy,mm);if(v===null&&b!==0)continue;rows.push({yy,mm,v:v===null?null:v-Number(data.hourPayouts?.[monthKey(yy,mm)]||0),cur:b===0})}
+   const max=Math.max(4,...rows.map(r=>Math.abs(r.v||0)));
+   let h=DS.head('Letzte 12 Monate','Monatsverlauf')+'<div class="ls">'+rows.reverse().map(r=>{const w=r.v===null?0:Math.abs(r.v)/max*50;return '<button type="button" class="hb'+(r.cur?' cur':'')+'" data-x="go" data-y="'+r.yy+'" data-m="'+r.mm+'"><span class="mn">'+esc(new Date(r.yy,r.mm,1).toLocaleDateString('de-DE',{month:'short'}))+'<small>'+r.yy+'</small></span><span class="tr"><i class="'+(r.v<0?'neg':'')+'" style="'+(r.v<0?'right:50%':'left:50%')+';width:0" data-w="'+w.toFixed(1)+'"></i></span><b class="'+cls(r.v)+'">'+sgn(r.v)+'</b></button>'}).join('')+'</div><p class="nt">Saldo je Monat nach Auszahlungen. Tippe auf einen Monat, um ihn in der Auswertung zu öffnen.</p>';
+   const t=monthTarget(y,m),hol=holidaySet(y,data.profile?.state||'NW'),wdl=typeof workdayList==='function'?workdayList():[1,2,3,4,5];const ab=[];
+   for(const [c,l] of [['U','Urlaub'],['K','Krankheit'],['T','Fortbildung'],['A','Überstundenabbau']]){let n=0,el2=0;for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const k=dateKey(y,m,d);if(data.shifts[k]!==c)continue;n++;const wd=new Date(y,m,d,12).getDay();if(wdl.includes(wd)&&!hol.has(k))el2++}if(n)ab.push({c,l,n,el2,h:t?el2*t.weekly/wdl.length:null})}
+   h+='<h4>Abwesenheiten im '+esc(new Date(y,m,1).toLocaleDateString('de-DE',{month:'long'}))+'</h4>'+(ab.length?'<div class="ls">'+ab.map(a=>'<div class="r"><i class="dot" style="--c:'+esc(sCol(a.c))+'"></i><span>'+a.l+'<small>'+a.n+' Tag'+(a.n>1?'e':'')+(a.el2!==a.n?' · davon '+a.el2+' Arbeitstag'+(a.el2===1?'':'e'):'')+'</small></span><b>'+(a.h===null?'–':(a.c==='A'?'− ':'+ ')+H(a.h))+'</b></div>').join('')+'</div><p class="nt">Urlaub, Krankheit und Fortbildung werden mit dem Tageswert gutgeschrieben. Überstundenabbau zählt nicht als Arbeitszeit – er verringert so dein Zeitguthaben.</p>':'<p class="nt">Keine Abwesenheiten in diesem Monat.</p>');
+   const node=el('<div>'+h+'</div>');DS.wire(node,{go:b=>{shown=new Date(Number(b.dataset.y),Number(b.dataset.m),1);DS.close();renderStatsOnly()}});return node},
+  payout(){const y=shown.getFullYear(),m=shown.getMonth(),mk=monthKey(y,m),cur=Number(data.hourPayouts?.[mk]||0),tot=carryAt(y,m).sum;
+   let h=DS.head(monthName(y,m),'Stunden auszahlen')+'<p class="nt" style="margin-top:0!important">Zahlt dein Arbeitgeber Überstunden aus, trägst du die Stunden hier ein. Sie werden von deinem Zeitguthaben abgezogen.</p>'+stepper(String(cur).replace('.',','))+'<div class="pv" data-pv></div><div class="er" data-err style="text-align:center;margin-bottom:10px"></div><div class="ac"><button type="button" class="bt pr" data-x="save">'+ICO.check+'Speichern</button></div>';
+   const node=el('<div>'+h+'</div>');const pv=node.querySelector('[data-pv]');const up=()=>{const n=num(st.input.value);pv.innerHTML=Number.isFinite(n)&&n>=0?'Zeitguthaben danach: <b>'+sgn(tot+cur-n)+'</b>':''};const st=wireStep(node,1,up);st.input.addEventListener('input',up);up();
+   DS.wire(node,{...st,save:()=>{const n=num(st.input.value)||0,err=node.querySelector('[data-err]');if(!Number.isFinite(n)||n<0||n>500){err.textContent='Bitte 0 bis 500 Stunden eingeben.';return}data.hourPayouts=data.hourPayouts||{};if(n===0)delete data.hourPayouts[mk];else data.hourPayouts[mk]=n;afterSave();toast(n?H(n)+' als ausgezahlt gespeichert':'Auszahlung entfernt');DS.close()}});return node},
+  adjust(){const y=shown.getFullYear(),m=shown.getMonth(),mk=monthKey(y,m),cur=Number(data.adjustments?.[mk]||0),saldo=displaySaldo(y,m);
+   let h=DS.head(monthName(y,m),'Stundenkorrektur')+'<p class="nt" style="margin-top:0!important">Weicht dein Stundenstand vom Zeitnachweis deines Arbeitgebers ab, gleichst du ihn hier aus. Plus = mehr Stunden, Minus = weniger.</p>'+stepper(String(cur).replace('.',','))+'<div class="pv" data-pv></div><div class="er" data-err style="text-align:center;margin-bottom:10px"></div><div class="ac">'+(cur?'<button type="button" class="bt" data-x="zero">Zurücksetzen</button>':'')+'<button type="button" class="bt pr" data-x="save">'+ICO.check+'Speichern</button></div>';
+   const node=el('<div>'+h+'</div>');const pv=node.querySelector('[data-pv]');const up=()=>{const n=num(st.input.value);pv.innerHTML=Number.isFinite(n)&&saldo!==null?'Monatssaldo danach: <b>'+sgn(saldo-cur+n)+'</b>':''};const st=wireStep(node,.5,up);st.input.addEventListener('input',up);up();
+   const save=n=>{data.adjustments=data.adjustments||{};if(n===0)delete data.adjustments[mk];else data.adjustments[mk]=n;afterSave();toast(n?'Korrektur gespeichert':'Korrektur entfernt');DS.close()};
+   DS.wire(node,{...st,zero:()=>save(0),save:()=>{const n=num(st.input.value)||0,err=node.querySelector('[data-err]');if(!Number.isFinite(n)||Math.abs(n)>500){err.textContent='Bitte einen Wert zwischen −500 und 500 eingeben.';return}save(n)}});return node}
+ };
+ const animBars=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('.sx-ds [data-w]').forEach(i=>i.style.width=i.dataset.w+'%')));
+ const tiles=document.querySelector('#hoursPanel .sv-tiles');
+ if(tiles)tiles.addEventListener('click',e=>{const b=e.target.closest('[data-panel]');if(!b||!P[b.dataset.panel])return;e.stopPropagation();e.preventDefault();buzz();DS.node(()=>P[b.dataset.panel]());animBars()},true);
+
+ /* ---------- Schichten-Reiter ---------- */
+ const SK=(()=>{const panel=$('templatesPanel');if(!panel)return {render(){}};panel.classList.add('sx-sk');const box=document.createElement('div');box.className='sk';panel.prepend(box);
+  const COLORS=['#176f68','#1f9e8f','#2563eb','#28536c','#493078','#7a55d6','#620b0b','#b23a44','#c2410c','#a16207','#3e7653','#824657','#556477','#334155'];
+  const ABS=[['U','Urlaub'],['K','Krank'],['T','Fortbildung'],['A','Überstundenabbau']];
+  const tOf=c=>types.includes(c)?data.templates[c]:data.customShifts?.[c];
+  const bdTxt=t=>t?.bd?.stage==='RB'?'Ruf­bereitschaft':t?.bd?.stage?'Bereitschaft':'';
+  function line(c,i){const t=tOf(c),d=duration(t);const sub=t.start+' – '+t.end+(Number(t.break)?' · '+t.break+' Min. Pause':'');const bd=bdTxt(t);
+   return '<button type="button" class="c2" data-k="edit" data-c="'+esc(c)+'" style="--c:'+esc(sCol(c))+';animation-delay:'+(i*40)+'ms"><span class="ic">'+(ICO[c]||(bd?ICO.BD:ICO.X))+'</span><span class="tx"><b>'+esc(shiftTitle(c))+'</b><small>'+esc(sub)+'</small></span>'+(bd?'<span class="bg2">'+bd+'</span>':'')+'<span class="hh">'+(t?.bd?.stage==='RB'?'':Number.isFinite(d)?fmtHours(d)+' h':'')+'</span>'+chev+'</button>'}
+  function render(flash){const custom=Object.keys(data.customShifts||{});
+   box.innerHTML='<h1>Schichten</h1><p class="sub">Zeiten, Pausen und Farben deiner Dienste</p>'+
+    '<section><h3>Deine Dienste</h3><div class="sl">'+types.map(line).join('')+custom.map((c,i)=>line(c,i+types.length)).join('')+'</div><button type="button" class="add" data-k="new" style="margin-top:10px!important">'+ICO.plus+'Neue Schicht anlegen</button></section>'+
+    '<section><h3>Abwesenheiten</h3><div class="ab">'+ABS.map(([c],i)=>'<button type="button" class="c2" data-k="abs" data-c="'+c+'" style="--c:'+esc(sCol(c))+';animation-delay:'+((types.length+custom.length+i)*40)+'ms"><span class="ic">'+ICO[c]+'</span><span class="tx"><b>'+esc(shiftTitle(c))+'</b><small>ganztägig</small></span></button>').join('')+'</div></section>'+
+    '<p class="tip">'+ICO.info+'<span>Die Zeiten gelten für alle Tage mit diesem Dienst. Die Reihenfolge im Planungsmodus änderst du dort durch langes Drücken.</span></p>';
+   if(flash){const b=box.querySelector('[data-c="'+CSS.escape(flash)+'"]');if(b){b.classList.add('flash');b.scrollIntoView?.({block:'nearest',behavior:reduce?'auto':'smooth'})}}}
+  function editor(c,isNew){const std=types.includes(c),abs=ABS.some(([x])=>x===c);const t=isNew?{start:'08:00',end:'16:00',break:30}:(abs?{}:{...tOf(c)});let col=isNew?COLORS[2]:shiftColor(c);const name=isNew?'':shiftTitle(c);const used=isNew?0:Object.values(data.shifts).filter(x=>x===c).length;
+   let h=DS.head(isNew?'Schichten':(abs?'Abwesenheit':'Dienst'),isNew?'Neue Schicht':shiftTitle(c)+' bearbeiten')+'<div class="sm" data-sm><span class="ic">'+(ICO[c]||ICO.X)+'</span><span><span data-smt></span><small data-sms></small></span></div><div class="fm" style="margin-top:14px">'+
+    '<label>Name<input data-f="name" maxlength="40" placeholder="z. B. Zwischendienst" value="'+esc(name)+'" autocomplete="off"></label>';
+   if(!abs){h+='<div class="r3"><label>Beginn<input type="time" data-f="start" value="'+esc(t.start)+'"></label><label>Ende<input type="time" data-f="end" value="'+esc(t.end)+'"></label><label>Pause<input type="text" inputmode="numeric" data-f="break" value="'+esc(t.break??0)+'"></label></div>';
+    if(!std)h+='<label>Art<select data-f="bd"><option value="">Normale Arbeitszeit</option><option value="I">Bereitschaftsdienst Stufe I (Krankenhaus)</option><option value="II">Bereitschaftsdienst Stufe II (Krankenhaus)</option><option value="III">Bereitschaftsdienst Stufe III (Krankenhaus)</option><option value="A">Bereitschaftsdienst Stufe A (Heim/TV-L)</option><option value="B">Bereitschaftsdienst Stufe B (Heim/TV-L)</option><option value="C">Bereitschaftsdienst Stufe C (Heim/TV-L)</option><option value="D">Bereitschaftsdienst Stufe D (Heim/TV-L)</option><option value="RB">Rufbereitschaft</option></select></label><label data-bdf'+(t.bd?.stage&&t.bd.stage!=='RB'?'':' hidden')+'>Bereitschaft ab (leer = ganze Schicht)<input type="time" data-f="bdFrom" value="'+esc(t.bd?.from||'')+'"></label>'}
+   h+='<div><span style="display:block;font-size:12.5px;font-weight:700;color:var(--sx-muted);margin-bottom:8px">Farbe</span><div class="cl2">'+COLORS.map(x=>'<button type="button" data-x="col" data-c="'+x+'" class="'+(x.toLowerCase()===String(col).toLowerCase()?'on':'')+'" style="--c:'+x+'" aria-label="Farbe '+x+'"></button>').join('')+'<label title="Eigene Farbe" class="'+(COLORS.some(x=>x.toLowerCase()===String(col).toLowerCase())?'':'on')+'" style="--c:'+esc(col)+'"><input type="color" data-f="color" value="'+esc(/^#[0-9a-f]{6}$/i.test(col)?col:'#2563eb')+'" aria-label="Eigene Farbe"></label></div></div><div class="er" data-err></div></div>'+
+    '<div class="ac">'+(!isNew&&!std&&!abs?'<button type="button" class="bt dg" data-x="del">'+ICO.trash+'Löschen</button>':'')+'<button type="button" class="bt pr" data-x="save">'+ICO.check+'Speichern</button></div>'+(used?'<p class="nt" style="text-align:center">An '+used+' Tag'+(used>1?'en':'')+' im Kalender eingetragen.</p>':'');
+   const node=el('<div>'+h+'</div>');const f=k=>node.querySelector('[data-f="'+k+'"]');const err=node.querySelector('[data-err]');
+   if(f('bd'))f('bd').value=t.bd?.stage||'';
+   const upd=()=>{const sm=node.querySelector('[data-sm]');sm.style.setProperty('--c',col);node.querySelector('[data-smt]').textContent=(f('name').value.trim()||'Neue Schicht');let sub='Ganztägig';if(!abs){const nx={start:f('start').value,end:f('end').value,break:Number(f('break').value)};const d=duration(nx);const over=mins(nx.end)<=mins(nx.start);const rb=f('bd')?.value==='RB';sub=Number.isFinite(d)?(rb?'Rufbereitschaft · Einsatzzeit trägst du pro Tag ein':fmtHours(d)+' h Arbeitszeit')+(over?' · endet am Folgetag':''):'Bitte Zeiten und Pause prüfen'}node.querySelector('[data-sms]').textContent=sub};
+   node.addEventListener('input',upd);node.addEventListener('change',e=>{if(e.target===f('bd')){const lb=node.querySelector('[data-bdf]');lb.hidden=!(f('bd').value&&f('bd').value!=='RB')}if(e.target===f('color')){col=f('color').value;node.querySelectorAll('.cl2 .on').forEach(x=>x.classList.remove('on'));f('color').parentElement.classList.add('on');f('color').parentElement.style.setProperty('--c',col)}upd()});
+   f('color').addEventListener('input',()=>{col=f('color').value;f('color').parentElement.style.setProperty('--c',col);upd()});
+   upd();
+   DS.wire(node,{col:b=>{col=b.dataset.c;node.querySelectorAll('.cl2 .on').forEach(x=>x.classList.remove('on'));b.classList.add('on');upd()},
+    del:()=>{if(used){err.textContent='Diese Schicht ist noch an '+used+' Tag'+(used>1?'en':'')+' eingetragen. Entferne zuerst diese Einträge im Kalender.';return}if(!confirm('Schicht „'+shiftTitle(c)+'“ löschen?'))return;delete data.customShifts[c];persist();render2('');toast('Schicht gelöscht');DS.close()},
+    save:()=>{const nm=f('name').value.trim();err.textContent='';if(!nm){err.textContent='Bitte gib einen Namen ein.';f('name').focus();return}
+     if(abs){data.shiftMeta=data.shiftMeta||{};data.shiftMeta[c]={...(data.shiftMeta[c]||{}),name:nm,color:col};persist();render2(c);toast(nm+' gespeichert');DS.close();return}
+     const pause=Number(String(f('break').value).replace(',','.'));const nx={start:f('start').value,end:f('end').value,break:pause};const d=duration(nx);if(!Number.isFinite(d)||d<=0){err.textContent='Bitte Beginn, Ende und Pause (0–180 Min.) prüfen.';return}
+     if(std){data.templates[c]=nx;data.shiftMeta=data.shiftMeta||{};data.shiftMeta[c]={name:nm,color:col};persist();render2(c);toast(nm+' gespeichert');DS.close();return}
+     const bdS=f('bd').value;const next={name:nm,...nx,color:col};if(bdS)next.bd={stage:bdS,from:bdS==='RB'?'':(f('bdFrom').value||'')};const id=isNew?'C'+Date.now().toString(36):c;data.customShifts=data.customShifts||{};data.customShifts[id]=next;persist();render2(id);toast(isNew?nm+' angelegt':nm+' gespeichert');DS.close()}});
+   if(isNew)setTimeout(()=>{try{f('name').focus({preventScroll:true})}catch(e){}},reduce?0:380);
+   return node}
+  function render2(flash){render();try{renderPlannerItems()}catch(e){}try{renderTemplates()}catch(e){}try{renderCustomShifts()}catch(e){}setTimeout(()=>render(flash),reduce?0:420)}
+  box.addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;buzz();const k=b.dataset.k;if(k==='new')DS.node(()=>editor('',true));else DS.node(()=>editor(b.dataset.c,false))});
+  $('tabTemplates')?.addEventListener('click',()=>render());render();
+  return {render}})();
+
+ /* ---------- Wischen zum Schließen ---------- */
+ function swipe(panel,scroller,onClose){if(!panel||panel.dataset.sxSwipe)return;panel.dataset.sxSwipe='1';let y0=0,x0=0,dy=0,t0=0,drag=false,decided=false,ok=false;
+  panel.addEventListener('touchstart',e=>{if(e.touches.length!==1){ok=false;return}if(e.target.closest('input,textarea,select,[contenteditable="true"],.planner-items,#plannerItems,.sx-nos')){ok=false;return}const sc=typeof scroller==='function'?scroller():scroller;let n=e.target,inner=0;while(n&&n!==panel){if(n.scrollHeight>n.clientHeight+2&&/(auto|scroll)/.test(getComputedStyle(n).overflowY))inner+=n.scrollTop;n=n.parentElement}ok=(!sc||sc.scrollTop<=0)&&inner<=0;y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;drag=false;decided=false;t0=performance.now()},{passive:true});
+  panel.addEventListener('touchmove',e=>{if(!ok)return;const ddy=e.touches[0].clientY-y0,ddx=e.touches[0].clientX-x0;if(!decided){if(Math.abs(ddy)<8&&Math.abs(ddx)<8)return;decided=true;drag=ddy>0&&Math.abs(ddy)>Math.abs(ddx)*1.2;if(!drag){ok=false;return}panel.classList.remove('sx-swipe');panel.style.transition='none'}if(drag){dy=Math.max(0,ddy);panel.style.transform='translateY('+(dy<0?0:dy)+'px)';if(e.cancelable)e.preventDefault()}},{passive:false});
+  const end=()=>{if(!drag)return;drag=false;ok=false;const v=dy/Math.max(1,performance.now()-t0);panel.style.transition='';if(dy>110||v>.65){onClose(panel,dy)}else{panel.classList.add('sx-swipe');panel.style.transform='';setTimeout(()=>panel.classList.remove('sx-swipe'),300)}};
+  panel.addEventListener('touchend',end);panel.addEventListener('touchcancel',end)}
+ const slideOut=(panel,fn)=>{panel.classList.add('sx-swipe');panel.style.transform='translateY(110%)';setTimeout(()=>{fn();setTimeout(()=>{panel.classList.remove('sx-swipe');panel.style.transform=''},320)},230)};
+ swipe(DS.sheet,DS.scroller,()=>{DS.sheet.style.transform='';DS.close()});
+ const gp=$('gpSheet');const gpPanel=()=>gp?.querySelector('.gp-panel');
+ if(gp)swipe(gpPanel(),gpPanel,p=>slideOut(p,()=>gp.querySelector('.gp-done')?.click()||gp.dispatchEvent(new MouseEvent('click',{bubbles:true}))));
+ const mb=document.querySelector('#modalBackdrop .modal-dialog');if(mb)swipe(mb,mb,p=>slideOut(p,()=>$('cancel')?.click()));
+ const sch=document.querySelector('#schSheet .sch-sheet');if(sch)swipe(sch,sch,p=>slideOut(p,()=>$('schClose')?.click()));
+ /* Unterseiten in „Mehr“: vom linken Rand nach rechts wischen */
+ const MXp=window.SchivioMore?.page;if(MXp){let x0=0,y0=0,dx=0,on=false,dec=false;MXp.addEventListener('touchstart',e=>{const t=e.touches[0];on=t.clientX<32;dec=false;x0=t.clientX;y0=t.clientY;dx=0},{passive:true});MXp.addEventListener('touchmove',e=>{if(!on)return;const t=e.touches[0];const ddx=t.clientX-x0,ddy=t.clientY-y0;if(!dec){if(Math.abs(ddx)<8&&Math.abs(ddy)<8)return;dec=true;if(Math.abs(ddy)>Math.abs(ddx)){on=false;return}MXp.style.transition='none'}dx=Math.max(0,ddx);MXp.style.transform='translateX('+dx+'px)';if(e.cancelable)e.preventDefault()},{passive:false});const end=()=>{if(!on||!dec)return;on=false;MXp.style.transition='';if(dx>90){MXp.style.transform='';window.SchivioMore.close()}else MXp.style.transform=''};MXp.addEventListener('touchend',end);MXp.addEventListener('touchcancel',end)}
+
+ /* ---------- Zurück-Taste (Android) ---------- */
+ const vis=id=>{const n=$(id);return !!n&&!n.hidden&&!n.classList.contains('hidden')&&getComputedStyle(n).display!=='none'};
+ const layers=[
+  [()=>window.SchivioLightbox?.isOpen(),()=>window.SchivioLightbox.close()],
+  [()=>DS.isOpen(),()=>{const b=DS.view()?.querySelector('.hd [data-x="back"]');if(b)b.click();else DS.close()}],
+  [()=>vis('gpSheet'),()=>{const p=gpPanel();if(p)slideOut(p,()=>gp.querySelector('.gp-done')?.click());}],
+  [()=>vis('salarySheet'),()=>{$('salarySheet').hidden=true;document.body.classList.remove('modal-open')}],
+  [()=>window.SchivioMore?.isOpen(),()=>window.SchivioMore.close()],
+  [()=>vis('flow'),()=>{const b=document.querySelector('#flow .fl-back');if(b&&!b.disabled&&getComputedStyle(b).visibility!=='hidden')b.click()}],
+  [()=>vis('setupOverlay')||vis('themeOnboarding'),()=>{}],
+  [()=>vis('modalBackdrop'),()=>$('cancel')?.click()],
+  [()=>vis('agendaBackdrop'),()=>$('agendaBackdrop').classList.add('hidden')],
+  [()=>vis('schSheet'),()=>$('schClose')?.click()],
+  [()=>window.SchivioFab?.isOpen(),()=>window.SchivioFab.close()],
+  [()=>typeof plannerActive!=='undefined'&&plannerActive,()=>setPlanner(false)],
+  [()=>$('plan')?.classList.contains('hidden'),()=>$('tabPlan')?.click()]
+ ];
+ let armed=false,exitT=0;
+ const arm=()=>{if(!armed){history.pushState({sx:'guard'},'');armed=true}};
+ try{history.replaceState({sx:'root'},'');arm()}catch(e){}
+ addEventListener('popstate',()=>{armed=false;clearTimeout(exitT);const L=layers.find(([is])=>{try{return is()}catch(e){return false}});
+  if(L){try{L[1]()}catch(e){}arm();return}
+  toast('Zum Beenden noch einmal „Zurück“ drücken');exitT=setTimeout(arm,2200)});
+ window.SchivioBack={arm};
 })();
 </script>
 
