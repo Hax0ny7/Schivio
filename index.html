@@ -639,7 +639,7 @@ if(!data.setupWizardDone&&!data.themeOnboardingDone){el('onboardingConfirm').add
 })();
 </script>
 <script>
-/* Schivio v1.0.49 – Rechenkern Gehalt.
+/* Schivio v1.0.50 – Rechenkern Gehalt.
    Eine zentrale Stelle für Tarifdaten und Berechnung. Alle Anzeigen lesen von hier,
    nie aus angezeigtem Text. Neue Tarife werden nur in TARIFFS ergänzt. */
 window.SchivioPay=(function(){
@@ -789,7 +789,7 @@ const TARIFFS={
   periods:()=>[{from:'2026-01-01',to:'2026-12-31',label:'01.01.2026 – 31.12.2026',table:DWM26},{from:'2027-01-01',to:'2027-12-31',label:'01.01.2027 – 31.12.2027',table:DWM27}],
   hints:[['Wechselschichtzulage','150,00 € · Krankenhaus 228,85 € (2027: 154,20 € / 235,26 €)'],['Schichtzulage','84,98 € (2027: 87,36 €)']],
   source:'https://www.diakonie-mitteldeutschland.de/wp-content/uploads/2026/03/2026-0228-avr_in_der_fassung_fuer_die_diakonie_mitteldeutschland.pdf'},
- 'avr-diakonie':{name:'AVR Diakonie (anderes Regelwerk)',pending:'Dieses Diakonie-Regelwerk ist noch nicht hinterlegt. Verfügbar sind AVR DD und BAT-KF.'},
+ 'avr-diakonie':{name:'AVR Diakonie (anderes Regelwerk)',pending:'Dieses Diakonie-Regelwerk (z. B. Hessen, Sachsen, Baden) ist noch nicht hinterlegt. Verfügbar sind AVR DD, BAT-KF, AVR Bayern, AVR Württemberg, AVR DWBO, KTD, TV DN und AVR Mitteldeutschland.'},
  'tv-l':{name:'TV-L',fulltime:40,fulltimeHospital:38.5,rates:TVOED_RATES,groupHint:'Pflege KR 5–17 · sonst EG 1–15',
   periods:()=>[{from:'2025-11-01',to:'2026-03-31',label:'01.11.2025 – 31.03.2026',table:{...kr(TVL25),...TVL_E25}},{from:'2026-04-01',to:'2026-12-31',label:'01.04.2026 – 28.02.2027',table:{...kr(TVL26),...TVL_E26}},{from:'2027-01-01',to:'2027-02-28',label:'01.04.2026 – 28.02.2027 (EG 1 ab 01.01.2027)',table:{...kr(TVL26),...TVL_E2701}},{from:'2027-03-01',to:'2027-12-31',label:'01.03.2027 – 31.12.2027',table:{...kr(TVL27),...TVL_E27}}],
   hints:[['Wechselschichtzulage Krankenhaus (ständig)','250,00 € ab 07/2026 (vorher 150 €)'],['Schichtzulage Krankenhaus (ständig)','100,00 € ab 07/2026 (vorher 60 €)']],
