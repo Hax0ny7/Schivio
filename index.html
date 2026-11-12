@@ -623,7 +623,7 @@ render();
 (function(){
 const el=id=>document.getElementById(id), overlay=el('setupOverlay');let step=0;
 function sync(){el('setupHoursFields').hidden=!el('setupHoursEnabled').checked;el('setupSalaryFields').hidden=!el('setupSalaryEnabled').checked;el('setupTariffFields').hidden=!el('setupSalaryEnabled').checked;for(let i=1;i<=3;i++)el('setupStep'+i).hidden=i!==step+1;el('setupProgress').textContent='Schritt '+(step+1)+' von 3';el('setupHeading').textContent=['Arbeitszeitprognose','Gehaltsprognose','Tarifprofil'][step];el('setupBack').textContent=step?'Zurück':'Abbrechen';el('setupNext').textContent=step===2?'Speichern':'Weiter'}
-function open(){const w=data.setupOptions||{};el('setupHoursEnabled').checked=w.hoursEnabled!==false;el('setupSalaryEnabled').checked=!!w.salaryEnabled;el('setupHoursMode').value=w.hoursMode||'weekly';el('setupHoursValue').value=(w.hoursMode==='monthly'?w.hoursValue:data.profile.weekly||w.hoursValue)||39;el('setupWorkplace').value=w.workplace||'hospital';el('setupTariff').value=data.profile.tariff||w.tariff||'';el('setupRegion').value=data.profile.state||w.region||'NW';el('setupFulltime').value=data.profile.fulltime||w.fulltime||'';el('setupGroup').value=data.profile.group||w.group||'';el('setupLevel').value=data.profile.level||w.level||'';step=0;sync();overlay.classList.remove('hidden');overlay.setAttribute('aria-hidden','false')}
+function open(){const w=data.setupOptions||{};el('setupHoursEnabled').checked=w.hoursEnabled!==false;el('setupSalaryEnabled').checked=!!w.salaryEnabled;el('setupHoursMode').value=w.hoursMode||'weekly';el('setupHoursValue').value=(w.hoursMode==='monthly'?w.hoursValue:data.profile.weekly||w.hoursValue)||39;el('setupWorkplace').value=w.workplace||'hospital';el('setupTariff').value=data.profile.tariff||w.tariff||'';el('setupRegion').value=data.profile.state||w.region||'NW';el('setupFulltime').value=data.profile.fulltime||w.fulltime||'';el('setupGroup').value=data.profile.group||w.group||'';el('setupLevel').value=data.profile.level||w.level||'';step=0;sync();window.__wizFill&&window.__wizFill();overlay.classList.remove('hidden');overlay.setAttribute('aria-hidden','false')}
 function close(){overlay.classList.add('hidden');overlay.setAttribute('aria-hidden','true')}
 el('setupHoursEnabled').onchange=sync;el('setupSalaryEnabled').onchange=sync;
 el('setupBack').onclick=()=>{if(step){step--;sync()}else close()};
@@ -638,7 +638,7 @@ if(!data.setupWizardDone&&!data.themeOnboardingDone){el('onboardingConfirm').add
 })();
 </script>
 <script>
-/* Schivio v1.0.33 – Rechenkern Gehalt.
+/* Schivio v1.0.34 – Rechenkern Gehalt.
    Eine zentrale Stelle für Tarifdaten und Berechnung. Alle Anzeigen lesen von hier,
    nie aus angezeigtem Text. Neue Tarife werden nur in TARIFFS ergänzt. */
 window.SchivioPay=(function(){
@@ -678,7 +678,7 @@ const TARIFFS={
   sourceFor:st=>OST.includes(st.state)?'https://www.erzbistumberlin.de/fileadmin/user_mount/Dokumentencenter/extern/Amtsblaetter/aktuelles_Jahr_Monatsausgaben/2025-09_Amtsblatt_Anlage_Langfassung_Eckpunktebeschluss2026.pdf':'https://www.oeffentlichen-dienst.de/kirche-wohlfahrt/avr/a/4358-2026.html',
   hints:[['Wechselschichtzulage (ständig)','250,00 €'],['Schichtzulage (ständig)','100,00 €'],['Pflegezulage','141,82 € (West, ab 02/2026)']]},
  'bat-kf':{name:'BAT-KF · Diakonie Rheinland-Westfalen-Lippe',fulltime:39,fulltimeHospital:38.5,rates:BATKF_RATES,
-  periods:()=>[{from:'2026-05-01',to:'2027-03-31',label:'01.05.2026 – 31.03.2027',table:BATKF26}],groupHint:'Pflege z. B. 7a, 8a, 9a · sonst EG 1–15',
+  periods:()=>[{from:'2026-05-01',to:'2027-03-31',label:'01.05.2026 – 31.03.2027',table:BATKF26}],pflegeKeys:['2A','3A','4A','7A','8A','9A','9B','9C','9D','10A','11A','11B','12A'],groupHint:'Pflege z. B. 7a, 8a, 9a · sonst EG 1–15',
   hints:[['Wechselschichtzulage Pflege (ständig)','250,00 €'],['Wechselschichtzulage sonst','200,00 €'],['Schichtzulage (ständig)','100,00 €']],
   source:'https://tarifvertrag-online.de/entgelttabelle/kirche/bat-kf'},
  'avr-dd':{name:'AVR Diakonie Deutschland (AVR DD)',fulltime:39,rates:DD_RATES,levels:LEVELS_DD,groupHint:'EG 1–13, Pflegefachkraft meist EG 7',
@@ -779,7 +779,14 @@ function compute(y,m){
  else out.notes.push('Für Zuschläge fehlt die Stundenbasis.');
  return out}
 function levelLabels(tariffValue){const T=TARIFFS[normalizeTariff(tariffValue)];return T?.levels||null}
-return {compute,normalizeTariff,normalizeGroup,levelLabels,TARIFFS};
+// Für Auswahllisten: Gruppen und besetzte Stufen der aktuell gültigen Tabelle (sonst der jüngsten).
+function groupLabel(T,key){if(T.groupPrefix)return T.groupPrefix+key;if(/^P\d/.test(key))return key;return 'EG '+key.replace(/(\d)([A-D])$/,(m,d,l)=>d+l.toLowerCase())}
+function catalog(tariffValue,state){const T=TARIFFS[normalizeTariff(tariffValue)];if(!T||!T.periods)return null;const ps=T.periods({state:state||'NW'});const now=new Date(),day=iso(now.getFullYear(),now.getMonth(),now.getDate());
+ const per=ps.find(p=>day>=p.from&&day<=p.to)||ps.filter(p=>p.from<=day).slice(-1)[0]||ps[0];
+ const nat=k=>{const m=/^(P)?(\d+)([A-DÜ]?)$/.exec(k);return m?[m[3]&&m[3]!=='Ü'?0:1,Number(m[2]),m[3]||'']:[2,0,k]};
+ const pk=T.pflegeKeys||[];const keys=Object.keys(per.table).sort((a,b)=>{const pa=pk.indexOf(a),pb=pk.indexOf(b);if(pa>=0||pb>=0)return (pa<0?99:pa)-(pb<0?99:pb);const x=nat(a),y=nat(b);return x[1]-y[1]||String(x[2]).localeCompare(String(y[2]))});
+ return {period:per.label,groups:keys.map(k=>({key:k,label:groupLabel(T,k)+(pk.includes(k)?' (Pflege)':''),levels:per.table[k].map((v,i)=>v?{n:i+1,label:T.levels?T.levels[i]:'Stufe '+(i+1),amount:v}:null).filter(Boolean)})),fulltime:T.fulltime,fulltimeHospital:T.fulltimeHospital}}
+return {compute,normalizeTariff,normalizeGroup,levelLabels,catalog,TARIFFS};
 })();
 
 </script><script>
@@ -1043,12 +1050,33 @@ refresh();
 })();
 </script>
 <script>
-/* v1.0.32: Stufenbezeichnungen und Gruppenhinweis passend zum gewählten Tarif */
+/* v1.0.34: Entgeltgruppe und Stufe als Auswahllisten passend zum Tarif (Mehr + Einrichtung) */
 (function(){
- const t=document.getElementById('tariff'),lv=document.getElementById('level'),gl=document.getElementById('groupLabel');if(!t||!lv)return;
- function sync(){const labels=SchivioPay.levelLabels(t.value),cur=lv.value;const n=labels?labels.length:6;
-  lv.replaceChildren(new Option('Bitte auswählen',''));for(let i=1;i<=n;i++)lv.append(new Option(labels?labels[i-1]:String(i),String(i)));
-  lv.value=Number(cur)<=n?cur:'';const T=SchivioPay.TARIFFS[SchivioPay.normalizeTariff(t.value)];if(gl)gl.textContent='Entgeltgruppe ('+(T?.groupHint||'z. B. P9')+')'}
- t.addEventListener('change',sync);sync();if(data.profile?.level&&Number(data.profile.level)<=lv.options.length-1)lv.value=data.profile.level;
+ const fmt=n=>n.toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+ function toSelect(id){const old=document.getElementById(id);if(!old||old.tagName==='SELECT')return old;const sel=document.createElement('select');sel.id=id;sel.className=old.className;old.replaceWith(sel);return sel}
+ function field(el){return el?.closest('.field')||null}
+ function wire(o){
+  const t=document.getElementById(o.tariff),g=toSelect(o.group),l=toSelect(o.level);if(!t||!g||!l)return null;
+  const gl=document.querySelector('label[for="'+o.group+'"]'),ll=document.querySelector('label[for="'+o.level+'"]'),ft=document.getElementById(o.fulltime);
+  function fill(wantG,wantL){
+   const st=(document.getElementById(o.state)||{}).value||data.profile?.state||'NW';const cat=SchivioPay.catalog(t.value,st);const ind=SchivioPay.normalizeTariff(t.value)==='individual';
+   [g,l,gl,ll].forEach(e=>{if(e)e.hidden=ind});[field(g),field(l)].forEach(e=>{if(e)e.hidden=ind});
+   const T=SchivioPay.TARIFFS[SchivioPay.normalizeTariff(t.value)];
+   if(gl)gl.textContent='Entgeltgruppe'+(T?.groupHint?' ('+T.groupHint+')':'');if(ll)ll.textContent=T?.levels?'Stufe':'Erfahrungsstufe';
+   if(ft){const hosp=(data.setupOptions||{}).workplace==='hospital';const d=cat?(hosp&&cat.fulltimeHospital?cat.fulltimeHospital:cat.fulltime):null;ft.placeholder=d?'leer = Tarifwert ('+String(d).replace('.',',')+' Std.)':'z. B. 39'}
+   const gWant=SchivioPay.normalizeGroup(wantG??g.value),lWant=String(wantL??l.value);
+   g.replaceChildren(new Option(cat?'Bitte auswählen':(T?.pending?'Tarif folgt noch':'Erst Tarif wählen'),''));l.replaceChildren(new Option('Bitte auswählen',''));
+   if(!cat)return;for(const x of cat.groups)g.append(new Option(x.label,x.key));
+   g.value=cat.groups.some(x=>x.key===gWant)?gWant:'';
+   const grp=cat.groups.find(x=>x.key===g.value);if(grp)for(const v of grp.levels)l.append(new Option(v.label+' · '+fmt(v.amount),String(v.n)));
+   l.value=grp&&grp.levels.some(v=>String(v.n)===lWant)?lWant:'';
+  }
+  t.addEventListener('change',()=>fill());g.addEventListener('change',()=>fill(g.value));const se=document.getElementById(o.state);if(se)se.addEventListener('change',()=>fill());
+  return fill;
+ }
+ const mehr=wire({tariff:'tariff',group:'group',level:'level',fulltime:'fulltime',state:'state'});
+ const wiz=wire({tariff:'setupTariff',group:'setupGroup',level:'setupLevel',fulltime:'setupFulltime',state:'setupRegion'});
+ if(mehr){const op=populateProfile;populateProfile=function(){op();mehr(data.profile?.group||'',data.profile?.level||'')};mehr(data.profile?.group||'',data.profile?.level||'')}
+ if(wiz){window.__wizFill=()=>wiz(data.profile?.group||data.setupOptions?.group||'',data.profile?.level||data.setupOptions?.level||'');window.__wizFill()}
 })();
 </script></body></html>
