@@ -639,7 +639,7 @@ if(!data.setupWizardDone&&!data.themeOnboardingDone){el('onboardingConfirm').add
 })();
 </script>
 <script>
-/* Schivio v1.0.52 – Rechenkern Gehalt.
+/* Schivio v1.0.53 – Rechenkern Gehalt.
    Eine zentrale Stelle für Tarifdaten und Berechnung. Alle Anzeigen lesen von hier,
    nie aus angezeigtem Text. Neue Tarife werden nur in TARIFFS ergänzt. */
 window.SchivioPay=(function(){
@@ -1049,7 +1049,7 @@ function draw(){
 (function(){
 const get=id=>document.getElementById(id);
 const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(n);
-const labels=[['wechsel','Wechselschichtzulage'],['pflege1','Pflegezulage I'],['pflege2','Pflegezulage II'],['leistung','Leistungszulage'],['stelle','Stellenzulage']];
+const labels=[['wechsel','Wechselschichtzulage'],['schicht','Schichtzulage'],['pflege1','Pflegezulage I'],['pflege2','Pflegezulage II'],['leistung','Leistungszulage'],['stelle','Stellenzulage'],['sonstige','Sonstige Zulage']];
 const dash=document.querySelector('#hoursPanel .sch-dashboard');if(!dash)return;
 const summary=document.createElement('div');summary.id='salarySummary';
 summary.innerHTML='<h3>Gehaltsübersicht</h3><div id="salarySummaryLines"></div><div class="salary-total"><span>Voraussichtliches Brutto</span><strong id="salarySummaryTotal">–</strong></div><p id="salarySummaryNote" class="salary-note"></p><button class="secondary salary-action" id="salaryDetailsOpen" type="button">Zulagen & Zuschläge ansehen · Einstellungen</button>';
@@ -1271,7 +1271,133 @@ refresh();
  if(mehr){const op=populateProfile;populateProfile=function(){op();mehr(data.profile?.group||'',data.profile?.level||'')};mehr(data.profile?.group||'',data.profile?.level||'')}
  if(wiz){window.__wizFill=()=>wiz(data.profile?.group||data.setupOptions?.group||'',data.profile?.level||data.setupOptions?.level||'');window.__wizFill()}
 })();
-</script><style id="flowStyle">
+</script><style id="gpStyle">
+#schSimpleSections{display:none!important}
+#gpCard{margin:16px 0 8px;padding:18px 18px 16px;border-radius:22px;background:color-mix(in srgb,currentColor 5%,transparent);border:1px solid color-mix(in srgb,currentColor 10%,transparent)}
+#gpCard[hidden]{display:none}
+.gp-eyebrow{font-size:.85rem;opacity:.65;margin:0}
+.gp-total{font-size:2rem;font-weight:750;margin:2px 0 12px;letter-spacing:-.01em}
+.gp-bar{display:flex;height:10px;border-radius:6px;overflow:hidden;gap:2px;margin-bottom:14px;background:color-mix(in srgb,currentColor 8%,transparent)}
+.gp-bar i{display:block;height:100%}
+.gp-bar i:nth-child(1){background:var(--accent-bright,#64d3cf)}.gp-bar i:nth-child(2){background:color-mix(in srgb,var(--accent-bright,#64d3cf) 55%,transparent)}.gp-bar i:nth-child(3){background:color-mix(in srgb,var(--accent-bright,#64d3cf) 28%,transparent)}
+.gp-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid color-mix(in srgb,currentColor 9%,transparent);width:100%;background:none!important;border-left:0!important;border-right:0!important;border-bottom:0!important;color:inherit!important;font:inherit;text-align:left;border-radius:0!important}
+.gp-dot{width:10px;height:10px;border-radius:50%;flex:none}
+.gp-row:nth-of-type(1) .gp-dot{background:var(--accent-bright,#64d3cf)}.gp-row:nth-of-type(2) .gp-dot{background:color-mix(in srgb,var(--accent-bright,#64d3cf) 55%,transparent)}.gp-row:nth-of-type(3) .gp-dot{background:color-mix(in srgb,var(--accent-bright,#64d3cf) 28%,transparent)}
+.gp-row span{flex:1;display:flex;flex-direction:column}.gp-row small{opacity:.6;font-size:.8rem;margin-top:2px}
+.gp-row b{font-weight:650;white-space:nowrap}
+.gp-chev{opacity:.5;transition:transform .25s ease;font-size:.9rem}
+.gp-row[aria-expanded="true"] .gp-chev{transform:rotate(180deg)}
+.gp-sub{display:grid;gap:0;padding:0 0 6px 20px;overflow:hidden}
+.gp-sub[hidden]{display:none}
+.gp-sub div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;font-size:.92rem}
+.gp-sub div span{opacity:.8}.gp-sub div em{font-style:normal;opacity:.55;font-size:.82rem;margin-left:6px}
+.gp-warn{margin:10px 0 0;padding:10px 12px;border-radius:12px;font-size:.85rem;line-height:1.4;background:color-mix(in srgb,#e0b96f 14%,transparent)}
+.gp-btn{width:100%;margin-top:14px;padding:14px;border-radius:14px;font-weight:650;font-size:1rem}
+.gp-foot{font-size:.78rem;opacity:.55;margin:10px 0 0;text-align:center}
+.gp-how{margin-top:8px;font-size:.82rem;opacity:.75}.gp-how summary{cursor:pointer;text-align:center;opacity:.8;list-style:none}.gp-how summary::-webkit-details-marker{display:none}.gp-how ul{margin:8px 0 0;padding-left:18px;display:grid;gap:6px;line-height:1.4}
+#gpSheet{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .25s ease}
+#gpSheet[hidden]{display:none}#gpSheet.show{opacity:1}
+#gpSheet .gp-panel{width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:24px 24px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom));transform:translateY(40px);transition:transform .35s cubic-bezier(.22,1,.36,1)}
+#gpSheet.show .gp-panel{transform:none}
+.gp-grab{width:40px;height:5px;border-radius:3px;background:currentColor;opacity:.2;margin:4px auto 12px}
+.gp-panel h2{margin:0 0 4px;font-size:1.35rem}
+.gp-panel h3{margin:22px 0 4px;font-size:1.05rem}
+.gp-panel .gp-hint{margin:0 0 12px;font-size:.88rem;opacity:.65;line-height:1.4}
+.gp-al{display:flex;align-items:center;gap:10px;padding:8px 0}
+.gp-al span{flex:1}
+.gp-al input{width:120px;text-align:right;font-size:1rem;padding:10px 12px;border-radius:12px}
+.gp-x{background:none!important;border:0!important;color:inherit!important;opacity:.5;font-size:1.3rem;width:34px;height:34px;padding:0}
+.gp-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.gp-chip{border-radius:999px!important;padding:9px 14px!important;font-size:.9rem!important;background:transparent!important;border:1px dashed color-mix(in srgb,currentColor 30%,transparent)!important;color:inherit!important}
+.gp-seg{display:grid;gap:8px}
+.gp-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid color-mix(in srgb,currentColor 14%,transparent)!important;background:color-mix(in srgb,currentColor 4%,transparent)!important;color:inherit!important;font:inherit;text-align:left;width:100%}
+.gp-opt i{width:18px;height:18px;border-radius:50%;border:2px solid color-mix(in srgb,currentColor 40%,transparent);flex:none;box-sizing:border-box}
+.gp-opt.sel{border-color:var(--accent-bright,#64d3cf)!important;background:color-mix(in srgb,var(--accent-bright,#64d3cf) 14%,transparent)!important}
+.gp-opt.sel i{border:5px solid var(--accent-bright,#64d3cf)}
+.gp-opt span{display:flex;flex-direction:column}.gp-opt small{opacity:.6;font-size:.8rem;margin-top:2px}
+.gp-field{display:flex;align-items:center;gap:10px;padding:6px 0}.gp-field span{flex:1;font-size:.95rem}.gp-field input,.gp-field select{width:150px;padding:10px 12px;border-radius:12px;font-size:1rem}
+.gp-done{width:100%;margin-top:24px;padding:15px;border-radius:14px;font-weight:650;font-size:1.05rem;border:0!important;background:var(--accent-bright,#64d3cf)!important;color:#0b1a1c!important}
+</style>
+<script>
+/* v1.0.53: Auswertung – aufgeräumte Gehaltskarte und neues Fenster „Gehalt anpassen“ */
+(function(){
+ const P=window.SchivioPay;const dash=document.querySelector('#hoursPanel .sch-dashboard');if(!P||!dash)return;
+ const eur=n=>Number(n||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});const num=n=>Number(n||0).toLocaleString('de-DE',{maximumFractionDigits:1});
+ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const ALLOW=[['wechsel','Wechselschichtzulage',/wechselschicht/i],['schicht','Schichtzulage',/^schichtzulage/i],['pflege1','Pflegezulage',/pflegezulage/i],['pflege2','Pflegezulage II',null],['leistung','Leistungszulage',null],['stelle','Stellenzulage',null],['sonstige','Sonstige Zulage',null]];
+ const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+ const card=document.createElement('section');card.id='gpCard';
+ const anchor=document.getElementById('schSimpleSections')||dash;anchor.insertAdjacentElement(anchor.id==='schSimpleSections'?'beforebegin':'afterend',card);
+ function allowSum(){const c=data.salaryAllowances||{};return ALLOW.reduce((a,[k])=>a+(c[k]?.enabled?Number(c[k].value)||0:0),0)}
+ function hintAmount(label){const r=P.compute(shown.getFullYear(),shown.getMonth());for(const [l,v] of (r.hints||[])){if(label&&label.test(l)){const m=/(\d{1,3}(?:\.\d{3})*,\d{2})\s*€/.exec(v);if(m)return Number(m[1].replace(/\./g,'').replace(',','.'))}}return null}
+ function draw(){const enabled=!!data.setupOptions?.salaryEnabled;card.hidden=!enabled;if(!enabled)return;
+  const y=shown.getFullYear(),m=shown.getMonth();const r=P.compute(y,m);
+  if(!(r.base>0)){card.innerHTML='<p class="gp-eyebrow">Gehalt im '+MONTHS[m]+'</p><div class="gp-warn">'+esc(r.reason||'Für diesen Monat ist keine Berechnung möglich.')+'</div><button class="gp-btn" type="button" data-gp-open>Gehalt anpassen</button>';card.querySelector('[data-gp-open]').onclick=open;return}
+  const base=r.base,al=Math.round(allowSum()*100)/100,zu=r.zuschlag?.total||0,tot=base+al+zu;
+  const lines=(r.zuschlag?.lines||[]).filter(x=>x.euro>0);
+  const short=l=>l.replace(/s?arbeit\b/,'').replace(/ \(.*$/,'').replace('24./31.12.','24./31. Dez.');
+  const sub=r.tariffId==='individual'?'Eigene Werte':r.tariff?.beamte?'Besoldung':[r.tariff?.name?.replace(/ \(.*\)$/,''),r.info].filter(Boolean).join(' · ');
+  const warns=(r.notes||[]).filter(n=>/nicht (hinterlegt|berechnet)|bitte mit/i.test(n));
+  const w=v=>tot>0?Math.max(0,v/tot*100).toFixed(2)+'%':'0';
+  card.innerHTML='<p class="gp-eyebrow">Brutto-Prognose '+MONTHS[m]+' '+y+'</p><div class="gp-total">'+eur(tot)+'</div>'+
+   '<div class="gp-bar" aria-hidden="true"><i style="width:'+w(base)+'"></i><i style="width:'+w(al)+'"></i><i style="width:'+w(zu)+'"></i></div>'+
+   '<button class="gp-row" type="button" data-gp-open><i class="gp-dot"></i><span>Grundgehalt<small>'+esc(sub)+'</small></span><b>'+eur(base)+'</b></button>'+
+   '<button class="gp-row" type="button" data-gp-open><i class="gp-dot"></i><span>Zulagen<small>'+(al>0?'feste Beträge pro Monat':'noch keine eingetragen')+'</small></span><b>'+eur(al)+'</b></button>'+
+   '<button class="gp-row" type="button" id="gpZuToggle" aria-expanded="false"'+(lines.length?'':' disabled')+'><i class="gp-dot"></i><span>Zuschläge<small>'+(lines.length?'für Nacht, Wochenende & Feiertage':'keine in diesem Monat')+'</small></span><b>'+eur(zu)+'</b>'+(lines.length?'<em class="gp-chev">▾</em>':'')+'</button>'+
+   '<div class="gp-sub" id="gpZuLines" hidden>'+lines.map(x=>'<div><span>'+esc(short(x.label))+'<em>'+num(x.hours)+' Std.</em></span><b>'+eur(x.euro)+'</b></div>').join('')+'</div>'+
+   warns.map(n=>'<div class="gp-warn">'+esc(n)+'</div>').join('')+
+   '<button class="gp-btn" type="button" data-gp-open>Zulagen & Einstellungen</button>'+
+   '<details class="gp-how"><summary>Wie wird gerechnet?</summary><ul>'+(r.notes||[]).filter(n=>!warns.includes(n)).map(n=>'<li>'+esc(n)+'</li>').join('')+'<li>Prognose aus deinen eingetragenen Diensten – keine verbindliche Abrechnung.</li></ul></details>';
+  card.querySelectorAll('[data-gp-open]').forEach(b=>b.onclick=open);
+  const t=card.querySelector('#gpZuToggle');if(t&&lines.length)t.onclick=()=>{const o=t.getAttribute('aria-expanded')!=='true';t.setAttribute('aria-expanded',o);card.querySelector('#gpZuLines').hidden=!o}}
+ // Fenster „Gehalt anpassen“
+ const sheet=document.createElement('div');sheet.id='gpSheet';sheet.hidden=true;sheet.innerHTML='<div class="gp-panel" role="dialog" aria-modal="true" aria-label="Gehalt anpassen"></div>';document.body.append(sheet);
+ const panel=sheet.querySelector('.gp-panel');
+ const parse=v=>{const t=String(v).trim().replace(/\s|€|%/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');return t===''?0:Number(t)};
+ function setAllow(k,v){data.salaryAllowances=data.salaryAllowances||{};data.salaryAllowances[k]={enabled:v>0,value:v};persist();render()}
+ function opt(group,val,title,sub,cur,fn){const b=document.createElement('button');b.type='button';b.className='gp-opt'+(val===cur?' sel':'');b.innerHTML='<i></i><span>'+esc(title)+(sub?'<small>'+esc(sub)+'</small>':'')+'</span>';b.onclick=()=>{group.querySelectorAll('.gp-opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');fn(val)};group.append(b)}
+ function field(label,key,ph,type){const l=document.createElement('label');l.className='gp-field';const s=document.createElement('span');s.textContent=label;const i=document.createElement('input');i.type=type||'text';if(!type)i.inputMode='decimal';i.placeholder=ph||'';const v=(data.individualPay||{})[key];i.value=v===undefined||v===''?'':(type?v:String(v).replace('.',','));
+  i.onchange=()=>{data.individualPay=data.individualPay||{};data.individualPay[key]=type==='time'?i.value:(i.value.trim()===''?'':parse(i.value));persist();render()};l.append(s,i);return l}
+ function build(){const r=P.compute(shown.getFullYear(),shown.getMonth());const T=r.tariff;panel.replaceChildren();
+  panel.insertAdjacentHTML('beforeend','<div class="gp-grab"></div><h2>Gehalt anpassen</h2><p class="gp-hint">Änderungen werden sofort übernommen.</p>');
+  // eigenes Gehalt (Individuell / Beamte)
+  if(T?.beamte){panel.insertAdjacentHTML('beforeend','<h3>Besoldung</h3><p class="gp-hint">Grundgehalt laut Bezügemitteilung und die Stundensätze für Dienst zu ungünstigen Zeiten.</p>');
+   panel.append(field('Grundgehalt (brutto)','monthly','z. B. 3.600'));const ip=data.individualPay||{};const l=document.createElement('label');l.className='gp-field';l.innerHTML='<span>Sätze von</span>';const s=document.createElement('select');s.innerHTML=Object.entries(P.DUZ).map(([k,v])=>'<option value="'+k+'">'+esc(v.name.replace(/ \(.*\)$/,''))+'</option>').join('');s.value=P.DUZ[ip.duzPreset]?ip.duzPreset:'bund';
+   s.onchange=()=>{data.individualPay=data.individualPay||{};data.individualPay.duzPreset=s.value;['duzSun','duzSat','duzNight'].forEach(k=>delete data.individualPay[k]);persist();render();build()};l.append(s);panel.append(l);
+   const D=P.DUZ[s.value]||P.DUZ.bund;const ph=v=>v?String(v.toFixed(2)).replace('.',',')+' €':'€ je Std.';panel.append(field('Sonn- & Feiertag (€/Std.)','duzSun',ph(D.sun)),field('Samstag 13–20 Uhr (€/Std.)','duzSat',ph(D.sat)),field('Nacht 20–6 Uhr (€/Std.)','duzNight',ph(D.night)))}
+  else if(T?.individual){panel.insertAdjacentHTML('beforeend','<h3>Dein Gehalt</h3><p class="gp-hint">Monatsgehalt und Zuschlagssätze findest du auf deiner Gehaltsabrechnung oder im Arbeitsvertrag.</p>');
+   panel.append(field('Monatsgehalt (brutto)','monthly','z. B. 3.500'),field('Nachtzuschlag (%)','night','z. B. 20'),field('Sonntagszuschlag (%)','sunday','z. B. 25'),field('Feiertagszuschlag (%)','holiday','z. B. 35'),field('Samstagszuschlag (%)','saturday','0'),field('Nacht ab','nightFrom','21:00','time'),field('Nacht bis','nightTo','06:00','time'))}
+  // Zulagen
+  panel.insertAdjacentHTML('beforeend','<h3>Deine Zulagen</h3><p class="gp-hint">Feste Beträge, die jeden Monat auf deiner Abrechnung stehen.</p>');
+  const list=document.createElement('div');panel.append(list);const chips=document.createElement('div');chips.className='gp-chips';
+  const c=data.salaryAllowances||{};const shownKeys=ALLOW.filter(([k])=>c[k]?.enabled&&Number(c[k].value)>0||sheet.dataset['add_'+k]);
+  shownKeys.forEach(([k,label])=>{const row=document.createElement('div');row.className='gp-al';const s=document.createElement('span');s.textContent=label;const i=document.createElement('input');i.type='text';i.inputMode='decimal';i.placeholder='0,00 €';const v=Number(c[k]?.value)||0;i.value=v?String(v).replace('.',','):'';
+   i.onchange=()=>{const n=parse(i.value);if(!Number.isFinite(n)||n<0||n>5000){i.value='';return}setAllow(k,n)};const x=document.createElement('button');x.type='button';x.className='gp-x';x.setAttribute('aria-label',label+' entfernen');x.textContent='×';x.onclick=()=>{delete sheet.dataset['add_'+k];setAllow(k,0);build()};row.append(s,i,x);list.append(row);if(sheet.dataset['add_'+k]==='focus'){sheet.dataset['add_'+k]='1';setTimeout(()=>i.focus(),50)}});
+  ALLOW.filter(x=>!shownKeys.includes(x)).forEach(([k,label,re])=>{const amt=re?hintAmount(re):null;const b=document.createElement('button');b.type='button';b.className='gp-chip';b.textContent='+ '+label+(amt?' · '+eur(amt).replace(',00',''):'');
+   b.onclick=()=>{if(amt){setAllow(k,amt)}else sheet.dataset['add_'+k]='focus';build()};chips.append(b)});
+  if(!shownKeys.length)list.insertAdjacentHTML('beforeend','<p class="gp-hint" style="margin:0 0 4px">Noch keine Zulagen eingetragen. Tippe unten auf eine Zulage, um sie hinzuzufügen.</p>');
+  panel.append(chips);
+  if(!T?.individual&&(r.hints||[]).length)panel.insertAdjacentHTML('beforeend','<p class="gp-hint" style="margin-top:10px">Vorschläge mit Betrag stammen aus deinem Tarif. Trag nur ein, was dir laut Abrechnung zusteht.</p>');
+  // Dienste
+  if(!T?.beamte){panel.insertAdjacentHTML('beforeend','<h3>Wie arbeitest du?</h3><p class="gp-hint">Davon hängen einige Zuschläge ab.</p>');const g=document.createElement('div');g.className='gp-seg';panel.append(g);const cur=r.settings?.shiftModel||'wechsel';
+   const set=v=>{data.payShiftModel=v;persist();render()};opt(g,'wechsel','Wechselschicht mit Nachtdiensten','Früh, Spät und Nacht im Wechsel',cur,set);opt(g,'schicht','Schichten ohne Nachtdienste','z. B. nur Früh und Spät',cur,set);opt(g,'none','Keine Schichtarbeit','feste Arbeitszeiten',cur,set)}
+  // Feiertag
+  if(T&&!T.individual&&r.tariff?.rates&&r.tariff.rates.holidayNoComp!==r.tariff.rates.holidayComp){panel.insertAdjacentHTML('beforeend','<h3>Arbeit an Feiertagen</h3><p class="gp-hint">Bekommst du für einen Feiertagsdienst später einen freien Tag zurück? Das ist der Normalfall.</p>');
+   const g=document.createElement('div');g.className='gp-seg';panel.append(g);const cur=data.tariffHolidayMode==='no-comp'?'no-comp':'comp';const set=v=>{data.tariffHolidayMode=v;persist();render()};
+   opt(g,'comp','Ja, ich bekomme einen freien Tag','Normalfall',cur,set);opt(g,'no-comp','Nein, es gibt nur Geld','dann ist der Feiertagszuschlag deutlich höher',cur,set)}
+  const done=document.createElement('button');done.type='button';done.className='gp-done';done.textContent='Fertig';done.onclick=close;panel.append(done)}
+ function open(){Object.keys(sheet.dataset).forEach(k=>delete sheet.dataset[k]);build();sheet.hidden=false;document.body.classList.add('modal-open');requestAnimationFrame(()=>sheet.classList.add('show'))}
+ function close(){sheet.classList.remove('show');setTimeout(()=>{sheet.hidden=true;document.body.classList.remove('modal-open')},250)}
+ sheet.addEventListener('click',e=>{if(e.target===sheet)close()});
+ {const bg=()=>{const op=c=>c&&!/rgba\(0, 0, 0, 0\)|transparent/.test(c);const cb=getComputedStyle(document.body).backgroundColor,ch=getComputedStyle(document.documentElement).backgroundColor;panel.style.background=op(cb)?cb:(op(ch)?ch:'#1d1e21')};const o=open;open=function(){bg();o()}}
+ // Kreis-Mitte öffnet das neue Fenster statt des alten
+ document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.sch-wheel-center')&&data.setupOptions?.salaryEnabled){e.stopPropagation();e.preventDefault();open()}},true);
+ document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('.sch-wheel-center')&&data.setupOptions?.salaryEnabled){e.stopPropagation();e.preventDefault();open()}},true);
+ const oldRender=render;render=function(){oldRender();draw()};const oldStats=renderStatsOnly;renderStatsOnly=function(){oldStats();draw()};draw();
+ window.SchivioPayCard={open,draw};
+})();
+</script>
+<style id="flowStyle">
 #flow{position:fixed;inset:0;z-index:10000;background:#18191b;display:flex;flex-direction:column;color:var(--text,#f3f4f6);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 #flow[hidden]{display:none}
 #flow .fl-top{display:flex;align-items:center;gap:12px;padding:14px 18px 6px}
