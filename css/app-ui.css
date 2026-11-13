@@ -56,13 +56,13 @@ html body #togglePlanner.sx-open{border-radius:50%!important}
 #togglePlanner.sx-open .sx-fi .p{opacity:0;transform:rotate(90deg) scale(.6)}
 #togglePlanner.sx-open .sx-fi .x{opacity:1;transform:none}
 .calendar-shell:has(.planner-bar:not(.hidden)) #togglePlanner.floating-edit{opacity:0!important;transform:scale(.5)!important;pointer-events:none}
-.sx-scrim{position:absolute;inset:0;z-index:39;background:rgba(8,9,10,.55);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .3s}
+.sx-scrim{position:absolute;inset:0;z-index:39;background:rgba(8,9,10,.62);opacity:0;pointer-events:none;transition:opacity .28s ease;will-change:opacity;transform:translateZ(0)}
 body[data-theme="light"] .sx-scrim{background:rgba(255,255,255,.6)}
 .sx-scrim.on{opacity:1;pointer-events:auto}
 .sx-fmenu{position:absolute;right:16px;bottom:88px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
-.sx-fmenu button{display:flex!important;align-items:center;gap:12px;min-width:236px;padding:10px 16px 10px 10px!important;border-radius:18px!important;border:1px solid var(--sx-line)!important;background:var(--sx-sheet)!important;color:var(--sx-text)!important;text-align:left;box-shadow:0 12px 30px rgba(0,0,0,.35)!important;opacity:0;transform:translateY(14px) scale(.96);transform-origin:right bottom;transition:transform .34s var(--sx-ease),opacity .22s;font:inherit;margin:0!important;width:auto!important;height:auto!important}
+.sx-fmenu button{display:flex!important;align-items:center;gap:12px;min-width:236px;padding:10px 16px 10px 10px!important;border-radius:18px!important;border:1px solid var(--sx-line)!important;background:var(--sx-sheet)!important;color:var(--sx-text)!important;text-align:left;box-shadow:0 12px 30px rgba(0,0,0,.35)!important;opacity:0;transform:translate3d(0,14px,0) scale(.96);transform-origin:right bottom;transition:transform .34s var(--sx-ease),opacity .24s ease!important;will-change:transform,opacity;backface-visibility:hidden;-webkit-tap-highlight-color:transparent;font:inherit;margin:0!important;width:auto!important;height:auto!important}
 .sx-fmenu.on{pointer-events:auto}
-.sx-fmenu.on button{opacity:1;transform:none}
+.sx-fmenu.on button{opacity:1;transform:translate3d(0,0,0) scale(1)}
 .sx-fmenu.on button:nth-child(1){transition-delay:.04s}
 .sx-fmenu button:active{transform:scale(.97)!important}
 .sx-fmenu .ic{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--sx-a) 16%,transparent);color:var(--sx-a)}
@@ -338,3 +338,6 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
 .mxp .txt p+p{margin-top:10px}
 .mxp .txt b{color:var(--sx-text)}
 @media (prefers-reduced-motion:reduce){.sx-ds *,.mx *,.mxp,.mxp *,.sx-fmenu *,#togglePlanner *{animation:none!important;transition:none!important}}
+
+.sx-fmenu button:focus{outline:none}
+.sx-fmenu button:focus-visible{outline:2px solid var(--sx-a)!important;outline-offset:2px}

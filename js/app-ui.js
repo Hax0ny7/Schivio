@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.59';
+ const VERSION='1.0.60';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -103,8 +103,9 @@
  const menu=el('<div class="sx-fmenu" role="menu" aria-label="Hinzufügen"><button type="button" role="menuitem" data-a="plan"><span class="ic">'+ICON.cal+'</span><span><b>Dienste planen</b><small>Mehrere Tage schnell eintragen</small></span></button><button type="button" role="menuitem" data-a="event"><span class="ic">'+ICON.ev+'</span><span><b>Termin hinzufügen</b><small>Arzttermin, Geburtstag, Treffen …</small></span></button></div>');
  if(shell){shell.append(scrim,menu)}
  function paintFab(){if(!fab)return;fab.innerHTML='<span class="sx-fi" aria-hidden="true"><svg class="p" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>'+ICON.x.replace('<svg','<svg class="x"')+'</span>';fab.setAttribute('aria-label',menuOpen?'Menü schließen':'Dienst oder Termin hinzufügen');fab.setAttribute('aria-expanded',String(menuOpen));fab.setAttribute('aria-haspopup','menu');fab.title=''}
- let menuOpen=false;
- function setMenu(on){menuOpen=on;fab.classList.toggle('sx-open',on);scrim.classList.toggle('on',on);menu.classList.toggle('on',on);paintFab();if(on){buzz();setTimeout(()=>menu.querySelector('button')?.focus({preventScroll:true}),60)}}
+ let menuOpen=false,kbOpen=false;
+ if(fab)fab.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')kbOpen=true});
+ function setMenu(on){menuOpen=on;fab.classList.toggle('sx-open',on);scrim.classList.toggle('on',on);menu.classList.toggle('on',on);paintFab();if(on){buzz();if(kbOpen)setTimeout(()=>menu.querySelector('button')?.focus({preventScroll:true}),360)}kbOpen=false}
  if(fab){fab.onclick=()=>{if(plannerActive){setPlanner(false);return}setMenu(!menuOpen)};paintFab()}
  scrim.addEventListener('click',()=>setMenu(false));window.SchivioFab={isOpen:()=>menuOpen,close:()=>setMenu(false)};
  menu.addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;buzz();setMenu(false);if(b.dataset.a==='plan')setTimeout(()=>setPlanner(true),120);else{const n=new Date(),inShown=n.getFullYear()===shown.getFullYear()&&n.getMonth()===shown.getMonth();DS.openEvent(inShown?todayKey():dateKey(shown.getFullYear(),shown.getMonth(),1))}});
