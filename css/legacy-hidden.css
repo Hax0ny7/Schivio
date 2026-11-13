@@ -1,0 +1,3 @@
+/* Altbestand: Diese Elemente werden noch vom Rechenkern (core.js / pay-center.js) beschrieben,
+   sind aber durch die neue Auswertung ersetzt. Sie werden beim Umbau des Kerns entfernt. */
+#payPanel,#salaryDetailsOpen,#salarySummary,#tariffExplanation,#tariffRates,#bonusPreview,#schSimpleSections,#salarySheet,#schSheet,#schCardStore,#agendaBackdrop{display:none!important}
