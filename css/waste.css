@@ -1,0 +1,46 @@
+/* v1.0.65: Müllkalender */
+.month-grid .day[data-date]{position:relative}
+.sx-waste{position:absolute;top:4px;right:3px;display:flex;flex-direction:column;gap:1px;pointer-events:none;z-index:2}
+.sx-waste svg{width:12px;height:12px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.sx-waste i{font-style:normal;font-size:9px;font-weight:800;line-height:9px;text-align:center;color:var(--sx-muted,#9aa0a6)}
+@media (min-width:420px){.sx-waste svg{width:14px;height:14px}}
+
+.sx-ds .sx-wday{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 16px}
+.sx-ds .sx-wday .lb{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--sx-muted);margin-right:2px}
+.sx-ds .sx-wday .wc{display:inline-flex!important;align-items:center;gap:6px;height:34px!important;min-height:0!important;width:auto!important;padding:0 12px 0 8px!important;margin:0!important;border-radius:999px!important;border:1px solid var(--sx-line)!important;background:color-mix(in srgb,var(--sx-text) 6%,transparent)!important;color:var(--sx-text)!important;font:inherit;font-size:13.5px!important;font-weight:650!important;box-shadow:none!important}
+.sx-ds .sx-wday .wc svg{width:18px;height:18px}
+.sx-ds .sx-wday .wc:active{transform:scale(.96)}
+
+.sx-ds .wm-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:8px 10px 20px}
+.sx-ds .wm-empty svg{width:44px;height:44px;display:inline-block}
+.sx-ds .wm-empty svg.a{transform:translate(18px,8px) rotate(-8deg)}
+.sx-ds .wm-empty svg.b{width:56px;height:56px;margin-top:-52px;position:relative;z-index:1}
+.sx-ds .wm-empty svg.c{transform:translate(-18px,-50px) rotate(8deg);margin-bottom:-44px}
+.sx-ds .wm-empty b{font-size:17px;color:var(--sx-text);margin-top:6px}
+.sx-ds .wm-empty span{font-size:14px;line-height:1.5;color:var(--sx-muted);max-width:300px}
+.sx-ds .wm-two{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.sx-ds .wm-big{display:grid!important;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:14px;align-items:center;text-align:left;width:100%!important;height:auto!important;min-height:0!important;padding:16px 18px!important;margin:0!important;border-radius:18px!important;border:1px solid var(--sx-line)!important;background:color-mix(in srgb,var(--sx-text) 5%,transparent)!important;color:var(--sx-text)!important;font:inherit;box-shadow:none!important;transition:transform .15s}
+.sx-ds .wm-big:active{transform:scale(.98)}
+.sx-ds .wm-big svg{grid-row:1/3;width:24px;height:24px}
+.sx-ds .wm-big b{font-size:15.5px;font-weight:750}
+.sx-ds .wm-big small{font-size:12.5px;color:var(--sx-muted);font-weight:500}
+.sx-ds .wm-big.pr{border:0!important;background:linear-gradient(135deg,var(--sx-a),var(--sx-b))!important;color:var(--sx-on)!important;box-shadow:0 8px 20px color-mix(in srgb,var(--sx-b) 30%,transparent)!important}
+.sx-ds .wm-big.pr small{color:inherit;opacity:.8}
+.sx-ds .wm-h{margin:18px 4px 8px;font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--sx-muted)}
+.sx-ds .wm-ic{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:color-mix(in srgb,var(--sx-text) 6%,transparent)}
+.sx-ds .wm-ic svg{width:24px;height:24px}
+.sx-ds .ls+.ac,.sx-ds .ls+.wm-h{margin-top:14px}
+.sx-ds .wm-lbl{display:block;font-size:12.5px;font-weight:700;color:var(--sx-muted);margin-bottom:8px}
+.sx-ds .wm-types{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sx-ds .wm-types button{display:flex!important;flex-direction:column;align-items:center;gap:4px;height:auto!important;min-height:0!important;width:auto!important;padding:10px 4px!important;margin:0!important;border-radius:14px!important;border:1.5px solid var(--sx-line)!important;background:color-mix(in srgb,var(--sx-text) 4%,transparent)!important;color:var(--sx-text)!important;font:inherit;font-size:12.5px!important;font-weight:650!important;box-shadow:none!important;transition:border-color .2s,transform .15s}
+.sx-ds .wm-types button svg{width:28px;height:28px}
+.sx-ds .wm-types button.on{border-color:var(--sx-a)!important;background:color-mix(in srgb,var(--sx-a) 12%,transparent)!important}
+.sx-ds .wm-rhy{display:flex;flex-wrap:wrap;gap:8px}
+.sx-ds .wm-rhy button{height:38px!important;min-height:0!important;width:auto!important;padding:0 14px!important;margin:0!important;border-radius:999px!important;border:1.5px solid var(--sx-line)!important;background:transparent!important;color:var(--sx-text)!important;font:inherit;font-size:13.5px!important;font-weight:650!important;box-shadow:none!important}
+.sx-ds .wm-rhy button.on{border-color:transparent!important;background:linear-gradient(135deg,var(--sx-a),var(--sx-b))!important;color:var(--sx-on)!important}
+.sx-ds .fm label[hidden]{display:none}
+.sx-ds .wm-one{align-items:end}
+.sx-ds .wm-one .bt{height:48px!important}
+.sx-ds .wm-info{margin:0;font-size:13px;color:var(--sx-muted)}
+.sx-ds .wm-one-hd{display:flex;justify-content:center;margin:4px 0 16px}
+.sx-ds .wm-one-hd svg{width:64px;height:64px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}

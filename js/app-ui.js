@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.64';
+ const VERSION='1.0.65';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -60,7 +60,7 @@
  function decorate(){const st=data.profile?.state||'NW';const root=$('calendar');if(!root)return;
   for(const b of root.querySelectorAll('.day[data-date]')){const k=b.dataset.date,y=k.slice(0,4),ck=y+st;if(!holCache[ck]){try{holCache[ck]=holidaySet(Number(y),st)}catch(e){holCache[ck]=new Set()}}
    b.classList.toggle('sx-hol',holCache[ck].has(k));b.querySelector('.sx-ev')?.remove();
-   const c=data.shifts[k],ev=eventsOn(k);const base=new Date(k+'T12:00:00').toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});b.setAttribute('aria-label',base+(c?', '+shiftTitle(c):'')+(ev.length?', '+ev.length+' Termin'+(ev.length>1?'e':''):''))}
+   const c=data.shifts[k],ev=eventsOn(k);const base=new Date(k+'T12:00:00').toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});b.setAttribute('aria-label',base+(c?', '+shiftTitle(c):'')+(ev.length?', '+ev.length+' Termin'+(ev.length>1?'e':''):'')+(window.SchivioWaste?SchivioWaste.cellLabel(k):''));try{window.SchivioWaste?.paint(b,k)}catch(e){}}
   Bars.paint(root)}
  /* Durchgehende Balken für Dienste und Termine (je Woche, in Spuren gestapelt) */
  const Bars=(()=>{const cache=new WeakMap();let geo=null;
@@ -174,7 +174,7 @@
     const when=multi?('Tag '+(i+1)+' von '+(n+1)+' · '+(e.allDay?'bis '+endTxt:(first?'ab '+e.start+' Uhr · bis '+endTxt:last?'bis '+(e.end||'')+' Uhr':'ganztägig'))):(e.allDay?'Ganztägig':(e.start+(e.end?' – '+e.end:'')+' Uhr'));
     items.push({sort:ad?-2:(mm(multi&&!first?'00:00':e.start)??0),kind:'event',ev:e,key,t1:multi&&!first&&!last?'Ganz-':(multi&&last&&!e.allDay?'bis':t1),t2:multi&&!first&&!last?'tägig':(multi&&last&&!e.allDay?(e.end||''):t2),title:e.title,sub:[when,e.place,e.note].filter(Boolean).join(' · '),color:e.color||EV_COLORS[0]})});
    items.sort((a,b)=>a.sort-b.sort||(a.kind==='shift'?-1:1));
-   let html=head(wkday(k),dTitle(k),{hol:holidayName(k)});
+   let html=head(wkday(k),dTitle(k),{hol:holidayName(k)})+(window.SchivioWaste?SchivioWaste.dayHtml(k):'');
    if(items.length){html+='<div class="tl">';items.forEach((it,i)=>{const ic=it.kind==='event'?ICON.pin:(ICON[it.code]||ICON.X);const id=it.kind==='event'?it.ev.id:it.kind;
      html+='<button type="button" class="it'+(it.kind==='prev'?' ghost':'')+(flashId&&flashId===id?' flash':'')+'" data-x="'+(it.kind==='event'?'ev':it.kind==='prev'?'prev':'shift')+'" data-id="'+esc(id)+'" style="--c:'+esc(it.color)+';animation-delay:'+(i*45)+'ms" aria-label="'+esc(it.title+', '+it.sub+', bearbeiten')+'"><span class="tm"><b>'+esc(it.t1)+'</b><small>'+esc(it.t2)+'</small></span><span class="nd"><i></i></span><span class="cd"><span class="ic">'+ic+'</span><span class="tx"><b>'+esc(it.title)+'</b><small>'+esc(it.sub)+'</small></span><span class="kd">'+(it.kind==='event'?'Termin':'Dienst')+'</span>'+ICON.chev+'</span></button>';
      if(it.kind==='event'){const e=it.ev,imgs=Array.isArray(e.images)?e.images:[];const mq=mapQuery(e);if(imgs.length||mq){html+='<div class="ex" style="animation-delay:'+(i*45+60)+'ms">'+(mq?'<button type="button" class="mp" data-x="map" data-id="'+esc(e.id)+'">'+ICON.map+'Karte</button>':'')+imgs.slice(0,6).map((im,j)=>'<button type="button" class="tb" data-x="img" data-id="'+esc(e.id)+'" data-i="'+j+'" aria-label="Foto '+(j+1)+' ansehen"><img alt="" src="'+esc(im.thumb)+'"></button>').join('')+'</div>'}}
@@ -314,6 +314,7 @@
     '</div></section>'+
     '<section><h3>Erinnerungen &amp; Kalender <em>· neu</em></h3><div class="gp">'+
      '<div class="rw" style="cursor:default"><span class="ri" style="--k:var(--sx-warn)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg></span><span class="rt"><b>Dienst-Erinnerung</b><small>'+(data.icsReminder!==false?'Am Vorabend um 20:00 Uhr · über den Handy-Kalender':'Aus')+'</small></span><button type="button" class="sx-sw" role="switch" aria-label="Dienst-Erinnerung" aria-checked="'+(data.icsReminder!==false)+'" data-m="remind"></button></div>'+
+     R('#facc15','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.3 12a2 2 0 0 1-2 1.8H8.3a2 2 0 0 1-2-1.8z"/><path d="M3.5 5h17M10 3h4"/></svg>','Müllkalender',(()=>{const w=data.waste;const n=w&&w.bins?w.bins.length:0;return n?(w.on===false?'Ausgeblendet · ':'')+n+(n===1?' Tonne':' Tonnen'):'Abholtage als Tonnen im Kalender'})(),'waste',data.waste&&data.waste.bins&&data.waste.bins.length?'':'<span class="bdg">Neu</span>')+
      R('#8fb0ff','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5L12 18l2.5-2.5"/></svg>','In Handy-Kalender übernehmen','Dienste &amp; Termine als Kalenderdatei','ics')+
     '</div></section>'+
     '<section><h3>Daten &amp; Sicherheit</h3><div class="gp pd"><p class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Alle Daten bleiben nur auf diesem Gerät. Ein Backup schützt sie bei Handywechsel oder beim Löschen des Browsers.</span></p>'+
@@ -327,6 +328,7 @@
   box.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;buzz();const a=b.dataset.m,v=b.dataset.v;
    if(a==='tarif')openPage('tarif');else if(a==='hours')openPage('tarif','hours');
    else if(a==='pay')openPay()
+   else if(a==='waste')window.SchivioWaste?.open()
    else if(a==='shifts'){$('tabTemplates')?.click();window.__sxFromMore=true}
    else if(a==='skin'){SchivioThemes.set(v);setTimeout(render,30)}
    else if(a==='neonpal'){SchivioThemes.set('neon',v);setTimeout(render,30)}
