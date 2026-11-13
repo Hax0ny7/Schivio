@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.63';
+ const VERSION='1.0.64';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -73,7 +73,7 @@
    const lanes=[];for(const it of items){let l=0;for(;;l++){lanes[l]=lanes[l]||[];if(lanes[l].every(o=>o.b<it.a||o.a>it.b))break}lanes[l].push(it);it.l=l}return items}
   function html(items,g,keys){const per=new Array(7).fill(0);items.forEach(it=>{for(let d=it.a;d<=it.b;d++)per[d]++});const need=Math.max(0,...per);const cap=need>g.cap?g.cap-1:g.cap;let out='';
    for(const it of items){if(it.l>=cap)continue;const top=g.top+it.l*(g.lh+g.gap);const cls='sx-bar'+(it.kind==='s'?' s '+esc(it.c):' e')+(it.cl?' cl':'')+(it.cr?' cr':'');
-    let bg,fg,label,ttl;if(it.kind==='s'){bg=displayShiftColor(shiftColor(it.c));fg=contrastColor(bg);label=shiftTitle(it.c);ttl=label}else{bg=it.e.color||EV_COLORS[0];fg='#fff';label=(it.e.allDay||it.cl?'':(it.e.start?it.e.start.replace(/^0/,'')+' ':''))+it.e.title;ttl=it.e.title}
+    let bg,fg,label,ttl;if(it.kind==='s'){bg=displayShiftColor(shiftColor(it.c));fg=contrastColor(bg);label=shiftTitle(it.c);ttl=label}else{bg=it.e.color||EV_COLORS[0];fg='#fff';label=(it.e.title||'').trim()||(it.e.start?it.e.start.replace(/^0/,'')+' Uhr':'Termin');/* v1.0.64: nur Text, keine Uhrzeit */ttl=it.e.title}
     out+='<span class="'+cls+'" aria-hidden="true" style="grid-column:'+(it.a+1)+' / '+(it.b+2)+';--t:'+top+'px;--h:'+g.lh+'px;--bg:'+esc(bg)+';--fg:'+esc(fg)+'"><i>'+esc(label)+'</i></span>'}
    if(cap<g.cap)for(let d=0;d<7;d++){const hid=items.filter(it=>it.l>=cap&&it.a<=d&&it.b>=d).length;if(hid)out+='<span class="sx-bar more" aria-hidden="true" style="grid-column:'+(d+1)+' / '+(d+2)+';--t:'+(g.top+cap*(g.lh+g.gap))+'px;--h:'+g.lh+'px"><i>+'+hid+'</i></span>'}
    return out}
