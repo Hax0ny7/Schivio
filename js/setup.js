@@ -1,4 +1,5 @@
-/* v1.0.51: Einrichtung mit Berufsgruppen – eine Frage pro Bildschirm */
+/* v1.0.62: Polizei vor MFA, MTRA / MTA statt Medizintechnik
+   v1.0.51: Einrichtung mit Berufsgruppen – eine Frage pro Bildschirm */
 (function(){
  const root=document.getElementById('flow'),stage=root.querySelector('.fl-stage'),bar=root.querySelector('.fl-bar i'),backBtn=root.querySelector('.fl-back'),closeBtn=root.querySelector('.fl-close');
  const P=window.SchivioPay;const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -9,6 +10,7 @@
   steth:'<path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 12v3a5 5 0 0 0 10 0v-2.2"/><circle cx="20" cy="10.6" r="2"/>',
   clip:'<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 3h6v3H9z"/><path d="M12 10v5M9.5 12.5h5"/>',
   baby:'<circle cx="12" cy="13" r="7"/><path d="M12 6c0-1.6 1.2-2.6 2.6-2.2"/><path d="M9.5 12.3h.01M14.5 12.3h.01"/><path d="M10.2 15.6a2.6 2.6 0 0 0 3.6 0"/>',
+  rad:'<circle cx="12" cy="12" r="1.4"/><path d="M10.5 9.4L7.75 4.64A8.5 8.5 0 0 1 16.25 4.64L13.5 9.4A3 3 0 0 0 10.5 9.4z"/><path d="M10.5 9.4L7.75 4.64A8.5 8.5 0 0 1 16.25 4.64L13.5 9.4A3 3 0 0 0 10.5 9.4z" transform="rotate(120 12 12)"/><path d="M10.5 9.4L7.75 4.64A8.5 8.5 0 0 1 16.25 4.64L13.5 9.4A3 3 0 0 0 10.5 9.4z" transform="rotate(240 12 12)"/>',
   micro:'<path d="M8.5 3.5l4 2-2.8 5.6-4-2z"/><path d="M11.4 8.4a5.5 5.5 0 0 1 3.2 9.6"/><path d="M5 21h14M8 18h7"/><path d="M8 11.5l-1 2"/>',
   flame:'<path d="M12 2.8c.9 3.2 5.3 5.3 5.3 10.4a5.3 5.3 0 0 1-10.6 0c0-2.2 1.1-3.8 2.2-4.8 0 2 1 3.2 2.1 3.2 0-3.2-.9-5.4 1-8.8z"/>',
   shield:'<path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6z"/><path d="M12 8.2l1.1 2.3 2.5.4-1.8 1.7.4 2.5-2.2-1.2-2.2 1.2.4-2.5-1.8-1.7 2.5-.4z"/>',
@@ -21,23 +23,24 @@
   full:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none" opacity=".25"/>',part:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12h8.5"/>',
   map:'<path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',bund:'<path d="M5 21V4"/><path d="M5 5h13l-2.5 4L18 13H5"/>'};
  const svg=k=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+(I[k]||I.dots)+'</svg>';
- const JOBS=[['pflege','Pflege','Krankenhaus','bed','hospital'],['alten','Altenpflege','Heim & ambulant','home','nursing'],['rettung','Rettungsdienst','','amb','other'],['arzt','Ärztin / Arzt','','steth','hospital'],['mfa','MFA','Praxis & Klinik','clip','other'],['hebamme','Hebamme','','baby','hospital'],['mtr','Medizintechnik','& Therapie','micro','hospital'],['feuerwehr','Feuerwehr','','flame','other'],['polizei','Polizei','','shield','other'],['sonst','Sonstiges','','dots','other']];
+ const JOBS=[['pflege','Pflege','Krankenhaus','bed','hospital'],['alten','Altenpflege','Heim & ambulant','home','nursing'],['rettung','Rettungsdienst','','amb','other'],['arzt','Ärztin / Arzt','','steth','hospital'],['polizei','Polizei','','shield','other'],['hebamme','Hebamme','','baby','hospital'],['mtr','MTRA / MTA','Radiologie & Labor','rad','hospital'],['feuerwehr','Feuerwehr','','flame','other'],['mfa','MFA','Praxis & Klinik','clip','other'],['sonst','Sonstiges','','dots','other']];
  const STATES=[['BW','Baden-Württemberg'],['BY','Bayern'],['BE','Berlin'],['BB','Brandenburg'],['HB','Bremen'],['HH','Hamburg'],['HE','Hessen'],['MV','Mecklenburg-Vorpommern'],['NI','Niedersachsen'],['NW','Nordrhein-Westfalen'],['RP','Rheinland-Pfalz'],['SL','Saarland'],['SN','Sachsen'],['ST','Sachsen-Anhalt'],['SH','Schleswig-Holstein'],['TH','Thüringen']];
  const DIAKONIE={BY:'AVR Bayern',BW:'AVR Württemberg I',NW:'BAT-KF',NI:'TV DN',HH:'KTD',SH:'KTD',MV:'KTD',BE:'AVR DWBO West',BB:'AVR DWBO Ost',ST:'AVR Mitteldeutschland',TH:'AVR Mitteldeutschland',HB:'AVR DD',RP:'AVR DD',SL:'AVR DD'};
  // Häufige Eingruppierungen (nur als Vorschlag; angezeigt wird nur, was es im Tarif gibt)
- const SUG={tvoed:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz'],['P5','Pflegehilfe']],rettung:[['N','Notfallsanitäter:in'],['E4','Rettungssanitäter:in']],hebamme:[['P8','Hebamme']],mtr:[['E9A','MTR / MTL'],['E8','Physio- / Ergotherapie']],mfa:[['E6','MFA']]},
+ const SUG={tvoed:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz'],['P5','Pflegehilfe']],rettung:[['N','Notfallsanitäter:in'],['E4','Rettungssanitäter:in']],hebamme:[['P8','Hebamme']],mtr:[['E9A','MTRA / MTR'],['E9B','MTRA mit schwierigen Aufgaben'],['E9C','MTRA mit Leitungsaufgaben']],mfa:[['E6','MFA']]},
   caritas:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz']]},
   dd:{pflege:[['7','Pflegefachkraft']]},bay:{pflege:[['7','Pflegefachkraft']]},tvdn:{pflege:[['8','Pflegefachkraft']]},
+  tvl:{mtr:[['E9A','MTRA / MTR'],['E9B','MTRA mit schwierigen Aufgaben']]},
   arzt:{arzt:[['Ä1','Assistenzärztin / -arzt'],['Ä2','Fachärztin / -arzt'],['Ä3','Oberärztin / -arzt']]}};
  SUG.tvoed.alten=SUG.tvoed.pflege;SUG.caritas.alten=SUG.caritas.pflege;SUG.dd.alten=SUG.dd.pflege;SUG.bay.alten=SUG.bay.pflege;SUG.tvdn.alten=SUG.tvdn.pflege;
- function sugFamily(k){if(k==='tvoed-vka-p'||k==='avr-wue-1')return 'tvoed';if(k==='avr-caritas-p')return 'caritas';if(['avr-dd','avr-wue-4','avr-dwbo-w','avr-dwbo-o','avr-dwm'].includes(k))return 'dd';if(k==='avr-bayern')return 'bay';if(k==='tv-dn')return 'tvdn';if(/aerzte/.test(k))return 'arzt';return ''}
+ function sugFamily(k){if(k==='tvoed-vka-p'||k==='avr-wue-1')return 'tvoed';if(k==='avr-caritas-p')return 'caritas';if(['avr-dd','avr-wue-4','avr-dwbo-w','avr-dwbo-o','avr-dwm'].includes(k))return 'dd';if(k==='avr-bayern')return 'bay';if(k==='tv-dn')return 'tvdn';if(/aerzte/.test(k))return 'arzt';if(k==='tv-l')return 'tvl';return ''}
  let s={},hist=[],cur=null,firstRun=false;
  function employers(){const j=s.job;
   if(j==='feuerwehr')return [['beamte','Verbeamtet','Beamtin / Beamter','shield'],['oed','Angestellt','öffentlicher Dienst','city'],['privat','Anderer Arbeitgeber','eigene Werte','build']];
   if(j==='polizei')return [['beamte','Landespolizei','verbeamtet','shield'],['bund','Bundespolizei','verbeamtet','bund'],['oed','Angestellt','Tarifbeschäftigte','city']];
   if(j==='arzt')return [['oed','Kommunale Klinik','Stadt oder Kreis','city'],['uni','Uniklinik','Land','uni'],['privat','Andere Klinik oder Praxis','eigene Werte','build']];
   const l=[['oed','Öffentlicher Dienst','Stadt, Kreis, Kommune','city'],['uni','Uniklinik / Land','','uni'],['caritas','Caritas','','cross'],['diakonie','Diakonie','','dove'],['drk','Rotes Kreuz','DRK','red'],['privat','Privat / anderer','eigene Werte','build']];
-  if(j==='mfa')l.unshift(['praxis','Arztpraxis','eigene Werte','clip']);return l}
+  if(j==='mfa')l.unshift(['praxis','Arztpraxis','eigene Werte','clip']);if(j==='mtr')l.splice(l.length-1,0,['praxis','Radiologische Praxis / MVZ','eigene Werte','rad']);return l}
  function tariff(){const e=s.emp,j=s.job;if(e==='beamte'||e==='bund')return 'Beamte';if(e==='privat'||e==='praxis')return 'Individuell';
   if(j==='arzt')return e==='uni'?'TV-Ärzte/TdL':'TV-Ärzte/VKA';if(e==='oed')return j==='polizei'?'TV-L':'TVöD-P';if(e==='uni')return 'TV-L';if(e==='caritas')return 'AVR Caritas';if(e==='drk')return 'DRK';
   if(e==='diakonie')return DIAKONIE[s.state]||'Individuell';return 'Individuell'}

@@ -139,11 +139,12 @@
   [()=>DS.isOpen(),()=>{const b=DS.view()?.querySelector('.hd [data-x="back"]');if(b)b.click();else DS.close()}],
   [()=>vis('gpSheet'),()=>{const p=gpPanel();if(p)slideOut(p,()=>gp.querySelector('.gp-done')?.click());}],
   [()=>window.SchivioMore?.isOpen(),()=>window.SchivioMore.close()],
-  [()=>vis('flow'),()=>{const b=document.querySelector('#flow .fl-back');if(b&&!b.disabled&&getComputedStyle(b).visibility!=='hidden')b.click()}],
+  [()=>vis('flow'),()=>{const b=document.querySelector('#flow .fl-back');if(b&&!b.disabled&&getComputedStyle(b).visibility!=='hidden')b.click();else window.SchivioFlow?.close()}],
   [()=>vis('setupOverlay')||!!document.querySelector('.skin-ob'),()=>{}],
   [()=>vis('modalBackdrop'),()=>$('cancel')?.click()],
   [()=>window.SchivioFab?.isOpen(),()=>window.SchivioFab.close()],
   [()=>typeof plannerActive!=='undefined'&&plannerActive,()=>setPlanner(false)],
+  [()=>window.__sxFromMore&&vis('templatesPanel'),()=>{window.__sxFromMore=false;$('tabSettings')?.click()}],
   [()=>$('plan')?.classList.contains('hidden'),()=>$('tabPlan')?.click()]
  ];
  let armed=false,exitT=0;
@@ -152,5 +153,7 @@
  addEventListener('popstate',()=>{armed=false;clearTimeout(exitT);const L=layers.find(([is])=>{try{return is()}catch(e){return false}});
   if(L){try{L[1]()}catch(e){}arm();return}
   toast('Zum Beenden noch einmal „Zurück“ drücken');exitT=setTimeout(arm,2200)});
+ /* Nach jeder Berührung sicherstellen, dass die Zurück-Taste abgefangen wird (Android überspringt sonst Einträge ohne Nutzeraktion) */
+ ['click','touchend','keydown'].forEach(t=>addEventListener(t,()=>{if(history.state?.sx!=='guard'){armed=false;arm()}},true));
  window.SchivioBack={arm};
 })();

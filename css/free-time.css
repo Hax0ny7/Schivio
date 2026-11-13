@@ -1,0 +1,36 @@
+/* v1.0.62: Reiter „Teilen“ – freie Zeiten finden */
+#sharePanel .ft-hero{margin:18px 4px 0;padding:30px 22px 24px;border-radius:26px;background:var(--sx-card);border:1px solid var(--sx-line);text-align:center;animation:sxUp .45s var(--sx-ease) both}
+#sharePanel .ft-art{width:76px;height:76px;margin:0 auto 18px;border-radius:24px;display:grid;place-items:center;color:var(--sx-on);background:linear-gradient(135deg,var(--sx-a),var(--sx-b));box-shadow:0 14px 32px color-mix(in srgb,var(--sx-b) 38%,transparent)}
+#sharePanel .ft-art svg{width:38px;height:38px}
+#sharePanel .ft-hero h2{margin:0 0 10px;font-size:22px;font-weight:800;color:var(--sx-text)}
+#sharePanel .ft-hero p{margin:0 auto 22px;max-width:340px;font-size:14.5px;line-height:1.55;color:var(--sx-muted)}
+#sharePanel .ft-go{width:100%;height:54px;min-height:0;border:0;border-radius:18px;display:flex;align-items:center;justify-content:center;gap:9px;font:inherit;font-size:16px;font-weight:750;color:var(--sx-on);background:linear-gradient(135deg,var(--sx-a),var(--sx-b));box-shadow:0 10px 24px color-mix(in srgb,var(--sx-b) 35%,transparent);transition:transform .15s;margin:0;padding:0 16px}
+#sharePanel .ft-go:active{transform:scale(.97)}
+#sharePanel .ft-go svg{width:20px;height:20px}
+#sharePanel .ft-soon{margin:16px 10px 0;text-align:center;font-size:12.5px;line-height:1.5;color:var(--sx-muted)}
+
+.sx-ds .ft-mon{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;padding:6px;border-radius:18px;background:color-mix(in srgb,var(--sx-text) 5%,transparent)}
+.sx-ds .ft-mon b{font-size:15.5px;font-weight:750;color:var(--sx-text)}
+.sx-ds .ft-mon .ib{width:36px!important;height:36px!important;min-width:36px;background:transparent!important}
+.sx-ds .ft-mon .ib:disabled{opacity:.28}
+.sx-ds .ft-opts .r{align-items:center}
+.sx-ds .ft-ic{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:var(--sx-a);background:color-mix(in srgb,var(--sx-a) 14%,transparent);margin-right:2px}
+.sx-ds .ft-ic svg{width:22px;height:22px}
+.sx-ds .ft-days .r{align-items:flex-start}
+.sx-ds .ft-days .ft-d{font-weight:650;white-space:nowrap}
+.sx-ds .ft-days .r b{display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-weight:650;text-align:right}
+.sx-ds .ft-days .r b em{font-style:normal}
+.sx-ds .ft-days .ft-full b em{padding:3px 10px;border-radius:999px;font-size:13px;color:var(--sx-on);background:linear-gradient(135deg,var(--sx-a),var(--sx-b))}
+.sx-ds .ft-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:26px 14px;color:var(--sx-muted)}
+.sx-ds .ft-empty svg{width:40px;height:40px;opacity:.6;margin-bottom:6px}
+.sx-ds .ft-empty b{color:var(--sx-text);font-size:16px}
+.sx-ds .ft-empty span{font-size:13.5px;line-height:1.5}
+.sx-ds .ft-prev{padding:14px;border-radius:20px;background:#fff;color:#16181c;margin-bottom:14px}
+.sx-ds .ft-prev p{margin:12px 0 0;text-align:center;font-size:13.5px;color:#6b7280}
+.sx-ds .ft-prev p b{color:#0e7c66}
+.sx-ds .ft-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.sx-ds .ft-grid .wd{text-align:center;font-size:10.5px;font-weight:700;color:#6b7280;padding-bottom:2px}
+.sx-ds .ft-grid .dy{aspect-ratio:1/.92;border-radius:8px;background:#f1f2f4;color:#8a9099;font-size:12px;font-weight:600;padding:4px 0 0 5px}
+.sx-ds .ft-grid .dy.past{background:#f7f7f8;color:#c3c6cc}
+.sx-ds .ft-grid .dy.on{background:#16a37f;color:#fff;font-weight:800}
+@media (prefers-reduced-motion: reduce){#sharePanel .ft-hero{animation:none}}

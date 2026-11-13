@@ -9,6 +9,7 @@
     css/evaluation.css    Auswertung: Monatsring und Kacheln
     css/app-ui.css        Kalender-Balken, Stift-Menü, Tagesansicht, Termine, Reiter „Mehr“
     css/app-panels.css    Auswertungs-Fenster, Schichten-Reiter
+    css/free-time.css     Reiter „Teilen“: freie Zeiten finden
     css/themes.css        Themes (Neon, Notizbuch, Klar, Pastell, Nachtschicht)
     css/legacy-hidden.css Altbestand, der noch vom Rechenkern beschrieben wird (ausgeblendet)
     js/core.js            Datenhaltung, Kalender, Dienste, Monatssoll, Zeitkonto
@@ -17,6 +18,7 @@
     js/evaluation.js      Auswertung (Monatsring)
     js/app-ui.js          Kalender-Balken, Termine, Tagesansicht, Mehr, Backup, Kalender-Export
     js/app-panels.js      Auswertungs-Fenster, Schichten, Wischgesten, Zurück-Taste
+    js/free-time.js       Freie Zeiten finden, freie Tage als PDF
     js/themes.js          Themes und Theme-Auswahl
 -->
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/><meta content="#1b1c1e" name="theme-color"/><meta content="light" name="color-scheme"/><meta content="light" name="supported-color-schemes"/><title>Schivio – Dienstplan &amp; Gehalt</title><link href="./manifest.webmanifest" rel="manifest"/><link href="./icon-192.png" rel="icon" type="image/png"/><link href="./apple-touch-icon.png" rel="apple-touch-icon"/><meta content="yes" name="apple-mobile-web-app-capable"/><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/><link href="./manifest.webmanifest" rel="manifest"/>
@@ -27,6 +29,7 @@
 <link rel="stylesheet" href="css/evaluation.css">
 <link rel="stylesheet" href="css/app-ui.css">
 <link rel="stylesheet" href="css/app-panels.css">
+<link rel="stylesheet" href="css/free-time.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/legacy-hidden.css">
 </head><body><main><header><img alt="Schivio Logo" class="brandicon" src="./icon-192.png"/><div><h1>schivio</h1><small>Dein Dienstplan. Dein Gehalt.</small></div></header><nav aria-label="Hauptnavigation" class="tabs bottom-tabs"><button class="active" id="tabPlan"><span class="tab-icon">▦</span>Kalender</button><button class="secondary" id="tabHours"><span class="tab-icon">▥</span>Auswertung</button><button class="secondary" id="tabShare"><span class="tab-icon">♧</span>Teilen</button><button class="secondary" id="tabTemplates"><span class="tab-icon">◷</span>Schichten</button><button class="secondary" id="tabSettings"><span class="tab-icon">☰</span>Mehr</button></nav><section id="plan"><div class="calendar-shell"><div class="sticky-month"><strong id="month"></strong><button class="today-button" id="jumpToday" type="button">Heute</button></div><div class="week"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div><div class="month-scroll" id="monthScroll"><div class="calendar-months" id="calendar"></div></div><button aria-label="Planungsmodus öffnen" aria-pressed="false" class="floating-edit" id="togglePlanner" title="Planungsmodus" type="button">✎</button><div class="planner-bar hidden" id="plannerBar"><div class="planner-title"><span>Dienst wählen · Tage antippen oder ziehen · Dienst lange drücken zum Sortieren</span><button class="mode-button" id="plannerDone">Fertig</button></div><div class="planner-items" id="plannerItems"></div></div></div><div class="hidden"><span id="shiftCount"></span><span id="hours"></span><span id="freeDays"></span><p id="targetDetail"></p><p id="balanceDetail"></p></div><div class="modal-backdrop hidden" id="modalBackdrop"><div aria-labelledby="selectedDate" aria-modal="true" class="modal-dialog" role="dialog"><div class="card" id="editor"><h2 id="selectedDate"></h2><p class="note" id="rangeHint"></p><div class="field"><label for="shift">Dienst</label><button aria-controls="shiftChoices" aria-expanded="false" class="shift-trigger" id="shiftTrigger" type="button"><span id="shiftLabel">Dienst auswählen</span><span aria-hidden="true">⌄</span></button><div aria-label="Dienst auswählen" class="shift-choices hidden" id="shiftChoices" role="group"><button data-shift="" type="button">Einträge löschen / frei lassen</button><button data-shift="F" type="button">Frühdienst</button><button data-shift="S" type="button">Spätdienst</button><button data-shift="N" type="button">Nachtdienst</button><button data-shift="U" type="button">Urlaub</button><button data-shift="T" type="button">Fortbildung</button><button data-shift="A" type="button">Überstundenabbau</button><button data-shift="X" type="button">Sonstiger Dienst</button></div></div><div class="row"><button id="save">Für Auswahl speichern</button><button class="secondary" id="cancel">Schließen</button></div></div></div></div><div class="modal-backdrop hidden" id="agendaBackdrop"><div aria-labelledby="agendaTitle" aria-modal="true" class="modal-dialog" role="dialog"><div class="card"><h2 id="agendaTitle">Tagesübersicht</h2><div id="agendaItems"></div><div class="row"><button id="agendaPlan">Dienst eintragen</button><button class="secondary" id="agendaClose">Schließen</button></div></div></div></div></section><section class="hidden" id="hoursPanel"><div class="section-title"><h2>Auswertung</h2><p>Arbeitszeit und Gehalt</p></div><div class="sch-dashboard"><div aria-label="Auswertung – Funktionsmenü" class="sch-wheel">
@@ -62,5 +65,6 @@
 <script src="js/evaluation.js"></script>
 <script src="js/app-ui.js"></script>
 <script src="js/app-panels.js"></script>
+<script src="js/free-time.js"></script>
 <script src="js/themes.js"></script>
 </body></html>

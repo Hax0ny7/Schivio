@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.61';
+ const VERSION='1.0.62';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -327,7 +327,7 @@
   box.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;buzz();const a=b.dataset.m,v=b.dataset.v;
    if(a==='tarif')openPage('tarif');else if(a==='hours')openPage('tarif','hours');
    else if(a==='pay')openPay()
-   else if(a==='shifts')$('tabTemplates')?.click();
+   else if(a==='shifts'){$('tabTemplates')?.click();window.__sxFromMore=true}
    else if(a==='skin'){SchivioThemes.set(v);setTimeout(render,30)}
    else if(a==='neonpal'){SchivioThemes.set('neon',v);setTimeout(render,30)}
    else if(a==='int'){document.querySelector('[data-intensity="'+v+'"]')?.click();setTimeout(render,30)}
@@ -339,7 +339,10 @@
    else if(a==='help')openPage('help')});
 
   /* Unterseiten */
-  let saveT=0,lastEl=null;
+  let saveT=0,lastEl=null,retPage='';
+  /* Nach „Gehalt anpassen“ zurück auf die Seite, von der es geöffnet wurde */
+  (()=>{const gs=$('gpSheet');if(!gs)return;new MutationObserver(()=>{if(gs.hidden&&retPage){const p=retPage;retPage='';setTimeout(()=>openPage(p),60)}}).observe(gs,{attributes:true,attributeFilter:['hidden']})})();
+  document.querySelector('.bottom-tabs')?.addEventListener('click',()=>{retPage='';window.__sxFromMore=false},true);
   function openPage(which,focus){lastEl=document.activeElement;page.hidden=false;page.innerHTML='';page.scrollTop=0;if(which==='help')renderHelp();else renderTarif();void page.offsetWidth;page.classList.add('on');document.body.classList.add('modal-open');if(focus==='hours')setTimeout(()=>page.querySelector('[data-sec="hours"]')?.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'}),reduce?0:450)}
   function closePage(){page.classList.remove('on');document.body.classList.remove('modal-open');setTimeout(()=>{page.hidden=true;page.innerHTML=''},reduce?0:430);render();try{lastEl?.focus({preventScroll:true})}catch(e){}}
   page.addEventListener('keydown',e=>{if(e.key==='Escape')closePage()});
@@ -392,7 +395,7 @@
     else if(a==='wm'){if(v==='m'){const cur=String($('workdays').value);setWorkdays(cur.startsWith('m:')?cur:'m:1234')}else setWorkdays(v)}
     else if(a==='wdd'){const d=Number(v);let l=typeof workdayList==='function'?workdayList():[1,2,3,4];l=l.includes(d)?l.filter(x=>x!==d):[...l,d];if(!l.length){toast('Mindestens ein Arbeitstag ist nötig.');return}setWorkdays('m:'+l.sort().join(''))}
     else if(a==='minus'||a==='plus'){const i=page.querySelector('[data-p-in="weekly"]');let n=Number(i.value)||0;n=Math.round((n+(a==='plus'?.5:-.5))*2)/2;n=Math.max(.5,Math.min(60,n));i.value=String(n);$('weekly').value=String(n);upShare();queueSave()}
-    else if(a==='pay'){closePage();setTimeout(openPay,200)}};
+    else if(a==='pay'){closePage();retPage='tarif';setTimeout(openPay,200)}};
    page.querySelectorAll('[data-p-in]').forEach(i=>i.addEventListener('input',()=>{$(i.dataset.pIn).value=i.value;upShare();queueSave(700)}));
    page.querySelectorAll('[data-p-sel]').forEach(s=>s.addEventListener('change',()=>{setSel(s.dataset.pSel,s.value);saveProfile();rerender()}))}
   function upShare(){const el2=page.querySelector('[data-share]');if(!el2)return;const ft=$('fulltime');const def=Number(ft.value)||Number((ft.placeholder||'').match(/[\d,]+/)?.[0]?.replace(',','.'))||39;const v=Number($('weekly').value);el2.textContent=v>0?(v>=def-0.001?'Vollzeit ('+fmtH(def)+' h)':'Teilzeit · '+fmtH(Math.round(v/def*1000)/10)+' % von '+fmtH(def)+' h'):'Bitte Wochenstunden eintragen'}
