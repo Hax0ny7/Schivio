@@ -46,7 +46,6 @@ html body[data-skin]:not([data-skin="neon"]) .bottom-tabs button.active .tab-ico
 /* Planungsleiste */
 html body[data-skin]:not([data-skin="neon"]) #plannerBar.planner-bar{background:var(--k-sheet)!important;border-color:var(--k-line)!important;box-shadow:0 -8px 24px rgba(0,0,0,.12)!important}
 html body[data-skin]:not([data-skin="neon"]) #plannerItems button{background:var(--k-ctrl)!important;color:var(--k-text)!important;border-color:var(--k-line)!important}
-html body[data-skin]:not([data-skin="neon"]) #plannerItems button.active{color:#fff!important}
 /* Auswertung */
 html body[data-skin]:not([data-skin="neon"]) #hoursPanel{--sv-a:var(--k-acc);--sv-b:var(--k-acc2);--sv-card:var(--k-card);--sv-line:var(--k-line);--sv-text:var(--k-text);--sv-muted:var(--k-muted);--sv-pos:var(--k-pos);--sv-neg:var(--k-neg);--sv-free:color-mix(in srgb,var(--k-text) 9%,transparent);--sv-track:color-mix(in srgb,var(--k-text) 8%,transparent)}
 html body[data-skin]:not([data-skin="neon"]) #hoursPanel .sv-dial .sch-wheel-center{background:var(--k-card)!important;box-shadow:0 8px 24px rgba(0,0,0,.1)!important}
