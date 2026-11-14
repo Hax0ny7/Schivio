@@ -64,20 +64,28 @@
   Bars.paint(root)}
  /* Durchgehende Balken für Dienste und Termine (je Woche, in Spuren gestapelt) */
  const Bars=(()=>{const cache=new WeakMap();let geo=null;
-  function measure(root){const cell=root.querySelector('.month-grid .day[data-date]:not(.today)');if(!cell||!cell.offsetHeight)return null;const n=cell.firstElementChild.getBoundingClientRect(),r=cell.getBoundingClientRect();const top=Math.round(n.bottom-r.top+5);const lh=Math.max(15,Math.min(19,Math.round(r.height*.15)));return {top,lh,gap:2,cap:Math.max(1,Math.floor((r.height-top-3+2)/(lh+2))),h:Math.round(r.height)}}
+  function measure(root){const cell=root.querySelector((root.classList?.contains('month-grid')?'':'.month-grid ')+'.day[data-date]:not(.today)');if(!cell||!cell.offsetHeight)return null;const n=cell.firstElementChild.getBoundingClientRect(),r=cell.getBoundingClientRect();const top=Math.round(n.bottom-r.top+5);const lh=Math.max(15,Math.min(19,Math.round(r.height*.15)));return {top,lh,gap:2,cap:Math.max(1,Math.floor((r.height-top-3+2)/(lh+2))),h:Math.round(r.height)}}
   function weekItems(keys){/* keys: 7 Einträge (Datum oder null) */const items=[];
    for(let i=0;i<7;i++){const k=keys[i];if(!k)continue;const c=data.shifts[k];if(!c)continue;const prevSame=i>0&&keys[i-1]&&data.shifts[keys[i-1]]===c;if(prevSame)continue;let j=i;while(j<6&&keys[j+1]&&data.shifts[keys[j+1]]===c)j++;
     const before=data.shifts[addDays(k,-1)]===c,after=data.shifts[addDays(keys[j],1)]===c;items.push({kind:'s',c,a:i,b:j,cl:before,cr:after,pri:0})}
-   const seen=new Set();for(let i=0;i<7;i++){const k=keys[i];if(!k)continue;for(const o of eventsOn(k)){const id=o.e.id+'|'+o.key;if(seen.has(id))continue;seen.add(id);let j=i;while(j<6&&keys[j+1]&&keys[j+1]<=o.end)j++;items.push({kind:'e',e:o.e,a:i,b:j,cl:o.key<k,cr:o.end>keys[j],pri:1,len:j-i,st:o.e.allDay?-1:(mm(o.e.start)??0)})}}
+   const seen=new Set();for(let i=0;i<7;i++){const k=keys[i];if(!k)continue;for(const o of eventsOn(k)){const id=o.e.id+'|'+o.key;if(seen.has(id))continue;seen.add(id);let j=i;while(j<6&&keys[j+1]&&keys[j+1]<=o.end)j++;const st=o.e.allDay?-1:(mm(o.e.start)??0);if(o.key===o.end){items.push({kind:'l',e:o.e,a:i,b:i,st});continue}items.push({kind:'e',e:o.e,a:i,b:j,cl:o.key<k,cr:o.end>keys[j],pri:1,len:j-i,st})}}
    items.sort((x,y)=>x.pri-y.pri||x.a-y.a||(y.b-y.a)-(x.b-x.a)||(x.st??0)-(y.st??0));
-   const lanes=[];for(const it of items){let l=0;for(;;l++){lanes[l]=lanes[l]||[];if(lanes[l].every(o=>o.b<it.a||o.a>it.b))break}lanes[l].push(it);it.l=l}return items}
-  function html(items,g,keys){const per=new Array(7).fill(0);items.forEach(it=>{for(let d=it.a;d<=it.b;d++)per[d]++});const need=Math.max(0,...per);const cap=need>g.cap?g.cap-1:g.cap;let out='';
+   const lanes=[];for(const it of items){if(it.kind==='l')continue;let l=0;for(;;l++){lanes[l]=lanes[l]||[];if(lanes[l].every(o=>o.b<it.a||o.a>it.b))break}lanes[l].push(it);it.l=l}return items}
+  function html(all,g,keys){const items=all.filter(it=>it.kind!=='l'),lines=all.filter(it=>it.kind==='l');const per=new Array(7).fill(0);items.forEach(it=>{for(let d=it.a;d<=it.b;d++)per[d]++});const need=Math.max(0,...per);const cap=need>g.cap?g.cap-1:g.cap;let out='';
    for(const it of items){if(it.l>=cap)continue;const top=g.top+it.l*(g.lh+g.gap);const cls='sx-bar'+(it.kind==='s'?' s '+esc(it.c):' e')+(it.cl?' cl':'')+(it.cr?' cr':'');
     let bg,fg,label,ttl;if(it.kind==='s'){bg=displayShiftColor(shiftColor(it.c));fg=contrastColor(bg);label=shiftTitle(it.c);ttl=label}else{bg=it.e.color||EV_COLORS[0];fg='#fff';label=(it.e.title||'').trim()||(it.e.start?it.e.start.replace(/^0/,'')+' Uhr':'Termin');/* v1.0.64: nur Text, keine Uhrzeit */ttl=it.e.title}
     out+='<span class="'+cls+'" aria-hidden="true" style="grid-column:'+(it.a+1)+' / '+(it.b+2)+';--t:'+top+'px;--h:'+g.lh+'px;--bg:'+esc(bg)+';--fg:'+esc(fg)+'"><i>'+esc(label)+'</i></span>'}
-   if(cap<g.cap)for(let d=0;d<7;d++){const hid=items.filter(it=>it.l>=cap&&it.a<=d&&it.b>=d).length;if(hid)out+='<span class="sx-bar more" aria-hidden="true" style="grid-column:'+(d+1)+' / '+(d+2)+';--t:'+(g.top+cap*(g.lh+g.gap))+'px;--h:'+g.lh+'px"><i>+'+hid+'</i></span>'}
+   /* Einzeltermine: als kompakte Zeilen unter den Balken, das Tagesfeld wird bis unten gefüllt; erst danach „+n“ */
+   const LH=Math.max(13,g.lh-3),MH=12,bottom=g.h-4;
+   for(let d=0;d<7;d++){const cover=items.filter(it=>it.a<=d&&it.b>=d);const shown=cover.filter(it=>it.l<cap);const hidBars=cover.length-shown.length;
+    let y=g.top+(shown.length?(Math.max(...shown.map(it=>it.l))+1)*(g.lh+g.gap):0);if(hidBars&&cap<g.cap)y=Math.max(y,g.top+cap*(g.lh+g.gap));
+    const day=lines.filter(it=>it.a===d).sort((x,z)=>x.st-z.st);let k=0;
+    if(!hidBars)for(;k<day.length;k++){const last=k===day.length-1;if(y+LH>bottom||(!last&&y+LH+g.gap+MH>bottom))break;const e=day[k].e,c=e.color||EV_COLORS[0];
+     out+='<span class="sx-bar ln" aria-hidden="true" style="grid-column:'+(d+1)+' / '+(d+2)+';--t:'+y+'px;--h:'+LH+'px;--bg:'+esc(c)+'"><i>'+esc((e.title||'').trim()||(e.start?e.start.replace(/^0/,'')+' Uhr':'Termin'))+'</i></span>';y+=LH+g.gap}
+    const rest=day.slice(k),n=rest.length+hidBars;
+    if(n){const dots=rest.slice(0,2).map(it=>'<b style="--bg:'+esc(it.e.color||EV_COLORS[0])+'"></b>').join('');out+='<span class="sx-bar more" aria-hidden="true" style="grid-column:'+(d+1)+' / '+(d+2)+';--t:'+Math.min(y,bottom-MH)+'px;--h:'+MH+'px">'+dots+'<i>+'+n+'</i></span>'}}
    return out}
-  function paintGrid(grid,g){const cells=[...grid.children].filter(n=>n.classList.contains('day'));const weeks=Math.ceil(cells.length/7);
+  function paintGrid(grid,g){g=measure(grid)||g;const cells=[...grid.children].filter(n=>n.classList.contains('day'));const weeks=Math.ceil(cells.length/7);
    const sigParts=[g.top,g.lh,g.cap,data.shiftIntensity,document.body.dataset.theme];const rows=[];for(let w=0;w<weeks;w++){const keys=cells.slice(w*7,w*7+7).map(c=>c.dataset.date||null);const items=weekItems(keys);rows.push(items);sigParts.push(items.map(it=>it.kind+(it.c||it.e.id+it.e.title+it.e.color+it.e.start)+it.a+it.b+it.l+it.cl+it.cr).join())}
    const tk=todayKey();const ti=cells.findIndex(c=>c.dataset.date===tk);sigParts.push('t'+ti);
    const sig=sigParts.join('|')+JSON.stringify(data.shiftMeta||{})+JSON.stringify(data.customShifts||{});if(cache.get(grid)===sig)return;cache.set(grid,sig);
