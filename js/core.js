@@ -100,6 +100,7 @@ let holdTimer=null,downX=0,downY=0,pendingDate='',longPress=false,gestureMoved=f
 let blockSyntheticClickUntil=0;
 function clearHold(){if(holdTimer!==null){clearTimeout(holdTimer);holdTimer=null}}
 function stopSelection(){clearHold();dragging=false;activePointer=null;longPress=false;gestureMoved=false;cal.classList.remove('selecting')}
+function openRangeSheet(){if(!selectionStart)return;const keys=updateSelection();if(window.SchivioDay?.openShift){SchivioDay.openShift(keys,()=>{selectionStart='';selectionEnd='';updateSelection()})}else openEditor()}
 function beginSingleDay(day){if(plannerActive){applyPlanner([day]);return}openAgenda(day)}
 cal.addEventListener('pointerdown',e=>{
  if(e.pointerType==='mouse'&&e.button!==0)return;
@@ -132,7 +133,7 @@ cal.addEventListener('pointerup',e=>{
  if(wasLong){
   // The click synthesized after pointerup must not close the newly opened modal.
   blockSyntheticClickUntil=performance.now()+120;
-  if(plannerActive)applyPlanner(daysBetween(selectionStart,selectionEnd));else openEditor();
+  if(plannerActive)applyPlanner(daysBetween(selectionStart,selectionEnd));else openRangeSheet();
  }else if(!wasMoved&&Math.hypot(e.clientX-downX,e.clientY-downY)<9){
   blockSyntheticClickUntil=performance.now()+120;
   beginSingleDay(day);

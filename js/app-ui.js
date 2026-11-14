@@ -139,9 +139,9 @@
   const root=el('<div class="sx-ds" hidden><div class="bg"></div><div class="sh" role="dialog" aria-modal="true" aria-labelledby="sxDsTitle"><div class="grab" aria-hidden="true"><i></i></div><div class="sc"><div class="bd"></div></div></div></div>');
   document.body.append(root);
   const sh=root.querySelector('.sh'),bd=root.querySelector('.bd'),sc=root.querySelector('.sc');
-  let view=null,day='',lastFocus=null,isOpen=false,closeT=0;
+  let view=null,day='',lastFocus=null,isOpen=false,closeT=0,onClose=null;
   function show(){if(isOpen)return;isOpen=true;clearTimeout(closeT);lastFocus=document.activeElement;root.hidden=false;document.body.classList.add('modal-open');sh.style.transform='';void root.offsetWidth;root.classList.add('open')}
-  function close(){if(!isOpen)return;isOpen=false;root.classList.remove('open');sh.style.transform='';document.body.classList.remove('modal-open');closeT=setTimeout(()=>{root.hidden=true;bd.replaceChildren();view=null},reduce?0:430);try{lastFocus?.focus({preventScroll:true})}catch(e){}}
+  function close(){if(!isOpen)return;isOpen=false;if(onClose){const f=onClose;onClose=null;try{f()}catch(e){}}root.classList.remove('open');sh.style.transform='';document.body.classList.remove('modal-open');closeT=setTimeout(()=>{root.hidden=true;bd.replaceChildren();view=null},reduce?0:430);try{lastFocus?.focus({preventScroll:true})}catch(e){}}
   function swap(node,dir){node.classList.add('vw');const old=view;view=node;
    if(!old||reduce||!isOpen){bd.replaceChildren(node);bd.style.height='';sc.scrollTop=0;return}
    const h0=bd.offsetHeight;old.style.setProperty('--dx',dir>0?'-28px':'28px');old.classList.remove('in');old.classList.add('out');
@@ -187,12 +187,16 @@
    return node}
 
   /* Dienst wählen / ändern */
-  function shiftView(k,ret){const cur=data.shifts[k]||'';const codes=typeof orderedPlannerCodes==='function'?orderedPlannerCodes():['F','S','N','X','U','T','A'];
-   let html=head(dShort(k),cur?'Dienst ändern':'Dienst eintragen',{back:true})+'<div class="gr">';
+  function shiftView(k,ret,keys){keys=Array.isArray(keys)&&keys.length?keys:[k];const multi=keys.length>1;
+   const first=data.shifts[keys[0]]||'',cur=keys.every(x=>(data.shifts[x]||'')===first)?first:'',any=keys.some(x=>data.shifts[x]);const codes=typeof orderedPlannerCodes==='function'?orderedPlannerCodes():['F','S','N','X','U','T','A'];
+   const eyebrow=multi?dShort(keys[0])+' – '+dShort(keys[keys.length-1])+' · '+keys.length+' Tage':dShort(k);
+   let html=head(eyebrow,cur?'Dienst ändern':'Dienst eintragen',{back:!multi})+'<div class="gr">';
    codes.forEach((c,i)=>{const t=tmplOf(c);const sub=isAllDay(c)?'Ganztägig':t.start+' – '+t.end;html+='<button type="button" class="op'+(c===cur?' on':'')+'" data-x="pick" data-c="'+esc(c)+'" style="--c:'+esc(sColor(c))+';animation-delay:'+(i*25)+'ms" aria-pressed="'+(c===cur)+'"><b>'+esc(shiftTitle(c))+'</b><small>'+esc(sub)+'</small></button>'});
-   if(cur)html+='<button type="button" class="op rm" data-x="pick" data-c="" style="animation-delay:'+(codes.length*25)+'ms"><b>'+ICON.trash.replace('<svg','<svg width="16" height="16"')+'Dienst entfernen</b><small>Tag wird frei</small></button>';
+   if(any)html+='<button type="button" class="op rm" data-x="pick" data-c="" style="animation-delay:'+(codes.length*25)+'ms"><b>'+ICON.trash.replace('<svg','<svg width="16" height="16"')+(multi?'Dienste entfernen':'Dienst entfernen')+'</b><small>'+(multi?'Tage werden frei':'Tag wird frei')+'</small></button>';
    html+='</div>';const node=el('<div>'+html+'</div>');
-   wire(node,{back:()=>swap(dayView(ret),-1),pick:b=>{const c=b.dataset.c;node.querySelectorAll('.op').forEach(o=>o.classList.toggle('on',o===b&&!!c));if(c)data.shifts[k]=c;else delete data.shifts[k];persist();render();if(typeof renderStatsOnly==='function')try{renderStatsOnly()}catch(e){}setTimeout(()=>swap(dayView(ret,c?(k===ret?'shift':'prev'):''),-1),c?220:120);toast(c?shiftTitle(c)+' eingetragen':'Dienst entfernt')}});
+   wire(node,{back:()=>swap(dayView(ret),-1),pick:b=>{const c=b.dataset.c;node.querySelectorAll('.op').forEach(o=>o.classList.toggle('on',o===b&&!!c));keys.forEach(x=>{if(c)data.shifts[x]=c;else delete data.shifts[x]});persist();render();if(typeof renderStatsOnly==='function')try{renderStatsOnly()}catch(e){}
+    if(multi){setTimeout(close,c?220:120);toast(c?shiftTitle(c)+' für '+keys.length+' Tage eingetragen':'Dienste entfernt');return}
+    setTimeout(()=>swap(dayView(ret,c?(k===ret?'shift':'prev'):''),-1),c?220:120);toast(c?shiftTitle(c)+' eingetragen':'Dienst entfernt')}});
    return node}
 
   /* Termin anlegen / bearbeiten */
@@ -247,6 +251,7 @@
    node(fn){show();swap(fn(),0)},
    open(k){show();swap(dayView(k),0)},
    openEvent(k){show();swap(eventView(k,null,k),0)},
+   openShift(keys,done){if(!keys?.length)return;onClose=null;show();onClose=done||null;swap(keys.length>1?shiftView(keys[0],keys[0],keys):shiftView(keys[0],keys[0]),0)},
    refresh(){if(isOpen&&view&&day&&view.querySelector('.tl,.em'))swap(dayView(day),0)},
    sheet:sh,scroller:sc,
    close
