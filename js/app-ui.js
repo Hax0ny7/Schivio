@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.65';
+ const VERSION='1.0.66';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -304,6 +304,7 @@
      R('var(--sx-a)','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/></svg>','Tarif &amp; Eingruppierung',esc(ind?tariffShort()+' · eigene Werte':[tariffShort(),p.group,lv.label].filter(Boolean).join(' · ')),'tarif')+
      R('#8fb0ff',ICON.A,'Arbeitszeit &amp; Soll',esc([weekly.replace(' / Woche',''),workdaysTxt,stateName()&&'Feiertage '+(p.state||'')].filter(Boolean).join(' · ')),'hours')+
      (salaryOn?R('#4ade80','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.5"/></svg>','Gehalt anpassen',(allowances?allowances+' Zulage'+(allowances>1?'n':'')+' · ':'Zulagen, ')+'Schichtmodell, Feiertage','pay',allowances?'':'<span class="bdg">Prüfen</span>'):'')+
+     R('#34d399','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>','Steuer-Helfer','Fahrten &amp; Fortbildungen fürs Finanzamt','tax',data.tax&&data.tax.km?'':'<span class="bdg">Neu</span>')+
      '<button type="button" class="rw" data-m="shifts"><span class="ri" style="--k:#b79cff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span><span class="rt"><b>Dienstarten</b><span class="bars">'+['F','S','N','U'].map(c=>'<i style="--c:'+esc(sColor(c))+'"></i>').join('')+'</span></span>'+ICON.cv+'</button>'+
     '</div></section>'+
     '<section><h3>Darstellung</h3><div class="gp pd"><span class="lbl">Theme</span>'+(window.SchivioThemes?SchivioThemes.pickerHTML():'')+
@@ -329,6 +330,7 @@
    if(a==='tarif')openPage('tarif');else if(a==='hours')openPage('tarif','hours');
    else if(a==='pay')openPay()
    else if(a==='waste')window.SchivioWaste?.open()
+   else if(a==='tax')window.SchivioTax?.open()
    else if(a==='shifts'){$('tabTemplates')?.click();window.__sxFromMore=true}
    else if(a==='skin'){SchivioThemes.set(v);setTimeout(render,30)}
    else if(a==='neonpal'){SchivioThemes.set('neon',v);setTimeout(render,30)}

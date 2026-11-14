@@ -1,0 +1,29 @@
+/* v1.0.66: Steuer-Helfer */
+.sx-ds .tx-warn{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:16px;margin-bottom:14px;background:color-mix(in srgb,var(--sx-warn,#f59e0b) 12%,transparent);color:var(--sx-text);font-size:13px;line-height:1.45}
+.sx-ds .tx-warn svg{flex:none;width:18px;height:18px;color:var(--sx-warn,#f59e0b);margin-top:1px}
+.sx-ds .tx-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.sx-ds .tx-card{display:flex!important;align-items:center;gap:14px;width:100%!important;height:auto!important;min-height:0!important;padding:16px!important;margin:0!important;text-align:left;border-radius:20px!important;border:1px solid var(--sx-line)!important;background:color-mix(in srgb,var(--sx-text) 5%,transparent)!important;color:var(--sx-text)!important;font:inherit;box-shadow:none!important;transition:transform .15s}
+.sx-ds .tx-card:active{transform:scale(.98)}
+.sx-ds .tx-card .ti{flex:none;width:46px;height:46px;border-radius:15px;display:grid;place-items:center;color:var(--sx-a);background:color-mix(in srgb,var(--sx-a) 14%,transparent)}
+.sx-ds .tx-card .ti svg{width:24px;height:24px}
+.sx-ds .tx-card .tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sx-ds .tx-card small{font-size:12.5px;font-weight:650;color:var(--sx-muted)}
+.sx-ds .tx-card b{font-size:21px;font-weight:800}
+.sx-ds .tx-card em{font-style:normal;font-size:12.5px;color:var(--sx-muted)}
+.sx-ds .tx-bar{height:8px;border-radius:99px;background:color-mix(in srgb,var(--sx-text) 10%,transparent);overflow:hidden;margin:12px 0 10px}
+.sx-ds .tx-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sx-a),var(--sx-b))}
+.sx-ds .tx-pb{margin:0;font-size:13px;line-height:1.45;color:var(--sx-muted)}
+.sx-ds .tx-note{margin:10px 4px 0;font-size:12.5px;line-height:1.45;color:var(--sx-muted)}
+.sx-ds .kp+.ac,.sx-ds .tx-note+.ac{margin-top:16px}
+.sx-ds .tx-hint{margin:-4px 2px 0;font-size:12.5px;line-height:1.45;color:var(--sx-muted)}
+.sx-ds .tx-months{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px}
+.sx-ds .tx-months span{display:flex;flex-direction:column;align-items:center;padding:8px 0;border-radius:12px;background:color-mix(in srgb,var(--sx-a) 12%,transparent)}
+.sx-ds .tx-months span.z{background:color-mix(in srgb,var(--sx-text) 5%,transparent);opacity:.6}
+.sx-ds .tx-months small{font-size:11px;color:var(--sx-muted)}
+.sx-ds .tx-months b{font-size:16px;font-weight:800;color:var(--sx-text)}
+.sx-ds .tx-calc{display:flex;flex-wrap:wrap;gap:6px 14px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--sx-a) 10%,transparent);font-size:13px;color:var(--sx-muted)}
+.sx-ds .tx-calc:empty{display:none}
+.sx-ds .tx-calc b{width:100%;font-size:15px;color:var(--sx-text)}
+.sx-ds .fm .sw+.sw{margin-top:-4px}
+.sx-ds .ls .r>b{white-space:nowrap}
+.sx-ds .tx-card .ch{flex:none;width:20px!important;height:20px!important;opacity:.45}
