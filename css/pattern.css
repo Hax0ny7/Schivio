@@ -1,0 +1,57 @@
+/* v1.0.78: Schichtmuster + Datei-Import + Urlaubs-Regeln */
+.sx-ds .pt-p{margin:10px 2px 12px;font-size:13.5px;line-height:1.45;color:var(--sx-muted)}
+.sx-ds .pt-p b{color:var(--sx-text)}
+.sx-ds .pt-h{margin:18px 2px 8px;font-size:12.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--sx-muted)}
+.sx-ds .pt-cur{padding:14px;border-radius:20px;margin-bottom:12px;border:1px solid var(--sx-line);background:color-mix(in srgb,var(--sx-text) 4%,transparent)}
+.sx-ds .pt-cur-h{display:flex;flex-direction:column;gap:2px;margin-bottom:10px}
+.sx-ds .pt-cur-h b{font-size:15.5px;font-weight:800}
+.sx-ds .pt-cur-h small{font-size:12.5px;color:var(--sx-muted)}
+.sx-ds .pt-cur .ac{margin-top:12px}
+.sx-ds .pt-strip{display:grid!important;font-style:normal;grid-template-columns:repeat(14,minmax(0,1fr));gap:3px}
+.sx-ds .pt-strip i{display:block!important;width:auto!important;height:12px!important;margin:0!important;border-radius:4px;background:var(--c)}
+.sx-ds .pt-strip i.f{background:color-mix(in srgb,var(--sx-text) 10%,transparent)}
+.sx-ds .pt-strip.mini{flex:none;width:84px;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.sx-ds .pt-strip.mini i{height:8px!important;border-radius:2px}
+.sx-ds .pt-r{width:100%!important;height:auto!important;min-height:0!important;margin:0!important;border-radius:0!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--sx-line)!important;box-shadow:none!important;color:var(--sx-text)!important;font:inherit;text-align:left;cursor:pointer}
+.sx-ds .ls .pt-r:last-child{border-bottom:0!important}
+.sx-ds .pt-r>span:first-child{flex:1;min-width:0;font-weight:700}
+.sx-ds .pt-r svg:last-child{flex:none;width:18px;height:18px;color:var(--sx-muted)}
+.sx-ds .pt-brush{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.sx-ds .pt-brush::-webkit-scrollbar{display:none}
+.sx-ds .pt-brush button{flex:none;min-height:38px!important;height:auto!important;width:auto!important;margin:0!important;padding:0 14px!important;border-radius:99px!important;font:inherit;font-size:13.5px;font-weight:700;border:1.5px solid color-mix(in srgb,var(--c) 70%,transparent)!important;background:transparent!important;color:var(--sx-text)!important;box-shadow:none!important;transition:background .2s,color .2s,transform .15s}
+.sx-ds .pt-brush button.on{background:var(--c)!important;color:#fff!important;transform:scale(1.04)}
+.sx-ds .pt-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.sx-ds .pt-c{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px;aspect-ratio:1/1.05;width:auto!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;border-radius:12px!important;border:0!important;box-shadow:none!important;font:inherit;background:var(--c)!important;color:#fff!important;transition:background .22s ease}
+.sx-ds .pt-c small{font-size:10.5px;font-weight:700;opacity:.8}
+.sx-ds .pt-c b{font-size:13.5px;font-weight:800}
+.sx-ds .pt-c.f{background:color-mix(in srgb,var(--sx-text) 7%,transparent)!important;color:var(--sx-muted)!important}
+.sx-ds .pt-len{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 2px 0;font-size:13.5px;color:var(--sx-muted)}
+.sx-ds .pt-len b{color:var(--sx-text)}
+.sx-ds .pt-lb{display:flex;gap:6px}
+.sx-ds .pt-lb button{min-width:44px;min-height:36px;font-weight:800}
+.sx-ds .pt-swr .sx-sw{flex:none}
+/* Urlaubs-Regeln */
+.sx-ds .vp-q{padding:14px;border-bottom:1px solid var(--sx-line)}
+.sx-ds .vp-q:last-child{border-bottom:0}
+.sx-ds .vp-q>b{display:block;font-size:14.5px;font-weight:700;margin-bottom:3px}
+.sx-ds .vp-q>small{display:block;font-size:12px;color:var(--sx-muted);line-height:1.35;margin-bottom:10px}
+.sx-ds .vp-seg{display:flex;flex-wrap:wrap;gap:6px}
+.sx-ds .vp-seg button{flex:1 1 auto;min-height:38px!important;height:auto!important;width:auto!important;margin:0!important;padding:6px 12px!important;border-radius:12px!important;font:inherit;font-size:13px;font-weight:700;border:1px solid var(--sx-line)!important;background:transparent!important;color:var(--sx-text)!important;box-shadow:none!important;transition:background .2s,color .2s}
+.sx-ds .vp-seg button.on{background:#f472b6!important;border-color:#f472b6!important;color:#2a0b1a!important}
+.sx-ds .vp-q input[type=date]{margin-top:10px;width:100%;min-height:42px;border-radius:12px;padding:0 10px;font:inherit;font-size:15px}
+.sx-ds .vp-q .vp-sw{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sx-ds .vp-q .vp-sw .sx-sw{flex:none}
+.sx-ds .vp-q[hidden],.sx-ds .vp-q [hidden]{display:none!important}
+.sx-ds .vp-brk{display:flex;flex-wrap:wrap;gap:6px;margin:10px 2px 0}
+.sx-ds .vp-brk span{font-size:12px;font-weight:700;padding:4px 9px;border-radius:99px;background:color-mix(in srgb,var(--sx-text) 7%,transparent);color:var(--sx-muted)}
+.sx-ds .vp-brk span.g{background:color-mix(in srgb,#4ade80 16%,transparent);color:#86efac}
+/* Datei-Import: Spalten/Zeilen wählen */
+.sx-ds .if-col{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.sx-ds .if-col small{font-size:12px;color:var(--sx-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sx-ds .if-pick{width:100%!important;height:auto!important;min-height:0!important;margin:0!important;border-radius:0!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--sx-line)!important;box-shadow:none!important;color:var(--sx-text)!important;font:inherit;text-align:left;cursor:pointer}
+.sx-ds .ls .if-pick:last-child{border-bottom:0!important}
+.sx-ds .if-pick.on{background:color-mix(in srgb,var(--sx-a) 14%,transparent)!important}
+.sx-ds .if-pick b{font-weight:700}
+.sx-ds .if-ok{flex:none!important;width:22px!important;height:22px!important;margin:0!important;border-radius:50%;border:2px solid var(--sx-line);display:grid!important;place-items:center}
+.sx-ds .if-pick.on .if-ok{border-color:var(--sx-a);background:var(--sx-a)}
+.sx-ds .if-mh{margin:16px 2px 6px;font-size:13px;font-weight:800;color:var(--sx-muted)}

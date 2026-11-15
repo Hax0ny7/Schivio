@@ -1,5 +1,5 @@
 /* Dienstplan-Import · Teil 4: Oberfläche und Ablauf
-   Start → (PDF: Zeile antippen | Foto: Tageszahlen + eigene Zeile antippen) → Kürzel zuordnen → Vorschau → übernehmen
+   Start → (Kalender-/Excel-Datei: siehe import-file.js | PDF: Zeile antippen | Foto: Tageszahlen + eigene Zeile antippen) → Kürzel zuordnen → Vorschau → übernehmen
    Datenschutz:
    - Foto/PDF wird nur hier im Arbeitsspeicher ausgewertet und beim Schließen sofort verworfen (nicht gespeichert, nicht im Backup).
    - Es wird nur die eigene Zeile ausgelesen. Daten von Kollegen werden nie gespeichert.
@@ -17,6 +17,7 @@
  const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
  const IC={
   lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/></svg>',
   pdf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>',
   cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
   warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg>',
@@ -48,19 +49,22 @@
    '<div class="ip-note">'+IC.lock+'<span><b>Alles bleibt auf deinem Handy.</b> Foto oder PDF werden nur hier ausgewertet und danach sofort verworfen. Schivio liest nur deine Zeile – Daten von Kollegen werden nicht gespeichert. Bitte prüfe, ob dein Arbeitgeber das Fotografieren des Dienstplans erlaubt.</span></div>'+
    monthBar()+'<p class="ip-p">Für welchen Monat ist der Dienstplan? Steht der Monat im Plan, erkennt Schivio ihn automatisch.</p>'+
    '<div class="ip-pick">'+
-    '<label class="ip-src"><span class="ii">'+IC.pdf+'</span><span class="tt"><b>PDF wählen</b><small>z. B. aus dem Mitarbeiterportal – am zuverlässigsten</small></span><input type="file" accept="application/pdf,.pdf" hidden data-f="pdf"></label>'+
+    '<label class="ip-src"><span class="ii">'+IC.file+'</span><span class="tt"><b>Kalender- oder Excel-Datei</b><small>.ics, .xlsx oder .csv aus dem Mitarbeiterportal – am genauesten</small></span><input type="file" accept=".ics,.ical,.icalendar,text/calendar,.csv,text/csv,.txt,.xlsx,.xlsm,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden data-f="file"></label>'+
+    '<label class="ip-src"><span class="ii">'+IC.pdf+'</span><span class="tt"><b>PDF wählen</b><small>z. B. ausgedruckter Plan als PDF – sehr zuverlässig</small></span><input type="file" accept="application/pdf,.pdf" hidden data-f="pdf"></label>'+
     '<label class="ip-src"><span class="ii">'+IC.cam+'</span><span class="tt"><b>Foto wählen</b><small>Möglichst gerade von vorne, gut beleuchtet, ohne Schatten</small></span><input type="file" accept="image/*" hidden data-f="img"></label>'+
    '</div>'+
    '<p class="ip-hint">Tipp für Fotos: Es reicht, wenn die Zeile mit den Tageszahlen und deine Zeile gut lesbar im Bild sind – lieber näher ran als den ganzen Plan. Beim ersten Foto wird die Texterkennung geladen (ca. 5 MB). Dein Foto wird dabei nicht verschickt.</p>'+
-   (u?'<button type="button" class="ip-undo" data-x="undo">Letzten Import rückgängig machen<small>'+u.n+' Dienste im '+MON[u.m]+' '+u.y+'</small></button>':'')+
+   (window.SchivioPattern?'<button type="button" class="ip-undo" data-x="pattern">Kein Plan zur Hand?<small>Wiederkehrenden Rhythmus als Schichtmuster eintragen</small></button>':'')+
+   (u?'<button type="button" class="ip-undo" data-x="undo">Letzten Import rückgängig machen<small>'+u.n+' Dienste · '+esc(u.label||MON[u.m]+' '+u.y)+'</small></button>':'')+
    '<div class="ip-err" data-err role="alert"></div></div>');
-  DS.wire(node,{mp:()=>{shiftMonth(-1);DS.swap(start(),-1)},mn:()=>{shiftMonth(1);DS.swap(start(),1)},undo:undoLast});
+  DS.wire(node,{mp:()=>{shiftMonth(-1);DS.swap(start(),-1)},mn:()=>{shiftMonth(1);DS.swap(start(),1)},undo:undoLast,pattern:()=>{discard();st=null;window.SchivioPattern.open()}});
+  node.querySelector('[data-f="file"]').addEventListener('change',e=>{const f=e.target.files?.[0];e.target.value='';if(f&&window.SchivioImportFile)window.SchivioImportFile.load(f,()=>{fresh();return start()})});
   node.querySelector('[data-f="pdf"]').addEventListener('change',e=>load(e,'pdf'));
   node.querySelector('[data-f="img"]').addEventListener('change',e=>load(e,'img'));
   return node}
 
  function undoLast(){const u=data.importUndo;if(!u)return;
-  if(!confirm('Die '+u.n+' importierten Dienste im '+MON[u.m]+' '+u.y+' wieder auf den vorherigen Stand setzen?'))return;
+  if(!confirm('Die '+u.n+' importierten Dienste ('+(u.label||MON[u.m]+' '+u.y)+') wieder auf den vorherigen Stand setzen?'))return;
   for(const [k,v] of Object.entries(u.prev||{})){if(v)data.shifts[k]=v;else delete data.shifts[k]}
   delete data.importUndo;refresh();toast('Import rückgängig gemacht');DS.swap(start(),0)}
 
@@ -171,7 +175,7 @@
   setTimeout(()=>{try{document.getElementById('tabPlan')?.click()}catch(e){}try{shown=new Date(y,m,1);render()}catch(e){}},350)}
 
  function open(){fresh();zoom=0;DS.node(start);DS.onClose?.(()=>{discard();st=null})}
- window.SchivioImport={open};
+ window.SchivioImport={open,lib:{guess,cfg,shiftOptions}};
  /* Nur für Tests: mit localStorage „schivio-debug“ = 1 ist der Zustand von außen lesbar */
  try{if(localStorage.getItem('schivio-debug')==='1')window.SchivioImport.debug=()=>st}catch(e){}
 })();
