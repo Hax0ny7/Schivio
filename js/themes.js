@@ -26,7 +26,7 @@
   '<i class="b f" style="--x:0;--w:2"></i><i class="b s" style="--x:2;--w:2"></i><i class="b n" style="--x:4;--w:3"></i>'+
   '<i class="b e" style="--x:1;--w:3;--y:1"></i><i class="b u" style="--x:4;--w:2;--y:1"></i></span><span class="skp-fab"></span></span>'}
  function pickerHTML(opts={}){const cur=opts.cur||current(),pal=opts.pal||neonPalette();
-  return '<div class="skn" role="radiogroup" aria-label="Theme">'+SKINS.map(s=>'<button type="button" role="radio" data-m="skin" data-v="'+s.id+'" class="'+(s.id===cur?'on':'')+'" aria-checked="'+(s.id===cur)+'">'+preview(s.id)+'<b>'+esc(s.name)+'</b><small>'+esc(s.sub)+'</small></button>').join('')+'</div>'+
+  return '<div class="skn" role="radiogroup" aria-label="Theme">'+SKINS.map(s=>'<button type="button" role="radio" data-m="skin" data-v="'+s.id+'" class="'+(s.id===cur?'on':'')+'" aria-checked="'+(s.id===cur)+'">'+preview(s.id)+'<b>'+esc(s.name)+(opts.pro&&window.SchivioPro&&!SchivioPro.freeSkins.includes(s.id)?' <span class="bdg pro">Pro</span>':'')+'</b><small>'+esc(s.sub)+'</small></button>').join('')+'</div>'+
    (cur==='neon'?'<div class="skc" role="radiogroup" aria-label="Akzentfarbe">'+NEON.map(([k,n,c])=>'<button type="button" role="radio" data-m="neonpal" data-v="'+k+'" class="'+(k===pal?'on':'')+'" aria-checked="'+(k===pal)+'" aria-label="'+n+'" style="--c:'+c+'"></button>').join('')+'</div>':'')}
 
  /* Auswahl beim ersten Start */

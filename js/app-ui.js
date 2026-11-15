@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.66';
+ const VERSION='1.0.69';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -266,6 +266,11 @@
   };
  })();
  window.SchivioDay=DS;window.SchivioToast=toast;
+ /* Schivio Pro – zentrale Liste. Solange es noch keine Bezahlung gibt, ist alles freigeschaltet (Testphase).
+    Kostenlos bleiben: Kalender, Dienste, Termine, Gehaltsprognose, Teilen mit einer Person, Backup, Datenexport, Konto löschen.
+    Widgets kommen mit der echten App. */
+ const PRO={active:()=>data.pro!==false,features:{import:'Dienstplan-Import',family:'Familienkalender',weather:'Wetter',taxExport:'Steuer-Export',stats:'Jahresstatistik & Lohn-Abgleich',themes:'Alle Themes'},freeSkins:['neon','klar']};
+ window.SchivioPro=PRO;
  openAgenda=function(day){DS.open(day)};
 
  /* ---------- Backup inkl. Termine ---------- */
@@ -303,6 +308,9 @@
   const fmtH=v=>Number(v).toLocaleString('de-DE',{maximumFractionDigits:2});
   const PAL={emerald:['Emerald','#16924c'],blue:['Blau','#1977b9'],violet:['Violett','#8654ba'],amber:['Gold','#ba8731'],teal:['Türkis','#148f8c'],rose:['Rosé','#b45d79']};
   const R=(k,ic,title,sub,act,extra='')=>'<button type="button" class="rw" data-m="'+act+'"><span class="ri" style="--k:'+k+'">'+ic+'</span><span class="rt"><b>'+title+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</span>'+extra+ICON.cv+'</button>';
+  let appearOpen=false;
+  const skinName=()=>{try{const id=SchivioThemes.current();return (SchivioThemes.SKINS.find(x=>x.id===id)||{}).name||'Theme'}catch(e){return 'Theme'}};
+  const SOON=(k,ic,title,sub,pro)=>'<div class="rw sx-soon" aria-disabled="true"><span class="ri" style="--k:'+k+'">'+ic+'</span><span class="rt"><b>'+title+'</b><small>'+sub+'</small></span><span class="bdg soon">Bald</span>'+(pro?'<span class="bdg pro">Pro</span>':'')+'</div>';
   function render(){const p=data.profile||{},o=data.setupOptions||{};const theme=document.body.dataset.theme||'anthracite';const mode=theme==='anthracite'?'anthracite':theme==='light'?'light':'colored';
    const vivid=data.shiftIntensity!=='subtle';const lv=levelInfo();const salaryOn=!!o.salaryEnabled;
    const allowances=Object.values(data.salaryAllowances||{}).filter(a=>a&&Number(a.value)>0).length;
@@ -313,24 +321,26 @@
    const wdl0=typeof workdayList==='function'?workdayList():[1,2,3,4,5];const wn=['So','Mo','Di','Mi','Do','Fr','Sa'];const workdaysTxt=String(p.workdays||'5').startsWith('m:')?wdl0.length+'-Tage-Woche ('+wdl0.map(d=>wn[d]).join(', ')+')':opt('workdays');
    box.innerHTML='<h1>Mehr</h1>'+
     '<button type="button" class="pc" data-m="tarif"><span class="top"><span class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span><span class="nm"><small>DEIN PROFIL</small><b>'+esc(tariffShort())+'</b></span>'+ICON.cv+'</span><span class="chips">'+chips+'</span>'+(lv.amount?'<span class="ft"><span>Tarifliches Grundentgelt</span><b>'+esc(lv.amount)+'</b></span>':'')+'</button>'+
-    '<section><h3>Arbeit &amp; Gehalt</h3><div class="gp">'+
-     R('var(--sx-a)','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/></svg>','Tarif &amp; Eingruppierung',esc(ind?tariffShort()+' · eigene Werte':[tariffShort(),p.group,lv.label].filter(Boolean).join(' · ')),'tarif')+
-     R('#8fb0ff',ICON.A,'Arbeitszeit &amp; Soll',esc([weekly.replace(' / Woche',''),workdaysTxt,stateName()&&'Feiertage '+(p.state||'')].filter(Boolean).join(' · ')),'hours')+
-     (salaryOn?R('#4ade80','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.5"/></svg>','Gehalt anpassen',(allowances?allowances+' Zulage'+(allowances>1?'n':'')+' · ':'Zulagen, ')+'Schichtmodell, Feiertage','pay',allowances?'':'<span class="bdg">Prüfen</span>'):'')+
-     R('#34d399','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>','Steuer-Helfer','Fahrten &amp; Fortbildungen fürs Finanzamt','tax',data.tax&&data.tax.km?'':'<span class="bdg">Neu</span>')+
-     '<button type="button" class="rw" data-m="shifts"><span class="ri" style="--k:#b79cff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span><span class="rt"><b>Dienstarten</b><span class="bars">'+['F','S','N','U'].map(c=>'<i style="--c:'+esc(sColor(c))+'"></i>').join('')+'</span></span>'+ICON.cv+'</button>'+
+    (salaryOn?'<section><h3>Arbeit &amp; Gehalt</h3><div class="gp">'+R('#4ade80','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.5"/></svg>','Gehalt anpassen',(allowances?allowances+' Zulage'+(allowances>1?'n':'')+' · ':'Zulagen, ')+'Schichtmodell, Feiertage','pay',allowances?'':'<span class="bdg">Prüfen</span>')+'</div></section>':'')+
+    '<section><h3>Tools</h3><div class="gp">'+
+     R('#38bdf8','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>','Freie Zeiten finden','Wann du Zeit für Verabredungen hast','free')+
+     R('#facc15','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.3 12a2 2 0 0 1-2 1.8H8.3a2 2 0 0 1-2-1.8z"/><path d="M3.5 5h17M10 3h4"/></svg>','Müllkalender',(()=>{const w=data.waste;const n=w&&w.bins?w.bins.length:0;return n?(w.on===false?'Ausgeblendet · ':'')+n+(n===1?' Tonne':' Tonnen'):'Abholtage als Tonnen im Kalender'})(),'waste')+
+     R('#34d399','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>','Steuer-Helfer','Fahrten &amp; Fortbildungen · Export mit Pro','tax')+
+     SOON('#f472b6','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 20c0-5 3-8 7-8s7 3 7 8M12 12V4M12 4l5 3"/></svg>','Urlaubsplaner','Resturlaub &amp; Brückentage',false)+
+     SOON('#a78bfa','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 10h8M8 14h5"/></svg>','Dienstplan-Import','Foto oder PDF vom Dienstplan einlesen',true)+
     '</div></section>'+
-    '<section><h3>Darstellung</h3><div class="gp pd"><span class="lbl">Theme</span>'+(window.SchivioThemes?SchivioThemes.pickerHTML():'')+
+    '<section><h3>Darstellung</h3><div class="gp">'+R('#f59e0b','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18c1.4 0 2-1 2-2s-1-1.5-1-2.5 1-1.5 2-1.5h2a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>','Aussehen',esc(skinName())+' · Dienstfarben '+(vivid?'kräftig':'dezent'),'appear')+'</div>'+
+     (appearOpen?'<div class="gp pd sx-appear"><span class="lbl">Theme</span>'+(window.SchivioThemes?SchivioThemes.pickerHTML({pro:true}):'')+
 
 
      '<div class="hr"></div><div class="ln"><span class="rt"><b>Dienstfarben</b><small>im Kalender</small></span><span class="seg"><button type="button" data-m="int" data-v="subtle" class="'+(vivid?'':'on')+'">Dezent</button><button type="button" data-m="int" data-v="vivid" class="'+(vivid?'on':'')+'">Kräftig</button></span></div>'+
      '<div class="pills">'+['F','S','N','U'].map(c=>'<span style="--c:'+esc(sColor(c))+'">'+esc(shiftTitle(c))+'</span>').join('')+'</div>'+
-    '</div></section>'+
-    '<section><h3>Erinnerungen &amp; Kalender <em>· neu</em></h3><div class="gp">'+
+    '</div>':'')+'</section>'+
+    '<section><h3>Erinnerungen &amp; Kalender</h3><div class="gp">'+
      '<div class="rw" style="cursor:default"><span class="ri" style="--k:var(--sx-warn)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg></span><span class="rt"><b>Dienst-Erinnerung</b><small>'+(data.icsReminder!==false?'Am Vorabend um 20:00 Uhr · über den Handy-Kalender':'Aus')+'</small></span><button type="button" class="sx-sw" role="switch" aria-label="Dienst-Erinnerung" aria-checked="'+(data.icsReminder!==false)+'" data-m="remind"></button></div>'+
-     R('#facc15','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.3 12a2 2 0 0 1-2 1.8H8.3a2 2 0 0 1-2-1.8z"/><path d="M3.5 5h17M10 3h4"/></svg>','Müllkalender',(()=>{const w=data.waste;const n=w&&w.bins?w.bins.length:0;return n?(w.on===false?'Ausgeblendet · ':'')+n+(n===1?' Tonne':' Tonnen'):'Abholtage als Tonnen im Kalender'})(),'waste',data.waste&&data.waste.bins&&data.waste.bins.length?'':'<span class="bdg">Neu</span>')+
      R('#8fb0ff','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5L12 18l2.5-2.5"/></svg>','In Handy-Kalender übernehmen','Dienste &amp; Termine als Kalenderdatei','ics')+
     '</div></section>'+
+    '<section><h3>Schivio Pro</h3><div class="gp"><div class="rw" style="cursor:default"><span class="ri" style="--k:#fbbf24"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg></span><span class="rt"><b>'+(PRO.active()?'Testphase · alles freigeschaltet':'Schivio Pro')+'</b><small>'+esc(Object.values(PRO.features).join(' · '))+'</small></span><span class="bdg pro">Pro</span></div></div></section>'+
     '<section><h3>Daten &amp; Sicherheit</h3><div class="gp pd"><p class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Alle Daten bleiben nur auf diesem Gerät. Ein Backup schützt sie bei Handywechsel oder beim Löschen des Browsers.</span></p>'+
      (bk?'<div class="bk ok">Letztes Backup: '+bk.toLocaleDateString('de-DE',{day:'numeric',month:'long',year:'numeric'})+'</div>':'<div class="bk warn">Letztes Backup: noch keins</div>')+
      '<div class="two"><button type="button" class="bt pr" data-m="backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Sichern</button><button type="button" class="bt" data-m="restore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>Wiederherstellen</button></div></div></section>'+
@@ -344,6 +354,8 @@
    else if(a==='pay')openPay()
    else if(a==='waste')window.SchivioWaste?.open()
    else if(a==='tax')window.SchivioTax?.open()
+   else if(a==='free')window.SchivioFreeTime?.open()
+   else if(a==='appear'){appearOpen=!appearOpen;render();if(appearOpen)setTimeout(()=>box.querySelector('.sx-appear')?.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'}),40)}
    else if(a==='shifts'){$('tabTemplates')?.click();window.__sxFromMore=true}
    else if(a==='skin'){SchivioThemes.set(v);setTimeout(render,30)}
    else if(a==='neonpal'){SchivioThemes.set('neon',v);setTimeout(render,30)}

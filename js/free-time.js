@@ -154,7 +154,7 @@
 
  /* ---------- Reiter „Teilen“ ---------- */
  const panel=$('sharePanel');
- if(panel){panel.innerHTML='<div class="ft-hero"><div class="ft-art">'+IC.cal+'</div><h2>Gemeinsam Zeit finden</h2><p>Schichtdienst und Verabredungen passen selten zusammen. Schivio sucht dir die freien Zeiten aus deinem Kalender heraus – zum Teilen mit Familie und Freunden.</p><button type="button" class="ft-go" id="freeTimeOpen">'+IC.clock+'Freie Zeiten finden</button></div><p class="ft-soon">Gemeinsame Kalender für Paare und Familien folgen mit Schivio Pro.</p>';
+ if(panel){panel.innerHTML='<div class="ft-hero"><div class="ft-art">'+IC.cal+'</div><h2>Gemeinsam Zeit finden</h2><p>Schichtdienst und Verabredungen passen selten zusammen. Schivio sucht dir die freien Zeiten aus deinem Kalender heraus – zum Teilen mit Familie und Freunden.</p><button type="button" class="ft-go" id="freeTimeOpen">'+IC.clock+'Freie Zeiten finden</button></div><p class="ft-soon">Bald: Kalender mit einer Person teilen – kostenlos. Familienkalender mit Schivio Pro.</p>';
   $('freeTimeOpen').addEventListener('click',()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}open()})}
  window.SchivioFreeTime={open,analyse,buildPdf};
 })();

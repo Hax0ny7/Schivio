@@ -348,3 +348,7 @@ body[data-theme="light"] .mxp .bk2{color:var(--sx-b)!important}
 .month-grid .sx-week .sx-bar.ln i{font-weight:600;font-size:clamp(9.5px,2.45vw,11px);opacity:.92}
 .month-grid .sx-week .sx-bar.more{gap:3px}
 .month-grid .sx-week .sx-bar.more b{flex:none;width:6px;height:6px;border-radius:50%;background:var(--bg)}
+.mx .bdg.pro{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1b1c1f;font-size:10px;padding:2px 7px;margin-left:4px;vertical-align:1px}
+.mx .bdg.soon{background:transparent;color:var(--sx-muted);border:1px solid var(--sx-line)}
+.mx .rw.sx-soon{cursor:default}.mx .rw.sx-soon .ri,.mx .rw.sx-soon .rt{opacity:.6}
+.mx .sx-appear{margin-top:8px;animation:sxBar .35s var(--sx-ease) both}
