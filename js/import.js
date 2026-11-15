@@ -213,9 +213,16 @@
  function dayColumns(y0,y1){const s=st.src;const G=gray(s.canvas,0,y0,s.w,y1-y0);const med=medOf(G.v);const prof=new Float32Array(G.W);
   for(let y=0;y<G.H;y++){const o=y*G.W;for(let x=0;x<G.W;x++){const d=med-G.v[o+x];if(d>0)prof[x]+=d}}for(let x=0;x<G.W;x++)prof[x]/=G.H;
   const xs=linePeaks(prof);if(xs.length<8)return null;
-  let best=null;for(let i=0;i<xs.length-1;i++){const g0=xs[i+1]-xs[i];if(g0<8)continue;let j=i+1;const gaps=[g0];
-   while(j+1<xs.length){const g=xs[j+1]-xs[j];const m=median(gaps);if(Math.abs(g-m)>m*.25)break;gaps.push(g);j++}
-   if(!best||gaps.length>best.cols.length){const cols=[];for(let k=i;k<j;k++)cols.push([xs[k],xs[k+1]]);best={cols}}}
+  const dim=new Date(st.y,st.m+1,0).getDate(),minG=Math.max(8,st.pitch*.5);const score=c=>{const n=c.length;return n>=dim-2&&n<=dim+2?1000-Math.abs(n-dim):n};
+  let best=null;for(let i=0;i<xs.length-1;i++){const g0=xs[i+1]-xs[i];if(g0<minG)continue;let j=i+1;const gaps=[g0];
+   const cols=[[xs[i],xs[i+1]]];
+   while(j+1<xs.length){const g=xs[j+1]-xs[j];const m=median(gaps);
+    /* einzelne Störlinie mitten in einer Zelle überspringen */
+    if(g<m*.6&&j+2<xs.length&&Math.abs(xs[j+2]-xs[j]-m)<=m*.25){cols.push([xs[j],xs[j+2]]);gaps.push(xs[j+2]-xs[j]);j+=2;continue}
+    const q=Math.round(g/m);if(q>2)break;
+    /* fehlende Linie (z. B. auf farbigem Hintergrund): Lücke von 2–3 Spaltenbreiten aufteilen */
+    if(q>=1&&q<=3&&Math.abs(g-q*m)<=m*.22*q){for(let r=0;r<q;r++)cols.push([xs[j]+g*r/q,xs[j]+g*(r+1)/q]);for(let r=0;r<q;r++)gaps.push(g/q);j++}else break}
+   if(!best||score(cols)>score(best.cols))best={cols}}
   return best&&best.cols.length>=8?best.cols:null}
  /* Waagerechte Linien um eine Zeile → Ober- und Unterkante der Zellen */
  function rowBounds(cy,x0,x1){const s=st.src,p=st.pitch;const y0=Math.max(0,cy-p*1.6),G=gray(s.canvas,x0,y0,x1-x0,p*3.2);const med=medOf(G.v);const prof=new Float32Array(G.H);
@@ -247,20 +254,41 @@
   if(rm.length<total*.85)for(const i of rm){px[i*4]=px[i*4+1]=px[i*4+2]=255}}
  async function readCell(col,yb,wl,psm){const c=cellCanvas(col[0],col[1],yb[0],yb[1]);if(!c)return '';
   for(const m of [psm||'7','13','10']){const w=await ocr(c,{tessedit_pageseg_mode:m,tessedit_char_whitelist:wl,minConf:5});const t=w.map(o=>o.t).join('');if(t.replace(/[^0-9A-Za-zÄÖÜäöüß]/g,''))return t}return ''}
- async function readGrid(){const s=st.src,dim=new Date(st.y,st.m+1,0).getDate();
-  const ya=Math.min(st.hY,st.rY)-st.pitch,yb=Math.max(st.hY,st.rY)+st.pitch;const span=Math.max(yb-ya,st.pitch*7);const mid=(ya+yb)/2;
-  const cols=dayColumns(Math.max(0,mid-span/2),Math.min(s.h,mid+span/2));if(!cols)return null;
+ /* Einer Zeile über alle Spalten folgen (Perspektive: Zeilen laufen leicht schräg) */
+ /* Verlauf einer Zeile aus den erkannten Wörtern schätzen (Perspektive: Zeilen laufen leicht schräg) */
+ function rowLine(cy){const P=st.pitch,W=st.src.w;let a=cy,b=0;
+  for(let it=0;it<4;it++){const pts=st.src.words.map(w=>({x:w.x+w.w/2,y:w.y+w.h/2})).filter(p=>Math.abs(p.y-(a+b*p.x))<P*(it?0.35:0.45));
+   if(pts.length<3)break;const xs=pts.map(p=>p.x);if(Math.max(...xs)-Math.min(...xs)<W*.25){a=pts.reduce((s,p)=>s+p.y,0)/pts.length-b*(xs.reduce((s,x)=>s+x,0)/pts.length);continue}
+   const n=pts.length,mx=xs.reduce((s,x)=>s+x,0)/n,my=pts.reduce((s,p)=>s+p.y,0)/n;let sxy=0,sxx=0;for(const p of pts){sxy+=(p.x-mx)*(p.y-my);sxx+=(p.x-mx)**2}
+   const nb=sxx?sxy/sxx:0;if(Math.abs(nb)>.08)break;b=nb;a=my-b*mx}
+  /* angetippte Höhe bleibt an der Stelle des Namens maßgeblich */
+  if(st.diag)st.diag.slope=b;
+  /* Höhe bleibt an der angetippten Stelle verankert (beim Namen bzw. der erkannten Zeile) */
+  let xr=0,bd=1e9;for(const l of st.lines){const d=Math.abs(l.cy-cy);if(d<bd){bd=d;xr=(l.x0+l.x1)/2}}if(bd>P*.5)xr=W*.2;st._xr=xr;const a2=cy-b*xr;return x=>a2+b*x}
+ function trackRow(cols,cy){const f=rowLine(cy),x0=cols[0][0],x1=cols[cols.length-1][1];const base=rowBounds(cy,x0,x1);const xr=st._xr||x0;return cols.map(c=>{const d=f((c[0]+c[1])/2)-cy;return [base[0]+d,base[1]+d]})}
+ function rowBoundsAt(cy,x0,x1,reach){const s=st.src,p=st.pitch;const y0=Math.max(0,cy-reach),G=gray(s.canvas,x0,y0,x1-x0,reach*2);const med=medOf(G.v);const prof=new Float32Array(G.H);
+  for(let y=0;y<G.H;y++){const o=y*G.W;let c=0;for(let x=0;x<G.W;x++){const d=med-G.v[o+x];if(d>0)c+=d}prof[y]=c/G.W}
+  const ys=linePeaks(prof).map(y=>y+G.y);const above=ys.filter(y=>y<cy-p*.12),below=ys.filter(y=>y>cy+p*.12);
+  let top=above.length?Math.max(...above):cy-p*.5,bot=below.length?Math.min(...below):cy+p*.5;
+  if(bot-top>p*1.5||bot-top<p*.45){top=cy-p*.5;bot=cy+p*.5}return [top,bot]}
+ async function readGrid(){const s=st.src,dim=new Date(st.y,st.m+1,0).getDate(),P=st.pitch;st.diag={};
+  /* Spalten zuerst direkt um die eigene Zeile suchen (wenig Verzerrung), sonst im größeren Bereich */
+  const tries=[[st.rY-P*1.2,st.rY+P*1.2],[st.rY-P*2.5,st.rY+P*2.5],[Math.min(st.hY,st.rY)-P,Math.max(st.hY,st.rY)+P],[st.hY-P*2.5,st.hY+P*2.5]];let cols=null;
+  for(const [a,b] of tries){const c=dayColumns(Math.max(0,a),Math.min(s.h,b));if(c&&(!cols||c.length>cols.length))cols=c;if(cols&&cols.length>=dim-1)break}
+  st.diag.cols=cols?cols.length:0;if(!cols)return null;st.diag.colx=[Math.round(cols[0][0]),Math.round(cols[cols.length-1][1])];
   const x0=cols[0][0],x1=cols[cols.length-1][1];
   /* Tageszahlen: Spalte → Tag (Versatz per Mehrheitsentscheid) */
-  const hb=rowBounds(st.hY,x0,x1);const votes={};let seen=0;
-  for(let j=0;j<cols.length;j++){prog('Tageszahlen werden gelesen … '+(j+1)+'/'+cols.length);const t=(await readCell(cols[j],hb,'0123456789','7')).replace(/\D/g,'');const n=parseInt(t,10);
+  const hbs=trackRow(cols,st.hY);const votes={};let seen=0;
+  for(let j=0;j<cols.length;j++){prog('Tageszahlen werden gelesen … '+(j+1)+'/'+cols.length);const t=(await readCell(cols[j],hbs[j],'0123456789','7')).replace(/\D/g,'');const n=parseInt(t,10);
    if(n>=1&&n<=31){const off=n-j;votes[off]=(votes[off]||0)+1;seen++;const top=Math.max(...Object.values(votes));if(top>=6&&seen>=8)break}}
   let off=null,bv=0;for(const [o,v] of Object.entries(votes))if(v>bv){bv=v;off=Number(o)}
-  if(off==null||bv<3){if(cols.length>=dim-1)off=1;else return null}
+  st.diag.nums=bv;
+  if(off==null||bv<3){if(cols.length>=dim-1&&cols.length<=dim+1)off=1;else return null}
   const dayCols=cols.map((c,j)=>({day:j+off,c})).filter(o=>o.day>=1&&o.day<=dim);if(dayCols.length<7)return null;
   /* Eigene Zeile, Zelle für Zelle */
-  const rb=rowBounds(st.rY,x0,x1);const out=[];
-  for(let i=0;i<dayCols.length;i++){prog('Deine Zeile wird gelesen … '+(i+1)+'/'+dayCols.length);const t=clean(await readCell(dayCols[i].c,rb,CELL_CHARS,'7'));if(t)out.push({day:dayCols[i].day,t})}
+  const rbs=trackRow(cols,st.rY),rbOf={};cols.forEach((c,j)=>rbOf[c[0]]=rbs[j]);const out=[];
+  for(let i=0;i<dayCols.length;i++){prog('Deine Zeile wird gelesen … '+(i+1)+'/'+dayCols.length);const t=clean(await readCell(dayCols[i].c,rbOf[dayCols[i].c[0]],CELL_CHARS,'7'));if(t)out.push({day:dayCols[i].day,t})}
+  st.diag.cells=out.length;
   st.header=dayCols.map(o=>({n:o.day,cx:(o.c[0]+o.c[1])/2}));st.sp=(dayCols[dayCols.length-1].c[1]-dayCols[0].c[0])/dayCols.length;
   return out}
 
@@ -274,7 +302,7 @@
     const hc=prep(s.canvas,0,st.hY-bh/2,s.w,bh,scale,true);
     const hw=(await ocr(hc,{tessedit_pageseg_mode:'11',tessedit_char_whitelist:'0123456789'})).map(w=>({...w,x:w.x/scale,w:w.w/scale}));
     const seq=headerOf(hw);
-    if(seq.length<7)throw new Error('Die Tageszahlen konnten nicht sicher gelesen werden. Tippe bitte genau auf die Zeile mit 1, 2, 3 … oder fotografiere etwas näher.');
+    if(seq.length<7){const d=st.diag||{};throw new Error('Die Tageszahlen konnten nicht sicher gelesen werden. Tippe bitte genau auf die Zeile mit 1, 2, 3 … oder fotografiere etwas näher. (Info: Spalten '+(d.cols||0)+', Zahlen '+(d.nums||0)+', Bild '+Math.round(s.w)+'×'+Math.round(s.h)+', Zeilenhöhe '+Math.round(st.pitch)+', Schräge '+(s.angle||0)+'°)')}
     setHeader(seq);st.progLabel='Deine Zeile wird gelesen';prog('Deine Zeile wird gelesen …');
     const rc=prep(s.canvas,0,st.rY-bh/2,s.w,bh,scale,true);
     const rw=(await ocr(rc,{tessedit_pageseg_mode:'11',tessedit_char_whitelist:CODE_CHARS})).map(w=>({...w,x:w.x/scale,w:w.w/scale}));
