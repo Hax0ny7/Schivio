@@ -209,21 +209,25 @@
   const r=new Float32Array(n);for(let i=0;i<n;i++)r[i]=prof[i]-base[i];
   const sorted=Array.from(r).sort((a,b)=>a-b);const thr=Math.max(6,.3*sorted[Math.floor(n*.995)]);
   const out=[];let i=0;while(i<n){if(r[i]>thr){let j=i;while(j+1<n&&(r[j+1]>thr||(j+2<n&&r[j+2]>thr&&j+2-i<6)))j++;out.push((i+j)/2);i=j+1}else i++}return out}
+ function fracPeaks(prof){const n=prof.length,win=20,pre=new Float64Array(n+1);for(let i=0;i<n;i++)pre[i+1]=pre[i]+prof[i];
+  const r=new Float32Array(n);for(let i=0;i<n;i++){const a=Math.max(0,i-win),b=Math.min(n,i+win+1);r[i]=prof[i]-(pre[b]-pre[a])/(b-a)}
+  const out=[];let i=0;while(i<n){if(r[i]>.3){let j=i;while(j+1<n&&(r[j+1]>.3||(j+2<n&&r[j+2]>.3&&j+2-i<8)))j++;out.push((i+j)/2);i=j+1}else i++}return out}
  /* Senkrechte Linien → längste Folge ähnlich breiter Spalten = Tagesspalten */
- function dayColumns(y0,y1){const s=st.src;const G=gray(s.canvas,0,y0,s.w,y1-y0);const med=medOf(G.v);const prof=new Float32Array(G.W);
-  for(let y=0;y<G.H;y++){const o=y*G.W;for(let x=0;x<G.W;x++){const d=med-G.v[o+x];if(d>0)prof[x]+=d}}for(let x=0;x<G.W;x++)prof[x]/=G.H;
-  const xs=linePeaks(prof);if(xs.length<8)return null;
-  const dim=new Date(st.y,st.m+1,0).getDate(),minG=Math.max(8,st.pitch*.5);const score=c=>{const n=c.length;return n>=dim-2&&n<=dim+2?1000-Math.abs(n-dim):n};
-  let best=null;for(let i=0;i<xs.length-1;i++){const g0=xs[i+1]-xs[i];if(g0<minG)continue;let j=i+1;const gaps=[g0];
-   const cols=[[xs[i],xs[i+1]]];
+ function dayColumns(y0,y1){const s=st.src;const G=gray(s.canvas,0,y0,s.w,y1-y0);const med=medOf(G.v);
+  /* zwei Linien-Detektoren: (a) mittlere Dunkelheit, (b) Anteil dunkler Zeilen (Linien laufen durch, Schrift nicht) */
+  const pa=new Float32Array(G.W),pb=new Float32Array(G.W);const thr=med-40;
+  for(let y=0;y<G.H;y++){const o=y*G.W;let last=-9;for(let x=0;x<G.W;x++){const v=G.v[o+x],d=med-v;if(d>0)pa[x]+=d;if(v<thr){const a=Math.max(last+1,x-2),b=Math.min(G.W-1,x+2);for(let i=a;i<=b;i++)pb[i]++;last=b}}}
+  for(let x=0;x<G.W;x++){pa[x]/=G.H;pb[x]/=G.H}
+  const A=runOf(linePeaks(pa)),B=runOf(fracPeaks(pb));return colFit(A)>=colFit(B)?A:B}
+ function colFit(c){const dim=new Date(st.y,st.m+1,0).getDate();return c?(c.length>=dim-2&&c.length<=dim+2?1000-Math.abs(c.length-dim):c.length):-1}
+ function runOf(xs){if(xs.length<8)return null;const minG=Math.max(8,st.pitch*.5);let best=null;
+  for(let i=0;i<xs.length-1;i++){const g0=xs[i+1]-xs[i];if(g0<minG)continue;let j=i+1;const gaps=[g0];const cols=[[xs[i],xs[i+1]]];
    while(j+1<xs.length){const g=xs[j+1]-xs[j];const m=median(gaps);
-    /* einzelne Störlinie mitten in einer Zelle überspringen */
     if(g<m*.6&&j+2<xs.length&&Math.abs(xs[j+2]-xs[j]-m)<=m*.25){cols.push([xs[j],xs[j+2]]);gaps.push(xs[j+2]-xs[j]);j+=2;continue}
-    const q=Math.round(g/m);if(q>2)break;
-    /* fehlende Linie (z. B. auf farbigem Hintergrund): Lücke von 2–3 Spaltenbreiten aufteilen */
-    if(q>=1&&q<=3&&Math.abs(g-q*m)<=m*.22*q){for(let r=0;r<q;r++)cols.push([xs[j]+g*r/q,xs[j]+g*(r+1)/q]);for(let r=0;r<q;r++)gaps.push(g/q);j++}else break}
-   if(!best||score(cols)>score(best.cols))best={cols}}
-  return best&&best.cols.length>=8?best.cols:null}
+    const q=Math.round(g/m);if(q<1||q>2)break;
+    if(Math.abs(g-q*m)<=m*.22*q){for(let r=0;r<q;r++)cols.push([xs[j]+g*r/q,xs[j]+g*(r+1)/q]);for(let r=0;r<q;r++)gaps.push(g/q);j++}else break}
+   if(!best||colFit(cols)>colFit(best))best=cols}
+  return best&&best.length>=8?best:null}
  /* Waagerechte Linien um eine Zeile → Ober- und Unterkante der Zellen */
  function rowBounds(cy,x0,x1){const s=st.src,p=st.pitch;const y0=Math.max(0,cy-p*1.6),G=gray(s.canvas,x0,y0,x1-x0,p*3.2);const med=medOf(G.v);const prof=new Float32Array(G.H);
   for(let y=0;y<G.H;y++){const o=y*G.W;let c=0;for(let x=0;x<G.W;x++){const d=med-G.v[o+x];if(d>0)c+=d}prof[y]=c/G.W}
@@ -236,8 +240,8 @@
   const d=s.canvas.getContext('2d',{willReadFrequently:true}).getImageData(X,Y,CW,CH).data;const n=CW*CH;
   /* Kanal mit dem stärksten Kontrast wählen: hellster Kanal (schwarze Schrift auf Farbe) oder dunkelster Kanal (weiße Schrift auf Farbe) */
   const vMax=new Uint8Array(n),vMin=new Uint8Array(n);for(let i=0,j=0;i<n;i++,j+=4){vMax[i]=Math.max(d[j],d[j+1],d[j+2]);vMin[i]=Math.min(d[j],d[j+1],d[j+2])}
-  const stats=v=>{const h=new Uint32Array(256);for(const a of v)h[a]++;let acc=0,p5=0,p50=0,p95=255;for(let i=0;i<256;i++){acc+=h[i];if(!p5&&acc>n*.05)p5=i;if(!p50&&acc>n*.5)p50=i;if(acc>n*.95){p95=i;break}}return {p5,p50,p95,sp:p95-p5}};
-  const sa=stats(vMax),sb=stats(vMin);const useMin=sb.sp>sa.sp*1.15;const v=useMin?vMin:vMax,S=useMin?sb:sa;
+  const stats=v=>{const h=new Uint32Array(256);for(const a of v)h[a]++;let acc=0,p5=-1,p50=-1,p95=255;for(let i=0;i<256;i++){acc+=h[i];if(p5<0&&acc>n*.01)p5=i;if(p50<0&&acc>n*.5)p50=i;if(acc>n*.99){p95=i;break}}p5=Math.max(0,p5);p50=Math.max(0,p50);return {p5,p50,p95,sp:p95-p5}};/* 1 %-Ränder: auch kleine Ziffern zählen */
+  const sa=stats(vMax),sb=stats(vMin);/* dunkle, kräftige Zellfarbe (Blau, Rot) → weiße Schrift: dunkelsten Kanal nehmen; sonst hellsten */const useMin=sa.p50<215&&sb.p50<110;const v=useMin?vMin:vMax,S=useMin?sb:sa;
   if(S.sp<40)return null;/* leere Zelle */
   const lim=S.sp*.35;let dk=0,br=0;for(const a of v){if(a<S.p50-lim)dk++;else if(a>S.p50+lim)br++}
   const inv=br>dk;const ink=(inv?br:dk)/n;if(ink<.012)return null;
@@ -265,29 +269,47 @@
   if(st.diag)st.diag.slope=b;
   /* Höhe bleibt an der angetippten Stelle verankert (beim Namen bzw. der erkannten Zeile) */
   let xr=0,bd=1e9;for(const l of st.lines){const d=Math.abs(l.cy-cy);if(d<bd){bd=d;xr=(l.x0+l.x1)/2}}if(bd>P*.5)xr=W*.2;st._xr=xr;const a2=cy-b*xr;return x=>a2+b*x}
- function trackRow(cols,cy){const f=rowLine(cy),x0=cols[0][0],x1=cols[cols.length-1][1];const base=rowBounds(cy,x0,x1);const xr=st._xr||x0;return cols.map(c=>{const d=f((c[0]+c[1])/2)-cy;return [base[0]+d,base[1]+d]})}
+ function trackRow(cols,cy){const f=rowLine(cy),P=st.pitch;return cols.map(c=>{const m=f((c[0]+c[1])/2);return [m-P*.5,m+P*.5]})}
  function rowBoundsAt(cy,x0,x1,reach){const s=st.src,p=st.pitch;const y0=Math.max(0,cy-reach),G=gray(s.canvas,x0,y0,x1-x0,reach*2);const med=medOf(G.v);const prof=new Float32Array(G.H);
   for(let y=0;y<G.H;y++){const o=y*G.W;let c=0;for(let x=0;x<G.W;x++){const d=med-G.v[o+x];if(d>0)c+=d}prof[y]=c/G.W}
   const ys=linePeaks(prof).map(y=>y+G.y);const above=ys.filter(y=>y<cy-p*.12),below=ys.filter(y=>y>cy+p*.12);
   let top=above.length?Math.max(...above):cy-p*.5,bot=below.length?Math.min(...below):cy+p*.5;
   if(bot-top>p*1.5||bot-top<p*.45){top=cy-p*.5;bot=cy+p*.5}return [top,bot]}
+ /* Spaltenlinien von der Kopfzeile nach unten verfolgen (starke Perspektive / gewölbtes Papier) */
+ function traceDown(bounds,y0,y1){const s=st.src,P=st.pitch;const h=P*.45;let xs=bounds.slice();
+  const widths=xs.slice(1).map((x,i)=>x-xs[i]);const cw=median(widths)||P;const R=Math.max(3,cw*.3);
+  const n=Math.max(1,Math.ceil(Math.abs(y1-y0)/h));
+  for(let k=1;k<=n;k++){const yc=y0+(y1-y0)*k/n;
+   const G=gray(s.canvas,0,yc-h/2,s.w,h);const med=medOf(G.v);const prof=new Float32Array(G.W);
+   for(let yy=0;yy<G.H;yy++){const o=yy*G.W;for(let x=0;x<G.W;x++){const d=med-G.v[o+x];if(d>0)prof[x]+=d}}
+   const found=xs.map(x=>{const a=Math.max(0,Math.floor(x-R)),b=Math.min(G.W-1,Math.ceil(x+R));let mx=-1,mi=x,mn=1e18;
+    for(let i=a;i<=b;i++){if(prof[i]>mx){mx=prof[i];mi=i}if(prof[i]<mn)mn=prof[i]}return {x:mi,str:mx-mn}});
+   const strs=found.map(f=>f.str).sort((a,b)=>a-b);const good=strs[Math.floor(strs.length*.5)]*.5;
+   const drift=[];found.forEach((f,i)=>{if(f.str>=good)drift.push(f.x-xs[i])});const dm=median(drift)||0;
+   xs=xs.map((x,i)=>found[i].str>=good&&Math.abs(found[i].x-x-dm)<R*.8?found[i].x:x+dm)}
+  return xs}
  async function readGrid(){const s=st.src,dim=new Date(st.y,st.m+1,0).getDate(),P=st.pitch;st.diag={};
-  /* Spalten zuerst direkt um die eigene Zeile suchen (wenig Verzerrung), sonst im größeren Bereich */
-  const tries=[[st.rY-P*1.2,st.rY+P*1.2],[st.rY-P*2.5,st.rY+P*2.5],[Math.min(st.hY,st.rY)-P,Math.max(st.hY,st.rY)+P],[st.hY-P*2.5,st.hY+P*2.5]];let cols=null;
-  for(const [a,b] of tries){const c=dayColumns(Math.max(0,a),Math.min(s.h,b));if(c&&(!cols||c.length>cols.length))cols=c;if(cols&&cols.length>=dim-1)break}
-  st.diag.cols=cols?cols.length:0;if(!cols)return null;st.diag.colx=[Math.round(cols[0][0]),Math.round(cols[cols.length-1][1])];
-  const x0=cols[0][0],x1=cols[cols.length-1][1];
-  /* Tageszahlen: Spalte → Tag (Versatz per Mehrheitsentscheid) */
-  const hbs=trackRow(cols,st.hY);const votes={};let seen=0;
-  for(let j=0;j<cols.length;j++){prog('Tageszahlen werden gelesen … '+(j+1)+'/'+cols.length);const t=(await readCell(cols[j],hbs[j],'0123456789','7')).replace(/\D/g,'');const n=parseInt(t,10);
-   if(n>=1&&n<=31){const off=n-j;votes[off]=(votes[off]||0)+1;seen++;const top=Math.max(...Object.values(votes));if(top>=6&&seen>=8)break}}
-  let off=null,bv=0;for(const [o,v] of Object.entries(votes))if(v>bv){bv=v;off=Number(o)}
-  st.diag.nums=bv;
-  if(off==null||bv<3){if(cols.length>=dim-1&&cols.length<=dim+1)off=1;else return null}
-  const dayCols=cols.map((c,j)=>({day:j+off,c})).filter(o=>o.day>=1&&o.day<=dim);if(dayCols.length<7)return null;
-  /* Eigene Zeile, Zelle für Zelle */
-  const rbs=trackRow(cols,st.rY),rbOf={};cols.forEach((c,j)=>rbOf[c[0]]=rbs[j]);const out=[];
-  for(let i=0;i<dayCols.length;i++){prog('Deine Zeile wird gelesen … '+(i+1)+'/'+dayCols.length);const t=clean(await readCell(dayCols[i].c,rbOf[dayCols[i].c[0]],CELL_CHARS,'7'));if(t)out.push({day:dayCols[i].day,t})}
+  const find=(cy,ranges)=>{let best=null;for(const [a,b] of ranges){const c=dayColumns(Math.max(0,cy+a*P),Math.min(s.h,cy+b*P));if(c&&(!best||c.length>best.length))best=c;if(best&&best.length>=dim-1)break}return best};
+  const pairs=T=>T.slice(1).map((x,i)=>[T[i],x]);const bounds=c=>[c[0][0],...c.map(x=>x[1])];
+  /* 1. Spalten an der eigenen Zeile finden (dort stehen die Linien meist klar), Linien hoch zu den Tageszahlen verfolgen */
+  const fit=c=>c?(c.length>=dim-2&&c.length<=dim+2?1000-Math.abs(c.length-dim):c.length):-1;
+  const hc=find(st.hY,[[-.9,.6],[-1.6,.7],[-1.2,1.2]]),rc=find(st.rY,[[-.6,.6],[-1.2,1.2],[-2.5,2.5]]);let cols=null,hcols=null;
+  /* Die Seite mit der besseren Spaltenfolge nehmen und die Linien zur anderen Zeile verfolgen */
+  if(hc&&fit(rc)<997&&fit(hc)>fit(rc)){hcols=hc;cols=pairs(traceDown(bounds(hc),st.hY,st.rY));st.diag.how='kopf'}
+  else if(rc){cols=rc;hcols=pairs(traceDown(bounds(rc),st.rY,st.hY));st.diag.how='zeile'}
+  st.diag.cols=cols?cols.length:0;if(!cols)return null;
+  /* 2. Tageszahlen lesen → welcher Tag gehört zu welcher Spalte */
+  const f=rowLine(st.hY),hh=Math.max(st.wh*.7,P*.3);const votes={};let seen=0,off=null,bv=0;
+  for(let j=0;j<hcols.length;j++){prog('Tageszahlen werden gelesen … '+(j+1)+'/'+hcols.length);const c=hcols[j],m=f((c[0]+c[1])/2);
+   const t=(await readCell(c,[m-hh,m+hh],'0123456789','7')).replace(/\D/g,'');const n=parseInt(t,10);
+   if(n>=1&&n<=31){const o=n-j;votes[o]=(votes[o]||0)+1;seen++;const top=Math.max(...Object.values(votes));if(top>=6&&seen>=8)break}}
+  for(const [o,v] of Object.entries(votes))if(v>bv){bv=v;off=Number(o)}st.diag.nums=bv;
+  if(bv<3)off=cols.length>=dim-1&&cols.length<=dim+1?1:null;
+  if(off==null)return null;
+  const dayCols=cols.map((c,j)=>({day:j+off,c})).filter(o=>o.day>=1&&o.day<=dim&&o.c[1]>o.c[0]+3);if(dayCols.length<7)return null;
+  /* 3. Eigene Zeile, Zelle für Zelle */
+  const rbs=trackRow(dayCols.map(o=>o.c),st.rY);const out=[];
+  for(let i=0;i<dayCols.length;i++){prog('Deine Zeile wird gelesen … '+(i+1)+'/'+dayCols.length);const t=clean(await readCell(dayCols[i].c,rbs[i],CELL_CHARS,'7'));if(t)out.push({day:dayCols[i].day,t})}
   st.diag.cells=out.length;
   st.header=dayCols.map(o=>({n:o.day,cx:(o.c[0]+o.c[1])/2}));st.sp=(dayCols[dayCols.length-1].c[1]-dayCols[0].c[0])/dayCols.length;
   return out}
@@ -302,7 +324,7 @@
     const hc=prep(s.canvas,0,st.hY-bh/2,s.w,bh,scale,true);
     const hw=(await ocr(hc,{tessedit_pageseg_mode:'11',tessedit_char_whitelist:'0123456789'})).map(w=>({...w,x:w.x/scale,w:w.w/scale}));
     const seq=headerOf(hw);
-    if(seq.length<7){const d=st.diag||{};throw new Error('Die Tageszahlen konnten nicht sicher gelesen werden. Tippe bitte genau auf die Zeile mit 1, 2, 3 … oder fotografiere etwas näher. (Info: Spalten '+(d.cols||0)+', Zahlen '+(d.nums||0)+', Bild '+Math.round(s.w)+'×'+Math.round(s.h)+', Zeilenhöhe '+Math.round(st.pitch)+', Schräge '+(s.angle||0)+'°)')}
+    if(seq.length<7){const d=st.diag||{};throw new Error('Die Tageszahlen konnten nicht sicher gelesen werden. Tippe bitte genau auf die Zeile mit 1, 2, 3 … oder fotografiere etwas näher. (Info: Weg '+(d.how||'-')+', Spalten '+(d.cols||0)+', Zahlen '+(d.nums||0)+', Bild '+Math.round(s.w)+'×'+Math.round(s.h)+', Zeilenhöhe '+Math.round(st.pitch)+', Schräge '+(s.angle||0)+'°)')}
     setHeader(seq);st.progLabel='Deine Zeile wird gelesen';prog('Deine Zeile wird gelesen …');
     const rc=prep(s.canvas,0,st.rY-bh/2,s.w,bh,scale,true);
     const rw=(await ocr(rc,{tessedit_pageseg_mode:'11',tessedit_char_whitelist:CODE_CHARS})).map(w=>({...w,x:w.x/scale,w:w.w/scale}));
