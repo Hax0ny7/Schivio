@@ -42,8 +42,10 @@
     '<label class="ip-src"><span class="ii">'+IC.cam+'</span><span class="tt"><b>Foto wählen</b><small>Möglichst gerade von vorne, gut beleuchtet, ohne Schatten</small></span><input type="file" accept="image/*" hidden data-f="img"></label>'+
    '</div>'+
    '<p class="ip-hint">Tipp für Fotos: Es reicht, wenn die Zeile mit den Tageszahlen und deine Zeile gut lesbar im Bild sind – lieber näher ran als den ganzen Plan. Beim ersten Foto wird die Texterkennung geladen (ca. 5 MB). Dein Foto wird dabei nicht verschickt.</p>'+
+   (data.importUndo?'<button type="button" class="ip-undo" data-x="undo">Letzten Import rückgängig machen<small>'+data.importUndo.n+' Dienste im '+MON[data.importUndo.m]+' '+data.importUndo.y+'</small></button>':'')+
    '<div class="ip-err" data-err role="alert"></div></div>');
-  DS.wire(node,{mp:()=>{st.m--;if(st.m<0){st.m=11;st.y--}DS.swap(start(),-1)},mn:()=>{st.m++;if(st.m>11){st.m=0;st.y++}DS.swap(start(),1)}});
+  DS.wire(node,{undo:()=>{const u=data.importUndo;if(!u)return;if(!confirm('Die '+u.n+' importierten Dienste im '+MON[u.m]+' '+u.y+' wieder auf den vorherigen Stand setzen?'))return;
+   for(const [k,v] of Object.entries(u.prev||{})){if(v)data.shifts[k]=v;else delete data.shifts[k]}delete data.importUndo;try{persist()}catch(e){}try{render()}catch(e){}try{renderStatsOnly()}catch(e){}toast('Import rückgängig gemacht');DS.swap(start(),0)},mp:()=>{st.m--;if(st.m<0){st.m=11;st.y--}DS.swap(start(),-1)},mn:()=>{st.m++;if(st.m>11){st.m=0;st.y++}DS.swap(start(),1)}});
   node.querySelector('[data-f="pdf"]').addEventListener('change',e=>run(e,'pdf'));
   node.querySelector('[data-f="img"]').addEventListener('change',e=>run(e,'img'));
   return node}
@@ -56,7 +58,7 @@
   DS.swap(busy(kind==='pdf'?'PDF wird gelesen …':'Bild wird vorbereitet …'),1);
   try{const src=kind==='pdf'?await readPdf(f):await readImg(f);
    if(!src.words.length&&src.kind==='pdf')throw new Error('Im Dokument wurde kein Text gefunden.');
-   st.src=src;analyse();
+   st.src=src;analyse();const dm=detectMonth();if(dm&&(dm[0]!==st.y||dm[1]!==st.m)){st.y=dm[0];st.m=dm[1];st.monthAuto=true}else if(dm)st.monthAuto=true;
    if(src.kind==='pdf'){st.row=autoRow();DS.swap(rowView(),1)}
    else{photoAuto();DS.swap(photoView(),1)}}
   catch(x){fail(x,start)}}
@@ -140,6 +142,12 @@
   const hs=st.src.words.map(w=>w.h);st.wh=median(hs)||14;const cys=st.lines.map(l=>l.cy);const d=[];for(let i=1;i<cys.length;i++){const x=cys[i]-cys[i-1];if(x>st.wh*.8)d.push(x)}st.pitch=Math.max(st.wh*1.4,Math.min(st.wh*4,median(d)||st.wh*2));
   /* Zeilenhöhe nie kleiner als ca. doppelte Schrifthöhe (sonst werden Zellen zu knapp ausgeschnitten) */
   const th=median(st.src.words.filter(w=>w.t.length>=2&&/[A-Za-zÄÖÜ0-9]/.test(w.t)).map(w=>w.h))||st.wh;st.th=th;st.pitch=Math.max(st.pitch,th*1.6)}
+ /* Monat aus dem Plan lesen: „Dezember 2026“ oder „01.12.2026 - 31.12.2026“ */
+ function detectMonth(){const txt=(st.lines||[]).map(l=>l.text).join('\n');
+  const m1=txt.match(/(Januar|Februar|M[äa]e?rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\s*(20\d\d)/i);
+  if(m1){const names=['januar','februar','märz','april','mai','juni','juli','august','september','oktober','november','dezember'];let n=m1[1].toLowerCase().replace('maerz','märz').replace('marz','märz');const i=names.indexOf(n);if(i>=0)return [Number(m1[2]),i]}
+  const m2=txt.match(/0?1\.(\d{1,2})\.(20\d\d)/);if(m2){const m=Number(m2[1])-1;if(m>=0&&m<12)return [Number(m2[2]),m]}
+  return null}
  function autoRow(){const n=(cfg().name||'').toLowerCase();if(!n)return null;const i=st.lines.findIndex((l,j)=>j!==st.hIdx&&l.text.toLowerCase().includes(n));return i>=0?i:null}
  const nameWord=l=>{if(!l)return '';const w=l.words.find(o=>/^[A-ZÄÖÜ][a-zäöüß]{2,}[,.]?$/.test(o.t)&&!/^(frei|urlaub|krank|früh|spät|nacht|dienst|mehrarbeit|name)$/i.test(o.t.replace(/[,.]$/,'')));return w?w.t.replace(/[,.]$/,''):''};
  const clean=t=>{t=t.replace(/[|\[\](){}_;:"'„“”’`]/g,'').replace(/^[.,-]+|[.,]+$/g,'').trim();/* Texterkennung liest „S“ gern als „Ss“ */if(/^([a-zäöü])\1$/i.test(t)&&t[0]!==t[1])t=t[0].toUpperCase();return t};
@@ -376,16 +384,20 @@
   const opts=c=>'<option value=""'+(c===''?' selected':'')+'>nicht übernehmen</option>'+codes().map(x=>'<option value="'+esc(x)+'"'+(x===c?' selected':'')+'>'+esc(shiftTitle(x))+'</option>').join('');
   const summary=()=>{const r=plan(),use=r.filter(x=>x.c),ch=use.filter(x=>x.old&&x.old!==x.c).length;return {use,txt:use.length+(use.length===1?' Dienst wird':' Dienste werden')+' eingetragen'+(ch?', davon '+ch+' ersetzt':'')+'. Falls etwas falsch erkannt wurde, kannst du jeden Tag hier direkt ändern.'}};
   const S0=summary();
-  const node=el('<div>'+DS.head(MON[st.m]+' '+st.y,'Vorschau',{back:true})+
+  const node=el('<div>'+DS.head('Dienstplan-Import','Vorschau',{back:true})+
+   '<div class="ip-mon"><button type="button" class="ib" data-x="pm" aria-label="Vorheriger Monat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg></button><b>'+MON[st.m]+' '+st.y+'</b><button type="button" class="ib" data-x="nm" aria-label="Nächster Monat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg></button></div>'+
+   '<p class="ip-p">'+(st.monthAuto?'Monat aus dem Dienstplan erkannt.':'Bitte prüfen: Ist das der richtige Monat?')+'</p>'+
    '<p class="ip-p" data-sum>'+esc(S0.txt)+'</p>'+
    (missing>3&&st.src&&st.src.kind==='img'?'<p class="ip-warn">'+IC.warn+'<span>Für '+missing+' Tage wurde nichts erkannt. Das kann an freien Tagen liegen – oder das Foto war an dieser Stelle unscharf. Bitte kurz vergleichen.</span></p>':'')+
    '<div class="ls ip-pv">'+rows.map(r=>{const d=new Date(r.k+'T12:00:00');return '<div class="r'+(r.c?'':' off')+'" data-row="'+r.k+'"><span class="dd"><b>'+pad2(r.day)+'.</b><small>'+WD[d.getDay()]+'</small></span><span class="ip-k">'+esc(r.t)+'</span><span class="to"><span class="nm"><i style="--c:'+esc(r.c?shiftColor(r.c):'transparent')+'"></i><select data-k="'+r.k+'" aria-label="Dienst am '+r.day+'.">'+opts(r.c)+'</select></span>'+(r.old&&r.old!==r.c&&r.c?'<small>ersetzt '+esc(shiftTitle(r.old))+'</small>':'')+'</span></div>'}).join('')+'</div>'+
    '<div class="ac"><button type="button" class="bt pr" data-x="apply"'+(S0.use.length?'':' disabled')+'>'+S0.use.length+' Dienste übernehmen</button></div></div>');
   node.querySelectorAll('select[data-k]').forEach(sel=>sel.addEventListener('change',()=>{st.ov[sel.dataset.k]=sel.value;const row=sel.closest('.r');row.classList.toggle('off',!sel.value);row.querySelector('i').style.setProperty('--c',sel.value?shiftColor(sel.value):'transparent');
    const S=summary();node.querySelector('[data-sum]').textContent=S.txt;const b=node.querySelector('[data-x="apply"]');b.textContent=S.use.length+' Dienste übernehmen';b.disabled=!S.use.length}));
-  DS.wire(node,{back:()=>DS.swap(mapView(),-1),apply:()=>{const use=summary().use;const c=cfg();Object.assign(c.map,st.map);const nm=nameWord(st.nameLine);if(nm)c.name=nm;
+  DS.wire(node,{back:()=>DS.swap(mapView(),-1),pm:()=>{st.m--;if(st.m<0){st.m=11;st.y--}st.monthAuto=false;st.ov={};DS.swap(preview(),0)},nm:()=>{st.m++;if(st.m>11){st.m=0;st.y++}st.monthAuto=false;st.ov={};DS.swap(preview(),0)},apply:()=>{const use=summary().use;
+   /* Rückgängig: alte Werte merken */data.importUndo={at:new Date().toISOString(),y:st.y,m:st.m,n:use.length,prev:Object.fromEntries(use.map(r=>[r.k,data.shifts[r.k]||null]))};const c=cfg();Object.assign(c.map,st.map);const nm=nameWord(st.nameLine);if(nm)c.name=nm;
    use.forEach(r=>{data.shifts[r.k]=r.c});try{persist()}catch(e){}try{render()}catch(e){}try{renderStatsOnly()}catch(e){}
-   const n=use.length;discard();st=null;DS.close();toast(n+' Dienste eingetragen');try{window.SchivioMore?.render?.()}catch(e){}}});
+   const n=use.length,yy=st.y,mm=st.m;discard();st=null;DS.close();toast(n+' Dienste im '+MON[mm]+' eingetragen');try{window.SchivioMore?.render?.()}catch(e){}
+   /* direkt zum Monat springen */setTimeout(()=>{try{document.getElementById('tabPlan')?.click()}catch(e){}try{shown=new Date(yy,mm,1);render()}catch(e){}},350)}});
   return node}
 
  function open(){fresh();zoom=0;DS.node(start);DS.onClose?.(()=>{discard();st=null})}
