@@ -137,7 +137,9 @@
  function analyse(){st.lines=groupLines(st.src.words);let best=null;
   st.lines.forEach((l,i)=>{const seq=headerOf(l.words);if(seq.length>=7&&(!best||seq.length>best.seq.length))best={i,seq}});
   st.hIdx=best?best.i:-1;setHeader(best&&best.seq);
-  const hs=st.src.words.map(w=>w.h);st.wh=median(hs)||14;const cys=st.lines.map(l=>l.cy);const d=[];for(let i=1;i<cys.length;i++){const x=cys[i]-cys[i-1];if(x>st.wh*.8)d.push(x)}st.pitch=Math.max(st.wh*1.4,Math.min(st.wh*4,median(d)||st.wh*2))}
+  const hs=st.src.words.map(w=>w.h);st.wh=median(hs)||14;const cys=st.lines.map(l=>l.cy);const d=[];for(let i=1;i<cys.length;i++){const x=cys[i]-cys[i-1];if(x>st.wh*.8)d.push(x)}st.pitch=Math.max(st.wh*1.4,Math.min(st.wh*4,median(d)||st.wh*2));
+  /* Zeilenhöhe nie kleiner als ca. doppelte Schrifthöhe (sonst werden Zellen zu knapp ausgeschnitten) */
+  const th=median(st.src.words.filter(w=>w.t.length>=2&&/[A-Za-zÄÖÜ0-9]/.test(w.t)).map(w=>w.h))||st.wh;st.th=th;st.pitch=Math.max(st.pitch,th*1.6)}
  function autoRow(){const n=(cfg().name||'').toLowerCase();if(!n)return null;const i=st.lines.findIndex((l,j)=>j!==st.hIdx&&l.text.toLowerCase().includes(n));return i>=0?i:null}
  const nameWord=l=>{if(!l)return '';const w=l.words.find(o=>/^[A-ZÄÖÜ][a-zäöüß]{2,}[,.]?$/.test(o.t)&&!/^(frei|urlaub|krank|früh|spät|nacht|dienst|mehrarbeit|name)$/i.test(o.t.replace(/[,.]$/,'')));return w?w.t.replace(/[,.]$/,''):''};
  const clean=t=>{t=t.replace(/[|\[\](){}_;:"'„“”’`]/g,'').replace(/^[.,-]+|[.,]+$/g,'').trim();/* Texterkennung liest „S“ gern als „Ss“ */if(/^([a-zäöü])\1$/i.test(t)&&t[0]!==t[1])t=t[0].toUpperCase();return t};
@@ -249,7 +251,15 @@
   const t=document.createElement('canvas');t.width=CW;t.height=CH;const tg=t.getContext('2d');const id=tg.createImageData(CW,CH);
   const lo=inv?S.p50:S.p5,hi=inv?S.p95:S.p50;
   for(let i=0,j=0;i<n;i++,j+=4){let a=(v[i]-lo)/Math.max(1,hi-lo)*255;a=Math.max(0,Math.min(255,a));if(inv)a=255-a;a=a>140?255:0;/* klare Schwarz-Weiß-Schrift, danach weich vergrößert */id.data[j]=id.data[j+1]=id.data[j+2]=a;id.data[j+3]=255}
-  clearBorder(id.data,CW,CH);tg.putImageData(id,0,0);const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d',{willReadFrequently:true});g.fillStyle='#fff';g.fillRect(0,0,W,H);g.imageSmoothingQuality='high';g.drawImage(t,pad,pad,W-pad*2,H-pad*2);return c}
+  clearBorder(id.data,CW,CH);
+  /* Nur das Schriftband nehmen, das der Zellmitte am nächsten liegt (schneidet Nachbarzeilen wie „Mehrarbeit“ ab) */
+  const rowInk=new Uint32Array(CH);for(let y=0;y<CH;y++){let c=0;for(let x=0;x<CW;x++)if(id.data[(y*CW+x)*4]===0)c++;rowInk[y]=c}
+  const runs=[];let y=0;const gap=Math.max(2,Math.round(CH*.06));while(y<CH){if(rowInk[y]){let e=y,z=y;while(z<CH&&(rowInk[z]||z-e<=gap)){if(rowInk[z])e=z;z++}runs.push([y,e]);y=z}else y++}
+  if(!runs.length)return null;const mid=CH/2;runs.sort((a,b)=>{const da=a[0]<=mid&&a[1]>=mid?0:Math.min(Math.abs(a[0]-mid),Math.abs(a[1]-mid));const db=b[0]<=mid&&b[1]>=mid?0:Math.min(Math.abs(b[0]-mid),Math.abs(b[1]-mid));return da-db});
+  const [r0,r1]=runs[0];if(r1-r0<2)return null;const y0c=Math.max(0,r0-3),y1c=Math.min(CH,r1+4);
+  tg.putImageData(id,0,0);const t2=document.createElement('canvas');t2.width=CW;t2.height=y1c-y0c;t2.getContext('2d').drawImage(t,0,y0c,CW,y1c-y0c,0,0,CW,y1c-y0c);
+  const kk=Math.max(1.5,Math.min(6,46/Math.max(6,y1c-y0c)));const W2=Math.round(CW*kk)+pad*2,H2=Math.round((y1c-y0c)*kk)+pad*2;
+  const c=document.createElement('canvas');c.width=W2;c.height=H2;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,W2,H2);g.imageSmoothingQuality='high';g.drawImage(t2,pad,pad,W2-pad*2,H2-pad*2);return c}
  /* Reste von Gitterlinien entfernen: alles Schwarze, das den Zellrand berührt */
  function clearBorder(px,W,H){const seen=new Uint8Array(W*H),q=[];const blk=i=>px[i*4]===0;
   const push=i=>{if(!seen[i]&&blk(i)){seen[i]=1;q.push(i)}};for(let x=0;x<W;x++){push(x);push((H-1)*W+x)}for(let y=0;y<H;y++){push(y*W);push(y*W+W-1)}
