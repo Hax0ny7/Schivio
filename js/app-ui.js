@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.76';
+ const VERSION='1.0.77';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -327,7 +327,7 @@
      R('#38bdf8','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>','Freie Zeiten finden','Wann du Zeit für Verabredungen hast','free')+
      R('#facc15','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.3 12a2 2 0 0 1-2 1.8H8.3a2 2 0 0 1-2-1.8z"/><path d="M3.5 5h17M10 3h4"/></svg>','Müllkalender',(()=>{const w=data.waste;const n=w&&w.bins?w.bins.length:0;return n?(w.on===false?'Ausgeblendet · ':'')+n+(n===1?' Tonne':' Tonnen'):'Abholtage als Tonnen im Kalender'})(),'waste')+
      R('#34d399','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>','Steuer-Helfer','Fahrten &amp; Fortbildungen · Export mit Pro','tax')+
-     SOON('#f472b6','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 20c0-5 3-8 7-8s7 3 7 8M12 12V4M12 4l5 3"/></svg>','Urlaubsplaner','Resturlaub &amp; Brückentage',false)+
+     R('#f472b6','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 20c0-5 3-8 7-8s7 3 7 8M12 12V4M12 4l5 3"/></svg>','Urlaubsplaner',(()=>{try{const b=window.SchivioVacation?.balance(new Date().getFullYear());return b?String(b.left).replace('.',',')+' Tage übrig · Brückentage mit Pro':'Resturlaub &amp; Brückentage'}catch(e){return 'Resturlaub &amp; Brückentage'}})(),'vac')+
      R('#a78bfa','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 10h8M8 14h5"/></svg>','Dienstplan-Import','Foto oder PDF – alles bleibt auf dem Handy','import','<span class="bdg pro">Pro</span>')+
     '</div></section>'+
     '<section><h3>Darstellung</h3><div class="gp">'+R('#f59e0b','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18c1.4 0 2-1 2-2s-1-1.5-1-2.5 1-1.5 2-1.5h2a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>','Aussehen',esc(skinName())+' · Dienstfarben '+(vivid?'kräftig':'dezent'),'appear')+'</div>'+
@@ -357,6 +357,7 @@
    else if(a==='tax')window.SchivioTax?.open()
    else if(a==='free')window.SchivioFreeTime?.open()
    else if(a==='import')window.SchivioImport?.open()
+   else if(a==='vac')window.SchivioVacation?.open()
    else if(a==='appear'){appearOpen=!appearOpen;render();if(appearOpen)setTimeout(()=>box.querySelector('.sx-appear')?.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'}),40)}
    else if(a==='shifts'){$('tabTemplates')?.click();window.__sxFromMore=true}
    else if(a==='skin'){SchivioThemes.set(v);setTimeout(render,30)}
