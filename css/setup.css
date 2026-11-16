@@ -41,3 +41,4 @@
 #flow .fl-sum span{opacity:.7}
 #flow .fl-sum b{text-align:right}
 @media (prefers-reduced-motion:reduce){#flow .fl-step{transition:opacity .25s ease}#flow .fl-step.below,#flow .fl-step.above{transform:none}#flow .fl-pop{animation:flfade .25s ease both}@keyframes flfade{from{opacity:0}to{opacity:1}}}
+.fl-chips[hidden]{display:none!important}

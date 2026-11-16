@@ -1,4 +1,5 @@
-/* v1.0.62: Polizei vor MFA, MTRA / MTA statt Medizintechnik
+/* v1.0.82: MTR-Vorschläge korrigiert (TVöD E7–E9b, TV-L E7/E9a, Caritas Anlage 2 VG 5c/5b/4b)
+   v1.0.62: Polizei vor MFA, MTRA / MTA statt Medizintechnik
    v1.0.51: Einrichtung mit Berufsgruppen – eine Frage pro Bildschirm */
 (function(){
  const root=document.getElementById('flow'),stage=root.querySelector('.fl-stage'),bar=root.querySelector('.fl-bar i'),backBtn=root.querySelector('.fl-back'),closeBtn=root.querySelector('.fl-close');
@@ -27,10 +28,11 @@
  const STATES=[['BW','Baden-Württemberg'],['BY','Bayern'],['BE','Berlin'],['BB','Brandenburg'],['HB','Bremen'],['HH','Hamburg'],['HE','Hessen'],['MV','Mecklenburg-Vorpommern'],['NI','Niedersachsen'],['NW','Nordrhein-Westfalen'],['RP','Rheinland-Pfalz'],['SL','Saarland'],['SN','Sachsen'],['ST','Sachsen-Anhalt'],['SH','Schleswig-Holstein'],['TH','Thüringen']];
  const DIAKONIE={BY:'AVR Bayern',BW:'AVR Württemberg I',NW:'BAT-KF',NI:'TV DN',HH:'KTD',SH:'KTD',MV:'KTD',BE:'AVR DWBO West',BB:'AVR DWBO Ost',ST:'AVR Mitteldeutschland',TH:'AVR Mitteldeutschland',HB:'AVR DD',RP:'AVR DD',SL:'AVR DD'};
  // Häufige Eingruppierungen (nur als Vorschlag; angezeigt wird nur, was es im Tarif gibt)
- const SUG={tvoed:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz'],['P5','Pflegehilfe']],rettung:[['N','Notfallsanitäter:in'],['E4','Rettungssanitäter:in']],hebamme:[['P8','Hebamme']],mtr:[['E9A','MTRA / MTR'],['E9B','MTRA mit schwierigen Aufgaben'],['E9C','MTRA mit Leitungsaufgaben']],mfa:[['E6','MFA']]},
-  caritas:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz']]},
+ const SUG={tvoed:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz'],['P5','Pflegehilfe']],rettung:[['N','Notfallsanitäter:in'],['E4','Rettungssanitäter:in']],hebamme:[['P8','Hebamme']],mtr:[['E7','MTR / MTRA'],['E8','MTR – mind. ¼ schwierige Aufgaben (z. B. CT, MRT)'],['E9A','MTR – überwiegend schwierige Aufgaben'],['E9B','MTR – mind. ½ Spezialaufgaben (z. B. OP-Röntgen)']],mfa:[['E6','MFA']]},
+  caritas:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz']],
+   mtr:[['VG5C','MTR / MTRA (Anlage 2)'],['VG5B','MTR nach 3 Jahren Bewährung oder mit Aufsicht über mind. 2 MTA'],['VG4B','MTR aus VG 5b nach 2 Jahren Bewährung']]},
   dd:{pflege:[['7','Pflegefachkraft']]},bay:{pflege:[['7','Pflegefachkraft']]},tvdn:{pflege:[['8','Pflegefachkraft']]},
-  tvl:{mtr:[['E9A','MTRA / MTR'],['E9B','MTRA mit schwierigen Aufgaben']]},
+  tvl:{mtr:[['E7','MTR / MTRA'],['E9A','MTR – mind. ¼ schwierige Aufgaben (z. B. CT, MRT)']]},
   arzt:{arzt:[['Ä1','Assistenzärztin / -arzt'],['Ä2','Fachärztin / -arzt'],['Ä3','Oberärztin / -arzt']]}};
  SUG.tvoed.alten=SUG.tvoed.pflege;SUG.caritas.alten=SUG.caritas.pflege;SUG.dd.alten=SUG.dd.pflege;SUG.bay.alten=SUG.bay.pflege;SUG.tvdn.alten=SUG.tvdn.pflege;
  function sugFamily(k){if(k==='tvoed-vka-p'||k==='avr-wue-1')return 'tvoed';if(k==='avr-caritas-p')return 'caritas';if(['avr-dd','avr-wue-4','avr-dwbo-w','avr-dwbo-o','avr-dwm'].includes(k))return 'dd';if(k==='avr-bayern')return 'bay';if(k==='tv-dn')return 'tvdn';if(/aerzte/.test(k))return 'arzt';if(k==='tv-l')return 'tvl';return ''}
