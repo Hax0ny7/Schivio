@@ -3,11 +3,24 @@
  const P=window.SchivioPay;const dash=document.querySelector('#hoursPanel .sch-dashboard');if(!P||!dash)return;
  const eur=n=>Number(n||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});const num=n=>Number(n||0).toLocaleString('de-DE',{maximumFractionDigits:1});
  const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
- const ALLOW=[['wechsel','Wechselschichtzulage',/wechselschicht/i],['schicht','Schichtzulage',/^schichtzulage/i],['pflege1','Pflegezulage',/pflegezulage/i],['pflege2','Pflegezulage II',null],['leistung','Leistungszulage',null],['stelle','Stellenzulage',null],['sonstige','Sonstige Zulage',null]];
+ /* v1.0.80: Zulagen passend zur Berufsgruppe. Werte anderer Berufsgruppen bleiben gespeichert,
+    werden aber ausgeblendet und nicht mitgerechnet (beim Zurückwechseln sind sie wieder da). */
+ const DEF={wechsel:['Wechselschichtzulage',/wechselschicht/i],schicht:['Schichtzulage',/^schichtzulage/i],pflege1:['Pflegezulage',/pflegezulage/i],pflege2:['Pflegezulage II',null],praxis:['Praxisanleiterzulage',null],leistung:['Leistungszulage',null],stelle:['Stellenzulage',null],
+  polizei:['Polizeizulage',null],feuerwehr:['Feuerwehrzulage',null],familie:['Familienzuschlag',null],erschwer:['Erschwerniszulage',null],sonstige:['Sonstige Zulage',null]};
+ const BY={pflege:'wechsel schicht pflege1 pflege2 praxis leistung stelle sonstige',alten:'wechsel schicht pflege1 praxis leistung stelle sonstige',rettung:'wechsel schicht praxis leistung stelle sonstige',arzt:'wechsel schicht leistung stelle sonstige',
+  hebamme:'wechsel schicht praxis leistung stelle sonstige',mtr:'wechsel schicht leistung stelle sonstige',mfa:'leistung stelle sonstige',polizei:'polizei familie wechsel schicht erschwer sonstige',feuerwehr:'feuerwehr familie wechsel schicht erschwer sonstige',
+  beamte:'familie stelle wechsel schicht erschwer sonstige',sonst:'wechsel schicht leistung stelle sonstige'};
+ const JOBS=[['pflege','Pflege'],['alten','Altenpflege'],['rettung','Rettungsdienst'],['arzt','Ärztin / Arzt'],['polizei','Polizei'],['hebamme','Hebamme'],['mtr','MTRA / MTA'],['feuerwehr','Feuerwehr'],['mfa','MFA'],['sonst','Sonstiges']];
+ const isBeamte=()=>{const t=String(data.profile?.tariff||data.setupOptions?.tariff||'');return t==='beamte'||/beamte/i.test(t)};
+ function job(){const p=data.setupOptions?.profession||'';if(isBeamte()&&(!BY[p]||p==='sonst'))return 'beamte';return BY[p]?p:'sonst'}
+ const jobName=()=>{const j=job();return j==='beamte'?'Beamte (Kommune)':(JOBS.find(x=>x[0]===j)||[])[1]||'Sonstiges'};
+ /* Beamte bekommen zusätzlich den Familienzuschlag angeboten */
+ const ALLOW_LIST=()=>{let l=BY[job()].split(' ');if(isBeamte()&&!l.includes('familie'))l.splice(l.length-1,0,'familie');return l.map(k=>[k,DEF[k][0],DEF[k][1]])};
+ let ALLOW=ALLOW_LIST();
  const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
  const card=document.createElement('section');card.id='gpCard';
  const anchor=document.getElementById('schSimpleSections')||dash;anchor.insertAdjacentElement(anchor.id==='schSimpleSections'?'beforebegin':'afterend',card);
- function allowSum(){const c=data.salaryAllowances||{};return ALLOW.reduce((a,[k])=>a+(c[k]?.enabled?Number(c[k].value)||0:0),0)}
+ function allowSum(){ALLOW=ALLOW_LIST();const c=data.salaryAllowances||{};return ALLOW.reduce((a,[k])=>a+(c[k]?.enabled?Number(c[k].value)||0:0),0)}
  function hintAmount(label){const r=P.compute(shown.getFullYear(),shown.getMonth());for(const [l,v] of (r.hints||[])){if(label&&label.test(l)){const m=/(\d{1,3}(?:\.\d{3})*,\d{2})\s*€/.exec(v);if(m)return Number(m[1].replace(/\./g,'').replace(',','.'))}}return null}
  function draw(){const enabled=!!data.setupOptions?.salaryEnabled;card.hidden=!enabled;if(!enabled)return;
   const y=shown.getFullYear(),m=shown.getMonth();const r=P.compute(y,m);
@@ -47,7 +60,8 @@
   else if(T?.individual){panel.insertAdjacentHTML('beforeend','<h3>Dein Gehalt</h3><p class="gp-hint">Monatsgehalt und Zuschlagssätze findest du auf deiner Gehaltsabrechnung oder im Arbeitsvertrag.</p>');
    panel.append(field('Monatsgehalt (brutto)','monthly','z. B. 3.500'),field('Nachtzuschlag (%)','night','z. B. 20'),field('Sonntagszuschlag (%)','sunday','z. B. 25'),field('Feiertagszuschlag (%)','holiday','z. B. 35'),field('Samstagszuschlag (%)','saturday','0'),field('Nacht ab','nightFrom','21:00','time'),field('Nacht bis','nightTo','06:00','time'))}
   // Zulagen
-  panel.insertAdjacentHTML('beforeend','<h3>Deine Zulagen</h3><p class="gp-hint">Feste Beträge, die jeden Monat auf deiner Abrechnung stehen.</p>');
+  ALLOW=ALLOW_LIST();
+  panel.insertAdjacentHTML('beforeend','<h3>Deine Zulagen</h3><p class="gp-hint">Feste Beträge, die jeden Monat auf deiner Abrechnung stehen. Passend zu deiner Berufsgruppe <b>'+esc(jobName())+'</b> – ändern unter Mehr › Tarif &amp; Eingruppierung.</p>');
   const list=document.createElement('div');panel.append(list);const chips=document.createElement('div');chips.className='gp-chips';
   const c=data.salaryAllowances||{};const shownKeys=ALLOW.filter(([k])=>c[k]?.enabled&&Number(c[k].value)>0||sheet.dataset['add_'+k]);
   shownKeys.forEach(([k,label])=>{const row=document.createElement('div');row.className='gp-al';const s=document.createElement('span');s.textContent=label;const i=document.createElement('input');i.type='text';i.inputMode='decimal';i.placeholder='0,00 €';const v=Number(c[k]?.value)||0;i.value=v?String(v).replace('.',','):'';
@@ -56,6 +70,8 @@
    b.onclick=()=>{if(amt){setAllow(k,amt)}else sheet.dataset['add_'+k]='focus';build()};chips.append(b)});
   if(!shownKeys.length)list.insertAdjacentHTML('beforeend','<p class="gp-hint" style="margin:0 0 4px">Noch keine Zulagen eingetragen. Tippe unten auf eine Zulage, um sie hinzuzufügen.</p>');
   panel.append(chips);
+  {const keys=ALLOW.map(x=>x[0]);const hid=Object.entries(c).filter(([k,v])=>!keys.includes(k)&&v?.enabled&&Number(v.value)>0).map(([k])=>DEF[k]?DEF[k][0]:k);
+   if(hid.length)panel.insertAdjacentHTML('beforeend','<p class="gp-hint" style="margin-top:10px">Ausgeblendet, weil sie nicht zu deiner Berufsgruppe passen: '+esc(hid.join(', '))+'. Sie werden nicht mitgerechnet und sind wieder da, wenn du die Berufsgruppe zurückstellst.</p>')}
   if(!T?.individual&&(r.hints||[]).length)panel.insertAdjacentHTML('beforeend','<p class="gp-hint" style="margin-top:10px">Vorschläge mit Betrag stammen aus deinem Tarif. Trag nur ein, was dir laut Abrechnung zusteht.</p>');
   // Dienste
   if(!T?.beamte){panel.insertAdjacentHTML('beforeend','<h3>Wie arbeitest du?</h3><p class="gp-hint">Davon hängen einige Zuschläge ab.</p>');const g=document.createElement('div');g.className='gp-seg';panel.append(g);const cur=r.settings?.shiftModel||'wechsel';
@@ -74,4 +90,5 @@
  document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('.sch-wheel-center')&&data.setupOptions?.salaryEnabled){e.stopPropagation();e.preventDefault();open()}},true);
  const oldRender=render;render=function(){oldRender();draw()};const oldStats=renderStatsOnly;renderStatsOnly=function(){oldStats();draw()};draw();
  window.SchivioPayCard={open,draw};
+ window.SchivioAllow={JOBS,job,jobName,count:()=>{const c=data.salaryAllowances||{};return ALLOW_LIST().filter(([k])=>c[k]?.enabled&&Number(c[k].value)>0).length},sum:allowSum};
 })();

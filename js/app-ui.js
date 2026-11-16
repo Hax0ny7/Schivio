@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.79';
+ const VERSION='1.0.80';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -314,7 +314,7 @@
   const SOON=(k,ic,title,sub,pro)=>'<div class="rw sx-soon" aria-disabled="true"><span class="ri" style="--k:'+k+'">'+ic+'</span><span class="rt"><b>'+title+'</b><small>'+sub+'</small></span><span class="bdg soon">Bald</span>'+(pro?'<span class="bdg pro">Pro</span>':'')+'</div>';
   function render(){const p=data.profile||{},o=data.setupOptions||{};const theme=document.body.dataset.theme||'anthracite';const mode=theme==='anthracite'?'anthracite':theme==='light'?'light':'colored';
    const vivid=data.shiftIntensity!=='subtle';const lv=levelInfo();const salaryOn=!!o.salaryEnabled;
-   const allowances=Object.values(data.salaryAllowances||{}).filter(a=>a&&Number(a.value)>0).length;
+   const allowances=window.SchivioAllow?SchivioAllow.count():Object.values(data.salaryAllowances||{}).filter(a=>a&&Number(a.value)>0).length;
    const weekly=Number(p.weekly)>0?fmtH(p.weekly)+' h / Woche':(o.hoursValue?fmtH(o.hoursValue)+' h / Woche':'Stunden fehlen');
    const ind=$('group')?.hidden;
    const chips=[ind?'Eigene Werte':((p.group||'')+(lv.label?' · '+lv.label:'')),weekly,stateName()].filter(Boolean).map(t=>'<span>'+esc(t)+'</span>').join('');
@@ -392,7 +392,9 @@
    const lv=levelInfo();const weekly=$('weekly')?.value||'';const ft=$('fulltime');const ftDef=Number((ft?.placeholder||'').match(/[\d,]+/)?.[0]?.replace(',','.'))||39;
    const wv=Number(weekly);const share=wv>0?(wv>=ftDef-0.001?'Vollzeit ('+fmtH(ftDef)+' h)':'Teilzeit · '+fmtH(Math.round(wv/ftDef*1000)/10)+' % von '+fmtH(ftDef)+' h'):'Bitte Wochenstunden eintragen';
    const wOpts=[...(wS?.options||[])];
+   const A=window.SchivioAllow,curJob=data.setupOptions?.profession||'';
    page.innerHTML='<div class="in">'+top('Tarif &amp; Eingruppierung',true)+
+    (A?'<section><h3>Berufsgruppe</h3><div class="chs">'+A.JOBS.map(([k,l])=>'<button type="button" data-p="job" data-v="'+k+'" class="'+(k===curJob?'on':'')+'" aria-pressed="'+(k===curJob)+'">'+esc(l)+'</button>').join('')+'</div><p class="wdi" style="margin:10px 2px 0">Bestimmt, welche Zulagen dir unter „Gehalt anpassen“ angeboten werden.</p></section>':'')+
     '<section><button type="button" class="tw" data-p="tlist" aria-expanded="false"><span><small>TARIFWERK</small><b>'+esc(tS?.value?opt('tariff'):'Bitte auswählen')+'</b></span><em>Ändern</em></button><div class="tl2" data-tl><div><div class="ls">'+tOpts.map(o=>'<button type="button" data-p="t" data-v="'+esc(o.value)+'" class="'+(o.value===tS.value?'on':'')+'">'+esc(o.textContent)+(o.value===tS.value?ICON.check.replace('<svg','<svg width="18" height="18"'):'')+'</button>').join('')+'</div></div></div></section>'+
     (ind?'<section><div class="bx"><p style="margin:0;font-size:14px;line-height:1.5;color:var(--sx-muted)">Bei diesem Tarif trägst du Grundgehalt und Zuschläge selbst ein.</p><button type="button" class="bt pr" data-p="pay">Eigene Werte eintragen</button></div></section>':
     (gOpts.length?'<section><h3>Entgeltgruppe</h3><div class="chs">'+gOpts.map(o=>'<button type="button" data-p="g" data-v="'+esc(o.value)+'" class="'+(o.value===gS.value?'on':'')+'" aria-pressed="'+(o.value===gS.value)+'">'+esc(o.textContent)+'</button>').join('')+'</div></section>':'')+
@@ -425,6 +427,7 @@
     if(a==='tlist'){const tl=page.querySelector('[data-tl]');const on=!tl.classList.contains('on');tl.classList.toggle('on',on);b.setAttribute('aria-expanded',String(on))}
     else if(a==='t'){setSel('tariff',v);saveProfile();renderTarif()}
     else if(a==='g'){setSel('group',v);saveProfile();rerender()}
+    else if(a==='job'){data.setupOptions=data.setupOptions||{};data.setupOptions.profession=v;persist();try{render()}catch(e){}rerender();toast('Berufsgruppe: '+((window.SchivioAllow?.JOBS.find(x=>x[0]===v)||[])[1]||''))}
     else if(a==='l'){setSel('level',v);saveProfile();rerender()}
     else if(a==='wm'){if(v==='m'){const cur=String($('workdays').value);setWorkdays(cur.startsWith('m:')?cur:'m:1234')}else setWorkdays(v)}
     else if(a==='wdd'){const d=Number(v);let l=typeof workdayList==='function'?workdayList():[1,2,3,4];l=l.includes(d)?l.filter(x=>x!==d):[...l,d];if(!l.length){toast('Mindestens ein Arbeitstag ist nötig.');return}setWorkdays('m:'+l.sort().join(''))}
