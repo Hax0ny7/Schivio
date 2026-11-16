@@ -210,6 +210,7 @@
   const mb=st.kind==='grid'?'<div class="ip-mon"><button type="button" class="ib" data-x="mp" aria-label="Vorheriger Monat">'+IC.prev+'</button><b>'+MON[st.m]+' '+st.y+'</b><button type="button" class="ib" data-x="mn" aria-label="Nächster Monat">'+IC.next+'</button></div><p class="ip-p">'+(st.monthAuto?'Monat aus dem Dienstplan erkannt.':'Bitte prüfen: Ist das der richtige Monat?')+'</p>':'';
   const node=el('<div>'+DS.head('Dienstplan-Import','Vorschau',{back:true})+mb+
    '<p class="ip-p" data-sum>'+esc(S0.txt)+'</p>'+
+   '<p class="ip-hint" style="margin:-4px 2px 12px">Beta: Bitte kurz mit deinem Plan vergleichen.</p>'+
    '<div class="ls ip-pv">'+rows.map(row).join('')+'</div>'+
    '<div class="ac"><button type="button" class="bt pr" data-x="apply"'+(S0.use.length?'':' disabled')+'>'+S0.use.length+' Dienste übernehmen</button></div></div>');
   node.querySelectorAll('select[data-k]').forEach(sel=>sel.addEventListener('change',()=>{st.ov[sel.dataset.k]=sel.value;const r=sel.closest('.r');r.classList.toggle('off',!sel.value);r.querySelector('i').style.setProperty('--c',sel.value?shiftColor(sel.value):'transparent');

@@ -44,24 +44,50 @@
  function fail(x,back){console.warn(x);DS.swap(back(),-1);setTimeout(()=>{const er=DS.view()?.querySelector('[data-err]');if(er)er.innerHTML=IC.warn+'<span>'+esc(x&&x.message||'Das hat leider nicht geklappt.')+'</span>'},60)}
 
  /* ---------- 1. Start ---------- */
- function start(){const u=data.importUndo;
+ const isPro=()=>!window.SchivioPro||SchivioPro.active();
+ const SRC=[
+  {k:'file',ic:'file',t:'Kalender- oder Excel-Datei',d:'.ics, .xlsx oder .csv, z. B. aus dem Mitarbeiterportal',q:'Sehr genau',l:'hi',acc:'.ics,.ical,.icalendar,text/calendar,.csv,text/csv,.txt,.xlsx,.xlsm,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'},
+  {k:'pdf',ic:'pdf',t:'PDF',d:'Dienstplan als PDF-Datei',q:'Meist genau',l:'mid',acc:'application/pdf,.pdf'},
+  {k:'img',ic:'cam',t:'Foto',d:'Ausgehängten oder gedruckten Plan fotografieren',q:'Fehleranfälliger',l:'lo',acc:'image/*'}];
+ function start(){const u=data.importUndo,pro=isPro();
   const node=el('<div>'+DS.head('Tools','Dienstplan-Import')+
-   '<div class="ip-note">'+IC.lock+'<span><b>Alles bleibt auf deinem Handy.</b> Foto oder PDF werden nur hier ausgewertet und danach sofort verworfen. Schivio liest nur deine Zeile – Daten von Kollegen werden nicht gespeichert. Bitte prüfe, ob dein Arbeitgeber das Fotografieren des Dienstplans erlaubt.</span></div>'+
-   monthBar()+'<p class="ip-p">Für welchen Monat ist der Dienstplan? Steht der Monat im Plan, erkennt Schivio ihn automatisch.</p>'+
-   '<div class="ip-pick">'+
-    '<label class="ip-src"><span class="ii">'+IC.file+'</span><span class="tt"><b>Kalender- oder Excel-Datei</b><small>.ics, .xlsx oder .csv aus dem Mitarbeiterportal – am genauesten</small></span><input type="file" accept=".ics,.ical,.icalendar,text/calendar,.csv,text/csv,.txt,.xlsx,.xlsm,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden data-f="file"></label>'+
-    '<label class="ip-src"><span class="ii">'+IC.pdf+'</span><span class="tt"><b>PDF wählen</b><small>z. B. ausgedruckter Plan als PDF – sehr zuverlässig</small></span><input type="file" accept="application/pdf,.pdf" hidden data-f="pdf"></label>'+
-    '<label class="ip-src"><span class="ii">'+IC.cam+'</span><span class="tt"><b>Foto wählen</b><small>Möglichst gerade von vorne, gut beleuchtet, ohne Schatten</small></span><input type="file" accept="image/*" hidden data-f="img"></label>'+
-   '</div>'+
-   '<p class="ip-hint">Tipp für Fotos: Es reicht, wenn die Zeile mit den Tageszahlen und deine Zeile gut lesbar im Bild sind – lieber näher ran als den ganzen Plan. Beim ersten Foto wird die Texterkennung geladen (ca. 5 MB). Dein Foto wird dabei nicht verschickt.</p>'+
+   '<div class="ip-tags"><span class="ip-tag beta">Beta</span><span class="ip-tag pro">Pro</span></div>'+
+   '<p class="ip-beta"><b>Beta:</b> Der Import ist neu und wird laufend verbessert. Je nach Quelle kann Schivio sich verlesen – prüfe übernommene Dienste deshalb immer kurz in der Vorschau.'+(pro?'':' <b>Der Import gehört zu Schivio Pro.</b> Hier siehst du schon, wie er funktioniert.')+'</p>'+
+   '<div class="ip-note">'+IC.lock+'<span><b>Alles bleibt auf deinem Handy.</b> Dateien und Fotos werden nur hier ausgewertet und danach sofort verworfen. Schivio liest nur deine Zeile – Daten von Kollegen werden nicht gespeichert. Bitte prüfe, ob dein Arbeitgeber das Fotografieren des Dienstplans erlaubt.</span></div>'+
+   '<div class="ip-pick">'+SRC.map(x=>'<button type="button" class="ip-src" data-x="src" data-k="'+x.k+'"><span class="ii">'+IC[x.ic]+'</span><span class="tt"><b>'+x.t+'</b><small>'+x.d+'</small><em class="ip-q '+x.l+'">'+x.q+'</em></span>'+(pro?'':'<span class="ip-lockb">Pro</span>')+'</button><input type="file" accept="'+x.acc+'" hidden data-f="'+x.k+'">').join('')+'</div>'+
+   '<p class="ip-hint">Für PDF und Foto: Monat wählen. Steht der Monat im Plan, erkennt Schivio ihn automatisch.</p>'+monthBar()+
    (window.SchivioPattern?'<button type="button" class="ip-undo" data-x="pattern">Kein Plan zur Hand?<small>Wiederkehrenden Rhythmus als Schichtmuster eintragen</small></button>':'')+
    (u?'<button type="button" class="ip-undo" data-x="undo">Letzten Import rückgängig machen<small>'+u.n+' Dienste · '+esc(u.label||MON[u.m]+' '+u.y)+'</small></button>':'')+
    '<div class="ip-err" data-err role="alert"></div></div>');
-  DS.wire(node,{mp:()=>{shiftMonth(-1);DS.swap(start(),-1)},mn:()=>{shiftMonth(1);DS.swap(start(),1)},undo:undoLast,pattern:()=>{discard();st=null;window.SchivioPattern.open()}});
-  node.querySelector('[data-f="file"]').addEventListener('change',e=>{const f=e.target.files?.[0];e.target.value='';if(f&&window.SchivioImportFile)window.SchivioImportFile.load(f,()=>{fresh();return start()})});
-  node.querySelector('[data-f="pdf"]').addEventListener('change',e=>load(e,'pdf'));
-  node.querySelector('[data-f="img"]').addEventListener('change',e=>load(e,'img'));
+  const inp=k=>node.querySelector('[data-f="'+k+'"]');
+  DS.wire(node,{mp:()=>{shiftMonth(-1);DS.swap(start(),-1)},mn:()=>{shiftMonth(1);DS.swap(start(),1)},undo:undoLast,pattern:()=>{discard();st=null;window.SchivioPattern.open()},
+   src:b=>{const k=b.dataset.k;if(!isPro()){proPop();return}if(k==='img'&&!cfg().photoTipsSeen){photoPop(inp('img'));return}inp(k).click()}});
+  inp('file').addEventListener('change',e=>{const f=e.target.files?.[0];e.target.value='';if(f&&window.SchivioImportFile)window.SchivioImportFile.load(f,()=>{fresh();return start()})});
+  inp('pdf').addEventListener('change',e=>load(e,'pdf'));
+  inp('img').addEventListener('change',e=>load(e,'img'));
   return node}
+
+ /* ---------- Hinweis-Fenster (ploppt über dem Import auf) ---------- */
+ function pop(html){const o=el('<div class="ip-pop" role="dialog" aria-modal="true"><div class="ip-pop-c">'+html+'</div></div>');
+  const close=()=>{o.classList.remove('on');setTimeout(()=>o.remove(),260)};
+  o.addEventListener('click',e=>{if(e.target===o||e.target.closest('[data-pop="close"]'))close()});
+  document.body.appendChild(o);requestAnimationFrame(()=>requestAnimationFrame(()=>o.classList.add('on')));return {o,close}}
+ const TIP={
+  plan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16M15 4v16"/></svg>',
+  sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  chk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>'};
+ function photoPop(input){
+  const P=pop('<h3>Bevor du fotografierst</h3>'+
+   '<ol class="ip-tips">'+
+    '<li><span class="n">'+TIP.plan+'</span><span><b>Klar erkennbarer Plan</b><small>Gedruckte, gut lesbare Kürzel funktionieren am besten. Farbige Markierungen und Handschrift erkennt Schivio schlecht.</small></span></li>'+
+    '<li><span class="n">'+TIP.sun+'</span><span><b>Gutes Licht, gerade von vorne</b><small>Ohne Schatten und Spiegelungen, Handy parallel zum Plan. Lieber näher ran – die Zeile mit den Tageszahlen und deine Zeile reichen.</small></span></li>'+
+    '<li class="w"><span class="n">'+TIP.chk+'</span><span><b>Dienste bitte kontrollieren</b><small>Die Foto-Erkennung ist deutlich fehleranfälliger als ein Datei-Import. Vergleiche in der Vorschau jeden Tag mit deinem Plan.</small></span></li>'+
+   '</ol>'+
+   '<p class="ip-pop-s">Beim ersten Foto wird die Texterkennung geladen (ca. 5 MB). Dein Foto verlässt das Handy nicht.</p>'+
+   '<label class="ip-pop-cb"><input type="checkbox" data-seen> Nicht mehr anzeigen</label>'+
+   '<div class="ip-pop-a"><button type="button" class="bt" data-pop="close">Abbrechen</button><button type="button" class="bt pr" data-pop="go">Foto wählen</button></div>');
+  P.o.querySelector('[data-pop="go"]').addEventListener('click',()=>{if(P.o.querySelector('[data-seen]').checked){cfg().photoTipsSeen=true;try{persist()}catch(e){}}input.click();P.close()})}
+ function proPop(){pop('<h3>Schivio Pro</h3><p class="ip-pop-p">Der Dienstplan-Import (Beta) ist Teil von Schivio Pro. Datei, PDF und Foto werden dann direkt auf deinem Handy ausgelesen.</p><p class="ip-pop-p">Bis dahin trägst du Dienste am schnellsten mit dem Stift im Kalender oder mit einem Schichtmuster ein – beides ist kostenlos.</p><div class="ip-pop-a"><button type="button" class="bt pr" data-pop="close">Verstanden</button></div>')}
 
  function undoLast(){const u=data.importUndo;if(!u)return;
   if(!confirm('Die '+u.n+' importierten Dienste ('+(u.label||MON[u.m]+' '+u.y)+') wieder auf den vorherigen Stand setzen?'))return;
@@ -157,6 +183,7 @@
   const node=el('<div>'+DS.head('Dienstplan-Import','Vorschau',{back:true})+monthBar()+
    '<p class="ip-p">'+(st.monthAuto?'Monat aus dem Dienstplan erkannt.':'Bitte prüfen: Ist das der richtige Monat?')+'</p>'+
    '<p class="ip-p" data-sum>'+esc(S0.txt)+'</p>'+
+   (st.src.kind==='img'?'<p class="ip-warn">'+IC.warn+'<span><b>Foto-Erkennung (Beta):</b> Bitte jeden Tag mit deinem Plan vergleichen – beim Foto verliest sich Schivio deutlich häufiger als bei einer Datei.</span></p>':'')+
    (missing>3&&st.src.kind==='img'?'<p class="ip-warn">'+IC.warn+'<span>Für '+missing+' Tage wurde nichts erkannt. Das kann an freien Tagen liegen – oder das Foto war an dieser Stelle unscharf. Bitte kurz vergleichen.</span></p>':'')+
    '<div class="ls ip-pv">'+rows.map(row).join('')+'</div>'+
    '<div class="ac"><button type="button" class="bt pr" data-x="apply"'+(S0.use.length?'':' disabled')+'>'+S0.use.length+' Dienste übernehmen</button></div></div>');
