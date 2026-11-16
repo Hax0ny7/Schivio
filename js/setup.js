@@ -1,4 +1,5 @@
-/* v1.0.82: MTR-Vorschläge korrigiert (TVöD E7–E9b, TV-L E7/E9a, Caritas Anlage 2 VG 5c/5b/4b)
+/* v1.0.83: Caritas-MTR auch mit EG (AVR 2027)
+   v1.0.82: MTR-Vorschläge korrigiert (TVöD E7–E9b, TV-L E7/E9a, Caritas Anlage 2 VG 5c/5b/4b)
    v1.0.62: Polizei vor MFA, MTRA / MTA statt Medizintechnik
    v1.0.51: Einrichtung mit Berufsgruppen – eine Frage pro Bildschirm */
 (function(){
@@ -30,7 +31,8 @@
  // Häufige Eingruppierungen (nur als Vorschlag; angezeigt wird nur, was es im Tarif gibt)
  const SUG={tvoed:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz'],['P5','Pflegehilfe']],rettung:[['N','Notfallsanitäter:in'],['E4','Rettungssanitäter:in']],hebamme:[['P8','Hebamme']],mtr:[['E7','MTR / MTRA'],['E8','MTR – mind. ¼ schwierige Aufgaben (z. B. CT, MRT)'],['E9A','MTR – überwiegend schwierige Aufgaben'],['E9B','MTR – mind. ½ Spezialaufgaben (z. B. OP-Röntgen)']],mfa:[['E6','MFA']]},
   caritas:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz']],
-   mtr:[['VG5C','MTR / MTRA (Anlage 2)'],['VG5B','MTR nach 3 Jahren Bewährung oder mit Aufsicht über mind. 2 MTA'],['VG4B','MTR aus VG 5b nach 2 Jahren Bewährung']]},
+   mtr:[['#','Schon vor 2027 bei der Caritas (bisheriges System, Anlage 2):'],['VG5C','MTR / MTRA'],['VG5B','MTR nach 3 Jahren Bewährung oder mit Aufsicht über mind. 2 MTA'],['VG4B','MTR aus VG 5b nach 2 Jahren Bewährung'],
+    ['#','Neu eingestellt ab 2027 oder in die AVR 2027 gewechselt:'],['E7','MTR / MTRA'],['E8','MTR – mind. ¼ schwierige Aufgaben (z. B. CT, MRT)'],['E9A','MTR – überwiegend schwierige Aufgaben'],['E9B','MTR – mind. ½ Spezialaufgaben (z. B. OP-Röntgen)']]},
   dd:{pflege:[['7','Pflegefachkraft']]},bay:{pflege:[['7','Pflegefachkraft']]},tvdn:{pflege:[['8','Pflegefachkraft']]},
   tvl:{mtr:[['E7','MTR / MTRA'],['E9A','MTR – mind. ¼ schwierige Aufgaben (z. B. CT, MRT)']]},
   arzt:{arzt:[['Ä1','Assistenzärztin / -arzt'],['Ä2','Fachärztin / -arzt'],['Ä3','Oberärztin / -arzt']]}};
@@ -65,8 +67,8 @@
    const val=()=>Number(i.value.replace(/\s|€/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));const b=next('Weiter',val()>0,()=>{s.pay=val();go('scope')},true);i.oninput=()=>{b.disabled=!(val()>0)};i.onkeydown=e=>{if(e.key==='Enter'&&!b.disabled){i.blur();b.click()}};setTimeout(()=>i.focus(),500)}
   else if(id==='group'){const c=P.catalog(tariff(),s.state);h('Welche Tätigkeit trifft auf dich zu?','Die genaue Entgeltgruppe steht auf deiner Gehaltsabrechnung.');
    if(!c||!c.groups.length){d.insertAdjacentHTML('beforeend','<p class="fl-note">Für diesen Tarif ist noch keine Tabelle hinterlegt.</p>');next('Weiter',true,()=>go('scope'))}
-   else{const fam=SUG[sugFamily(tkey())]||{};const sug=(fam[s.job]||[]).filter(([g])=>c.groups.some(x=>x.key===g));const pick=g=>{s.group=g;s.level='';go('level')};
-    if(sug.length){const l=document.createElement('div');l.className='fl-list';sug.forEach(([g,t])=>{const G=c.groups.find(x=>x.key===g);const lo=G.levels[0];l.append(tile('fl-row','user',t,G.label.replace(/ \(.*\)$/,'')+' · ab '+eur(lo.amount),()=>pick(g),s.group===g))});d.append(l)}
+   else{const fam=SUG[sugFamily(tkey())]||{};const sug=(fam[s.job]||[]).filter(([g])=>g==='#'||c.groups.some(x=>x.key===g)).filter((x,i,l)=>x[0]!=='#'||(l[i+1]&&l[i+1][0]!=='#'));const pick=g=>{s.group=g;s.level='';go('level')};
+    if(sug.length){const l=document.createElement('div');l.className='fl-list';sug.forEach(([g,t])=>{if(g==='#'){const p=document.createElement('p');p.className='fl-note';p.style.margin='6px 2px 0';p.textContent=t;l.append(p);return}const G=c.groups.find(x=>x.key===g);const lo=G.levels[0];l.append(tile('fl-row','user',t,G.label.replace(/ \(.*\)$/,'')+' · ab '+eur(lo.amount),()=>pick(g),s.group===g))});d.append(l)}
     const all=document.createElement('div');all.className='fl-chips';c.groups.forEach(G=>{const b=document.createElement('button');b.type='button';b.className='fl-chip'+(s.group===G.key?' sel':'');b.textContent=G.label;b.onclick=()=>{all.querySelectorAll('.fl-chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');setTimeout(()=>pick(G.key),170)};all.append(b)});
     if(sug.length){const m=document.createElement('button');m.type='button';m.className='fl-more';m.textContent='Andere Entgeltgruppe wählen';all.hidden=!(s.group&&!sug.some(x=>x[0]===s.group));m.onclick=()=>{all.hidden=!all.hidden};d.append(m,all)}else d.append(all)}}
   else if(id==='level'){const c=P.catalog(tariff(),s.state);const G=c&&c.groups.find(x=>x.key===s.group);h('Wie lange arbeitest du schon in deinem Beruf?','Daraus ergibt sich deine Stufe. Du kannst sie unten anpassen.');
