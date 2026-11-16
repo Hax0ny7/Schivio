@@ -99,5 +99,11 @@
  document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('.sch-wheel-center')&&data.setupOptions?.salaryEnabled){e.stopPropagation();e.preventDefault();open()}},true);
  const oldRender=render;render=function(){oldRender();draw()};const oldStats=renderStatsOnly;renderStatsOnly=function(){oldStats();draw()};draw();
  window.SchivioPayCard={open,draw};
- window.SchivioAllow={JOBS,job,jobName,count:()=>{const c=data.salaryAllowances||{};return ALLOW_LIST().filter(([k])=>c[k]?.enabled&&Number(c[k].value)>0).length},sum:allowSum};
+ /* für den Start-Assistenten: Zulagen-Liste und Vorschlagsbeträge ohne gespeicherte Daten */
+ function listFor(j,beamte){const jj=beamte&&(!BY[j]||j==='sonst')?'beamte':(BY[j]?j:'sonst');let l=BY[jj].split(' ');if(beamte&&!l.includes('familie'))l.splice(l.length-1,0,'familie');return l.map(k=>[k,DEF[k][0]])}
+ function suggestFor(k,c){/* c={tariffId,state,bund,hospital,job} */
+  if(k==='polizei'||k==='feuerwehr'){const p=POLFW[c.bund?'bund':String(c.state||'').toLowerCase()];return p?(k==='polizei'?p[0]:p[1]):null}
+  const re=DEF[k]&&DEF[k][1];if(!re)return null;if(k==='pflege1'&&!['pflege','alten'].includes(c.job))return null;
+  const T=P.TARIFFS[c.tariffId];for(const [l,v] of (T?.hints||[])){if(re.test(l)){const all=[...String(v).matchAll(/(\d{1,3}(?:\.\d{3})*,\d{2})\s*€/g)].map(m=>Number(m[1].replace(/\./g,'').replace(',','.')));if(!all.length)return null;return c.hospital&&/krankenhaus/i.test(v)?all[all.length-1]:all[0]}}return null}
+ window.SchivioAllow={JOBS,job,jobName,listFor,suggestFor,count:()=>{const c=data.salaryAllowances||{};return ALLOW_LIST().filter(([k])=>c[k]?.enabled&&Number(c[k].value)>0).length},sum:allowSum};
 })();

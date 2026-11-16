@@ -176,7 +176,7 @@ function settings(){const w=data.setupOptions||{},p=data.profile||{};return{
  enabled:!!w.salaryEnabled,tariff:normalizeTariff(p.tariff||w.tariff),group:normalizeGroup(p.group||w.group,normalizeTariff(p.tariff||w.tariff)),
  level:Number(p.level||w.level),state:p.state||w.region||'NW',weekly:Number(p.weekly)>0?Number(p.weekly):(w.hoursMode==='weekly'?Number(w.hoursValue):NaN),
  fulltime:Number(p.fulltime)>0?Number(p.fulltime):(Number(w.fulltime)>0?Number(w.fulltime):NaN),workplace:w.workplace||'',holidayMode:data.tariffHolidayMode==='no-comp'?'no-comp':'comp',
- shiftModel:['wechsel','schicht','none'].includes(data.payShiftModel)?data.payShiftModel:(data.payShiftWork===false?'none':'wechsel'),ind:data.individualPay||{}}}
+ shiftModel:['wechsel','schicht','none'].includes(data.payShiftModel)?data.payShiftModel:(data.payShiftWork===false||data.setupOptions?.profession==='mfa'||data.setupOptions?.employer==='praxis'?'none':'wechsel'),ind:data.individualPay||{}}}
 function templateFor(code){if(!code)return null;if(types.includes(code))return data.templates?.[code]||null;return data.customShifts?.[code]||null}
 // Effektive Sätze je nach Schichtmodell; Samstag ggf. als Festbetrag (€/Std.).
 function effective(rates,st,hourly){const e={...rates};
@@ -328,13 +328,18 @@ function levelLabels(tariffValue){const T=TARIFFS[normalizeTariff(tariffValue)];
 // Für Auswahllisten: Gruppen und besetzte Stufen der aktuell gültigen Tabelle (sonst der jüngsten).
 function groupLabel(T,key){if(T.groupPrefix)return T.groupPrefix+key;if(/^P\d/.test(key))return key;if(key==='N')return 'N (Notfallsanitäter)';if(/^VG\d/.test(key))return 'VG '+key.slice(2).toLowerCase();if(/^Ä\d/.test(key))return 'Ä '+key.slice(1)+' · '+({1:'Arzt/Ärztin',2:'Facharzt/-ärztin',3:'Oberarzt/-ärztin',4:'ständige Vertretung'}[key.slice(1)]);if(/^KR\d/.test(key))return 'KR '+key.slice(2);
  const k=key.replace(/^E(?=\d)/,'');return 'EG '+k.replace(/(\d)([A-D])$/,(m,d,l)=>d+l.toLowerCase())}
-function catalog(tariffValue,state){const T=TARIFFS[normalizeTariff(tariffValue)];if(!T||!T.periods)return null;const ps=T.periods({state:state||'NW'});const now=new Date(),day=iso(now.getFullYear(),now.getMonth(),now.getDate());
+/* v1.0.84: Entgeltgruppen passend zur Berufsgruppe (P/KR = Pflege, N = Notfallsanitäter, EG/VG = andere Berufe).
+   Gruppen ohne Buchstaben (DRK, Diakonie) und Ärzte-Gruppen werden nie ausgefiltert. */
+const GROUP_FIT={pflege:/^(P|KR)\d/,alten:/^(P|KR)\d/,hebamme:/^(P|KR)\d/,rettung:/^(N$|E\d|VG)/,mtr:/^(E\d|VG)/,mfa:/^(E\d|VG)/,polizei:/^(E\d|VG)/,feuerwehr:/^(E\d|VG)/};
+function groupFits(job,key){const re=GROUP_FIT[job];if(!re||!/^(P\d|KR\d|N$|E\d|VG)/.test(key))return true;return re.test(key)}
+function catalog(tariffValue,state,job){const T=TARIFFS[normalizeTariff(tariffValue)];if(!T||!T.periods)return null;const ps=T.periods({state:state||'NW'});const now=new Date(),day=iso(now.getFullYear(),now.getMonth(),now.getDate());
  const per=ps.find(p=>day>=p.from&&day<=p.to)||ps.filter(p=>p.from<=day).slice(-1)[0]||ps[0];
  /* Gruppen, die erst in einem kommenden Zeitraum gelten (z. B. Caritas EG ab 2027), schon zur Auswahl anbieten */
  const fut=ps.filter(p=>p.from>per.to).sort((a,b)=>a.from<b.from?-1:1),soon={};
  for(const p of fut)for(const k of Object.keys(p.table))if(!per.table[k]&&!soon[k])soon[k]=p;
  const cls=k=>/^P\d/.test(k)?0:k==='N'?1:/^KR/.test(k)?2:/^E\d/.test(k)?3:4;const nat=k=>{const m=/(\d+)([A-DÜ]?)$/.exec(k);return m?[cls(k),Number(m[1]),m[2]||'']:[cls(k),0,k]};
  const pk=T.pflegeKeys||[];const tab={...per.table};for(const k in soon)tab[k]=soon[k].table[k];const keys=Object.keys(tab).sort((a,b)=>{const pa=pk.indexOf(a),pb=pk.indexOf(b);if(pa>=0||pb>=0)return (pa<0?99:pa)-(pb<0?99:pb);const x=nat(a),y=nat(b);return x[0]-y[0]||x[1]-y[1]||String(x[2]).localeCompare(String(y[2]))});
- return {period:per.label,groups:keys.map(k=>({key:k,label:groupLabel(T,k)+(pk.includes(k)?' (Pflege)':'')+(soon[k]?' · gilt ab '+soon[k].from.slice(5,7)+'/'+soon[k].from.slice(0,4):''),from:soon[k]?soon[k].from:null,levels:tab[k].map((v,i)=>v?{n:i+1,label:T.levels?T.levels[i]:'Stufe '+(i+1),amount:v}:null).filter(Boolean)})),fulltime:T.fulltime,fulltimeHospital:T.fulltimeHospital}}
-return {compute,normalizeTariff,normalizeGroup,levelLabels,catalog,TARIFFS,DUZ};
+ const fit=job?keys.filter(k=>groupFits(job,k)):keys;const use=fit.length?fit:keys;
+ return {period:per.label,groups:use.map(k=>({key:k,label:groupLabel(T,k)+(pk.includes(k)?' (Pflege)':'')+(soon[k]?' · gilt ab '+soon[k].from.slice(5,7)+'/'+soon[k].from.slice(0,4):''),from:soon[k]?soon[k].from:null,levels:tab[k].map((v,i)=>v?{n:i+1,label:T.levels?T.levels[i]:'Stufe '+(i+1),amount:v}:null).filter(Boolean)})),fulltime:T.fulltime,fulltimeHospital:T.fulltimeHospital}}
+return {compute,normalizeTariff,normalizeGroup,levelLabels,catalog,groupFits,TARIFFS,DUZ};
 })();

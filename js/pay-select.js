@@ -14,7 +14,7 @@
    if(ft){const hosp=(data.setupOptions||{}).workplace==='hospital';const d=cat?(hosp&&cat.fulltimeHospital?cat.fulltimeHospital:cat.fulltime):null;ft.placeholder=d?'leer = Tarifwert ('+String(d).replace('.',',')+' Std.)':'z. B. 39'}
    const gWant=SchivioPay.normalizeGroup(wantG??g.value,SchivioPay.normalizeTariff(t.value)),lWant=String(wantL??l.value);
    g.replaceChildren(new Option(cat?'Bitte auswählen':(T?.pending?'Tarif folgt noch':'Erst Tarif wählen'),''));l.replaceChildren(new Option('Bitte auswählen',''));
-   if(!cat)return;for(const x of cat.groups)g.append(new Option(x.label,x.key));
+   if(!cat)return;const job=data.setupOptions?.profession||'';for(const x of cat.groups)if(!job||x.key===gWant||SchivioPay.groupFits(job,x.key))g.append(new Option(x.label,x.key));
    g.value=cat.groups.some(x=>x.key===gWant)?gWant:'';
    const grp=cat.groups.find(x=>x.key===g.value);if(grp)for(const v of grp.levels)l.append(new Option(v.label+' · '+fmt(v.amount),String(v.n)));
    l.value=grp&&grp.levels.some(v=>String(v.n)===lWant)?lWant:'';

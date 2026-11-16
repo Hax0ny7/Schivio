@@ -42,3 +42,12 @@
 #flow .fl-sum b{text-align:right}
 @media (prefers-reduced-motion:reduce){#flow .fl-step{transition:opacity .25s ease}#flow .fl-step.below,#flow .fl-step.above{transform:none}#flow .fl-pop{animation:flfade .25s ease both}@keyframes flfade{from{opacity:0}to{opacity:1}}}
 .fl-chips[hidden]{display:none!important}
+/* v1.0.84: Zulagen im Start-Assistenten */
+.fl-al{display:flex;align-items:center;gap:10px;padding:6px 8px 6px 6px;border-radius:16px;border:1px solid color-mix(in srgb,currentColor 14%,transparent);background:color-mix(in srgb,currentColor 5%,transparent);transition:background .2s ease,border-color .2s ease}
+.fl-al.on{border-color:var(--accent-bright,#64d3cf);background:color-mix(in srgb,var(--accent-bright,#64d3cf) 12%,transparent)}
+.fl-al-t{flex:1;display:flex;align-items:center;gap:12px;min-height:44px;padding:0 8px!important;margin:0!important;border:0!important;background:transparent!important;box-shadow:none!important;color:inherit!important;font:inherit;font-weight:700;text-align:left;cursor:pointer}
+.fl-al-t i{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid color-mix(in srgb,currentColor 35%,transparent);transition:all .2s ease}
+.fl-al.on .fl-al-t i{border-color:var(--accent-bright,#64d3cf);background:var(--accent-bright,#64d3cf) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23062a28' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center/14px no-repeat}
+.fl-al input{flex:none;width:110px;font-size:1rem;padding:10px 12px;border-radius:12px;border:1px solid color-mix(in srgb,currentColor 20%,transparent);background:color-mix(in srgb,currentColor 6%,transparent);color:inherit;text-align:right;box-sizing:border-box}
+.fl-list .fl-al{animation:none}
+.fl-step>*:not(.fl-spacer){flex-shrink:0}
