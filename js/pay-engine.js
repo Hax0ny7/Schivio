@@ -331,7 +331,9 @@ function groupLabel(T,key){if(T.groupPrefix)return T.groupPrefix+key;if(/^P\d/.t
 /* v1.0.84: Entgeltgruppen passend zur Berufsgruppe (P/KR = Pflege, N = Notfallsanitäter, EG/VG = andere Berufe).
    Gruppen ohne Buchstaben (DRK, Diakonie) und Ärzte-Gruppen werden nie ausgefiltert. */
 const GROUP_FIT={pflege:/^(P|KR)\d/,alten:/^(P|KR)\d/,hebamme:/^(P|KR)\d/,rettung:/^(N$|E\d|VG)/,mtr:/^(E\d|VG)/,mfa:/^(E\d|VG)/,polizei:/^(E\d|VG)/,feuerwehr:/^(E\d|VG)/};
-function groupFits(job,key){const re=GROUP_FIT[job];if(!re||!/^(P\d|KR\d|N$|E\d|VG)/.test(key))return true;return re.test(key)}
+/* Tarife mit eigenen Pflege-Gruppen ohne Buchstaben (BAT-KF Anlage 2: 2a … 12a) über pflegeKeys */
+const PFLEGE_JOBS=['pflege','alten','hebamme'];
+function groupFits(job,key,tid){const pk=tid&&TARIFFS[tid]&&TARIFFS[tid].pflegeKeys;if(job&&pk&&pk.length&&job!=='sonst')return PFLEGE_JOBS.includes(job)?pk.includes(key):!pk.includes(key);const re=GROUP_FIT[job];if(!re||!/^(P\d|KR\d|N$|E\d|VG)/.test(key))return true;return re.test(key)}
 function catalog(tariffValue,state,job){const T=TARIFFS[normalizeTariff(tariffValue)];if(!T||!T.periods)return null;const ps=T.periods({state:state||'NW'});const now=new Date(),day=iso(now.getFullYear(),now.getMonth(),now.getDate());
  const per=ps.find(p=>day>=p.from&&day<=p.to)||ps.filter(p=>p.from<=day).slice(-1)[0]||ps[0];
  /* Gruppen, die erst in einem kommenden Zeitraum gelten (z. B. Caritas EG ab 2027), schon zur Auswahl anbieten */
@@ -339,7 +341,7 @@ function catalog(tariffValue,state,job){const T=TARIFFS[normalizeTariff(tariffVa
  for(const p of fut)for(const k of Object.keys(p.table))if(!per.table[k]&&!soon[k])soon[k]=p;
  const cls=k=>/^P\d/.test(k)?0:k==='N'?1:/^KR/.test(k)?2:/^E\d/.test(k)?3:4;const nat=k=>{const m=/(\d+)([A-DÜ]?)$/.exec(k);return m?[cls(k),Number(m[1]),m[2]||'']:[cls(k),0,k]};
  const pk=T.pflegeKeys||[];const tab={...per.table};for(const k in soon)tab[k]=soon[k].table[k];const keys=Object.keys(tab).sort((a,b)=>{const pa=pk.indexOf(a),pb=pk.indexOf(b);if(pa>=0||pb>=0)return (pa<0?99:pa)-(pb<0?99:pb);const x=nat(a),y=nat(b);return x[0]-y[0]||x[1]-y[1]||String(x[2]).localeCompare(String(y[2]))});
- const fit=job?keys.filter(k=>groupFits(job,k)):keys;const use=fit.length?fit:keys;
+ const fit=job?keys.filter(k=>groupFits(job,k,normalizeTariff(tariffValue))):keys;const use=fit.length?fit:keys;
  return {period:per.label,groups:use.map(k=>({key:k,label:groupLabel(T,k)+(pk.includes(k)?' (Pflege)':'')+(soon[k]?' · gilt ab '+soon[k].from.slice(5,7)+'/'+soon[k].from.slice(0,4):''),from:soon[k]?soon[k].from:null,levels:tab[k].map((v,i)=>v?{n:i+1,label:T.levels?T.levels[i]:'Stufe '+(i+1),amount:v}:null).filter(Boolean)})),fulltime:T.fulltime,fulltimeHospital:T.fulltimeHospital}}
 return {compute,normalizeTariff,normalizeGroup,levelLabels,catalog,groupFits,TARIFFS,DUZ};
 })();
