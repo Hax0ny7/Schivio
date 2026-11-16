@@ -17,6 +17,13 @@
  /* Beamte bekommen zusätzlich den Familienzuschlag angeboten */
  const ALLOW_LIST=()=>{let l=BY[job()].split(' ');if(isBeamte()&&!l.includes('familie'))l.splice(l.length-1,0,'familie');return l.map(k=>[k,DEF[k][0],DEF[k][1]])};
  let ALLOW=ALLOW_LIST();
+ /* v1.0.81: Polizei- und Feuerwehrzulage je Dienstherr – Betrag nach 2 Dienstjahren (Quelle: dbb-Besoldungstabellen, Stand siehe Datum).
+    NRW: Polizei ab A 9, Feuerwehr A 7/A 8. Werte mit Datum in der Zukunft/„Entwurf“ beim dbb: BY, HB, HE, NW. */
+ const POLFW={bund:[228,190,'05/2026','Bund'],bw:[132.69,132.69,'04/2026','Baden-Württemberg'],by:[191.52,191.52,'10/2026','Bayern'],be:[177.27,177.27,'04/2026','Berlin'],bb:[200,200,'01/2026','Brandenburg'],
+  hb:[127.38,150,'04/2026','Bremen'],hh:[170,170,'04/2026','Hamburg'],he:[160,160,'07/2026','Hessen'],mv:[159.37,159.37,'04/2026','Mecklenburg-Vorpommern'],ni:[127.38,133.75,'04/2026','Niedersachsen'],
+  nw:[130.56,132.16,'04/2026','Nordrhein-Westfalen'],rp:[180,180,'04/2026','Rheinland-Pfalz'],sl:[135.14,160.14,'11/2024','Saarland'],sn:[150,150,'04/2026','Sachsen'],st:[152.86,152.86,'04/2026','Sachsen-Anhalt'],
+  sh:[184.02,184.02,'01/2026','Schleswig-Holstein'],th:[145,145,'02/2025','Thüringen']};
+ function polfw(){const d=data.individualPay?.duzPreset;const k=d==='bund'?'bund':String(data.profile?.state||data.setupOptions?.region||'').toLowerCase();return POLFW[k]||null}
  const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
  const card=document.createElement('section');card.id='gpCard';
  const anchor=document.getElementById('schSimpleSections')||dash;anchor.insertAdjacentElement(anchor.id==='schSimpleSections'?'beforebegin':'afterend',card);
@@ -66,10 +73,12 @@
   const c=data.salaryAllowances||{};const shownKeys=ALLOW.filter(([k])=>c[k]?.enabled&&Number(c[k].value)>0||sheet.dataset['add_'+k]);
   shownKeys.forEach(([k,label])=>{const row=document.createElement('div');row.className='gp-al';const s=document.createElement('span');s.textContent=label;const i=document.createElement('input');i.type='text';i.inputMode='decimal';i.placeholder='0,00 €';const v=Number(c[k]?.value)||0;i.value=v?String(v).replace('.',','):'';
    i.onchange=()=>{const n=parse(i.value);if(!Number.isFinite(n)||n<0||n>5000){i.value='';return}setAllow(k,n)};const x=document.createElement('button');x.type='button';x.className='gp-x';x.setAttribute('aria-label',label+' entfernen');x.textContent='×';x.onclick=()=>{delete sheet.dataset['add_'+k];setAllow(k,0);build()};row.append(s,i,x);list.append(row);if(sheet.dataset['add_'+k]==='focus'){sheet.dataset['add_'+k]='1';setTimeout(()=>i.focus(),50)}});
-  ALLOW.filter(x=>!shownKeys.includes(x)).forEach(([k,label,re])=>{const amt=re?hintAmount(re):null;const b=document.createElement('button');b.type='button';b.className='gp-chip';b.textContent='+ '+label+(amt?' · '+eur(amt).replace(',00',''):'');
+  const pf=polfw();
+  ALLOW.filter(x=>!shownKeys.includes(x)).forEach(([k,label,re])=>{const amt=k==='polizei'&&pf?pf[0]:k==='feuerwehr'&&pf?pf[1]:re?hintAmount(re):null;const b=document.createElement('button');b.type='button';b.className='gp-chip';b.textContent='+ '+label+(amt?' · '+eur(amt).replace(',00',''):'');
    b.onclick=()=>{if(amt){setAllow(k,amt)}else sheet.dataset['add_'+k]='focus';build()};chips.append(b)});
   if(!shownKeys.length)list.insertAdjacentHTML('beforeend','<p class="gp-hint" style="margin:0 0 4px">Noch keine Zulagen eingetragen. Tippe unten auf eine Zulage, um sie hinzuzufügen.</p>');
   panel.append(chips);
+  {const pk=ALLOW.find(x=>x[0]==='polizei'||x[0]==='feuerwehr');if(pk)panel.insertAdjacentHTML('beforeend','<p class="gp-hint" style="margin-top:10px">'+(pf?esc(pk[1])+' '+esc(pf[3])+': '+eur(pk[0]==='polizei'?pf[0]:pf[1])+' nach zwei Dienstjahren (Stand '+pf[2]+(pf[3]==='Nordrhein-Westfalen'?(pk[0]==='polizei'?', ab A 9':', A 7/A 8'):'')+'). Im ersten Dienstjahr gibt es meist die Hälfte, davor nichts. Maßgeblich ist deine Bezügemitteilung.':'Für den Vorschlag zur '+esc(pk[1])+' bitte Bundesland oder „Sätze von: Bund“ wählen.')+'</p>')}
   {const keys=ALLOW.map(x=>x[0]);const hid=Object.entries(c).filter(([k,v])=>!keys.includes(k)&&v?.enabled&&Number(v.value)>0).map(([k])=>DEF[k]?DEF[k][0]:k);
    if(hid.length)panel.insertAdjacentHTML('beforeend','<p class="gp-hint" style="margin-top:10px">Ausgeblendet, weil sie nicht zu deiner Berufsgruppe passen: '+esc(hid.join(', '))+'. Sie werden nicht mitgerechnet und sind wieder da, wenn du die Berufsgruppe zurückstellst.</p>')}
   if(!T?.individual&&(r.hints||[]).length)panel.insertAdjacentHTML('beforeend','<p class="gp-hint" style="margin-top:10px">Vorschläge mit Betrag stammen aus deinem Tarif. Trag nur ein, was dir laut Abrechnung zusteht.</p>');
