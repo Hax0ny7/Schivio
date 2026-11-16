@@ -1,4 +1,5 @@
-/* v1.0.84: Schritte „Wie arbeitest du?“ und „Zulagen“ (mit Zulagen-Prognose), Entgeltgruppen je Beruf
+/* v1.0.86: Diakonie-Vorschläge (AVR DD, BAT-KF Anlage 2, KTD, TV DN, AVR Bayern EG 8), Altenpflege nutzt Pflege-Vorschläge
+   v1.0.84: Schritte „Wie arbeitest du?“ und „Zulagen“ (mit Zulagen-Prognose), Entgeltgruppen je Beruf
    v1.0.83: Caritas-MTR auch mit EG (AVR 2027)
    v1.0.82: MTR-Vorschläge korrigiert (TVöD E7–E9b, TV-L E7/E9a, Caritas Anlage 2 VG 5c/5b/4b)
    v1.0.62: Polizei vor MFA, MTRA / MTA statt Medizintechnik
@@ -34,11 +35,15 @@
   caritas:{pflege:[['P7','Pflegefachkraft'],['P8','Pflegefachkraft mit Fachweiterbildung'],['P6','Pflegefachassistenz']],
    mtr:[['#','Schon vor 2027 bei der Caritas (bisheriges System, Anlage 2):'],['VG5C','MTR / MTRA'],['VG5B','MTR nach 3 Jahren Bewährung oder mit Aufsicht über mind. 2 MTA'],['VG4B','MTR aus VG 5b nach 2 Jahren Bewährung'],
     ['#','Neu eingestellt ab 2027 oder in die AVR 2027 gewechselt:'],['E7','MTR / MTRA'],['E8','MTR – mind. ¼ schwierige Aufgaben (z. B. CT, MRT)'],['E9A','MTR – überwiegend schwierige Aufgaben'],['E9B','MTR – mind. ½ Spezialaufgaben (z. B. OP-Röntgen)']]},
-  dd:{pflege:[['7','Pflegefachkraft']]},bay:{pflege:[['7','Pflegefachkraft']]},tvdn:{pflege:[['8','Pflegefachkraft']]},
+  dd:{pflege:[['7','Pflegefachkraft'],['8','Fachpflegekraft (OP, Intensiv, Anästhesie, Psychiatrie …)'],['5','Pflegefachassistenz in der Altenhilfe']],alten:[['7','Pflegefachkraft'],['5','Pflegefachassistenz in der Altenhilfe']],mtr:[['7','MTR / MTRA']]},
+  bay:{pflege:[['8','Pflegefachkraft']]},
+  tvdn:{pflege:[['8','Pflegefachkraft (Fachweiterbildung: E 8 + Zulage)']],alten:[['8','Pflegefachkraft']],mfa:[['7','MFA']]},
+  ktd:{pflege:[['8','Pflegefachkraft (EP 8 / EK 8)'],['9','Pflegefachkraft mit Fachweiterbildung'],['5','Pflegeassistenz (mind. 1 Jahr Ausbildung)']],hebamme:[['8','Hebamme (im Kreißsaal EK 9)']],mtr:[['7','MTR / MTRA (EK 7)']],mfa:[['6','MFA (EP 6 / EK 6)']]},
+  batkf:{pflege:[['7A','Pflegefachkraft'],['8A','Pflegefachkraft im Fachbereich ohne Fachweiterbildung oder Praxisanleitung'],['9A','Pflegefachkraft mit Fachweiterbildung'],['4A','Pflegehilfe mit mind. 1-jähriger Ausbildung']],hebamme:[['8A','Hebamme']]},
   tvl:{mtr:[['E7','MTR / MTRA'],['E9A','MTR – mind. ¼ schwierige Aufgaben (z. B. CT, MRT)']]},
   arzt:{arzt:[['Ä1','Assistenzärztin / -arzt'],['Ä2','Fachärztin / -arzt'],['Ä3','Oberärztin / -arzt']]}};
  SUG.tvoed.alten=SUG.tvoed.pflege;SUG.caritas.alten=SUG.caritas.pflege;SUG.dd.alten=SUG.dd.pflege;SUG.bay.alten=SUG.bay.pflege;SUG.tvdn.alten=SUG.tvdn.pflege;
- function sugFamily(k){if(k==='tvoed-vka-p'||k==='avr-wue-1')return 'tvoed';if(k==='avr-caritas-p')return 'caritas';if(['avr-dd','avr-wue-4','avr-dwbo-w','avr-dwbo-o','avr-dwm'].includes(k))return 'dd';if(k==='avr-bayern')return 'bay';if(k==='tv-dn')return 'tvdn';if(/aerzte/.test(k))return 'arzt';if(k==='tv-l')return 'tvl';return ''}
+ function sugFamily(k){if(k==='tvoed-vka-p'||k==='avr-wue-1')return 'tvoed';if(k==='avr-caritas-p')return 'caritas';if(['avr-dd','avr-wue-4','avr-dwbo-w','avr-dwbo-o','avr-dwm'].includes(k))return 'dd';if(k==='avr-bayern')return 'bay';if(k==='tv-dn')return 'tvdn';if(k==='ktd')return 'ktd';if(k==='bat-kf')return 'batkf';if(/aerzte/.test(k))return 'arzt';if(k==='tv-l')return 'tvl';return ''}
  let s={},hist=[],cur=null,firstRun=false;
  function employers(){const j=s.job;
   if(j==='feuerwehr')return [['beamte','Verbeamtet','Beamtin / Beamter','shield'],['oed','Angestellt','öffentlicher Dienst','city'],['privat','Anderer Arbeitgeber','eigene Werte','build']];
@@ -69,7 +74,7 @@
    const val=()=>Number(i.value.replace(/\s|€/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));const b=next('Weiter',val()>0,()=>{s.pay=val();go('scope')},true);i.oninput=()=>{b.disabled=!(val()>0)};i.onkeydown=e=>{if(e.key==='Enter'&&!b.disabled){i.blur();b.click()}};setTimeout(()=>i.focus(),500)}
   else if(id==='group'){const c=P.catalog(tariff(),s.state,s.job);h('Welche Tätigkeit trifft auf dich zu?','Die genaue Entgeltgruppe steht auf deiner Gehaltsabrechnung.');
    if(!c||!c.groups.length){d.insertAdjacentHTML('beforeend','<p class="fl-note">Für diesen Tarif ist noch keine Tabelle hinterlegt.</p>');next('Weiter',true,()=>go('scope'))}
-   else{const fam=SUG[sugFamily(tkey())]||{};const sug=(fam[s.job]||[]).filter(([g])=>g==='#'||c.groups.some(x=>x.key===g)).filter((x,i,l)=>x[0]!=='#'||(l[i+1]&&l[i+1][0]!=='#'));const pick=g=>{s.group=g;s.level='';go('level')};
+   else{const fam=SUG[sugFamily(tkey())]||{};const sug=(fam[s.job]||(s.job==='alten'?fam.pflege:null)||[]).filter(([g])=>g==='#'||c.groups.some(x=>x.key===g)).filter((x,i,l)=>x[0]!=='#'||(l[i+1]&&l[i+1][0]!=='#'));const pick=g=>{s.group=g;s.level='';go('level')};
     if(sug.length){const l=document.createElement('div');l.className='fl-list';sug.forEach(([g,t])=>{if(g==='#'){const p=document.createElement('p');p.className='fl-note';p.style.margin='6px 2px 0';p.textContent=t;l.append(p);return}const G=c.groups.find(x=>x.key===g);const lo=G.levels[0];l.append(tile('fl-row','user',t,G.label.replace(/ \(.*\)$/,'')+' · ab '+eur(lo.amount),()=>pick(g),s.group===g))});d.append(l)}
     const all=document.createElement('div');all.className='fl-chips';c.groups.forEach(G=>{const b=document.createElement('button');b.type='button';b.className='fl-chip'+(s.group===G.key?' sel':'');b.textContent=G.label;b.onclick=()=>{all.querySelectorAll('.fl-chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');setTimeout(()=>pick(G.key),170)};all.append(b)});
     if(sug.length){const m=document.createElement('button');m.type='button';m.className='fl-more';m.textContent='Andere Entgeltgruppe wählen';all.hidden=!(s.group&&!sug.some(x=>x[0]===s.group));m.onclick=()=>{all.hidden=!all.hidden};d.append(m,all)}else d.append(all)}}
