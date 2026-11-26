@@ -1,4 +1,4 @@
-/* v1.0.77 · v1.0.78 Zählregeln: Urlaubsplaner (Tools)
+/* v1.0.77 · v1.0.78 Zählregeln · v1.0.87 Dienst-Wochenenden zählen, Aufschlüsselung: Urlaubsplaner (Tools)
    - Resturlaub-Zähler: Anspruch (Tarif-Vorschlag, änderbar) + Zusatzurlaub + Rest aus dem Vorjahr − genommen − geplant
    - Urlaub planen: Zeitraum wählen, Schivio zeigt die nötigen Urlaubstage und trägt „Urlaub“ ein
    - Brückentage (Schivio Pro): wenige Urlaubstage, viele freie Tage am Stück – nach Feiertagen und deiner Arbeitswoche
@@ -54,9 +54,14 @@
  function plannedFree(k,r){const wd=toDate(k).getDay();if(wd===0||wd===6){const w=workWeekend(k,r);if(w!==null)return !w}
   let p=null;try{p=window.SchivioPattern?.dutyOn?.(k)}catch(e){}return p===''}
  /* Was kostet ein Urlaubstag an diesem Datum? why: hol = Feiertag, off = laut Zählweise kein Arbeitstag, free = Gutschrift */
- function dayCost(k,r=R()){const d=toDate(k),wd=d.getDay();
+ function dayCost(k,r=R()){const d=toDate(k),wd=d.getDay(),we=wd===0||wd===6;
   if(r.hol&&holidays(d.getFullYear()).has(k))return {c:0,why:'hol'};
-  if(r.count==='mofr'&&(wd===0||wd===6))return {c:0,why:'off'};
+  if(r.count==='mofr'&&we)return {c:0,why:'off'};
+  /* v1.0.87: Wochenend-Rhythmus geht vor der Arbeitswoche – ein Dienst-Wochenende kostet Urlaub,
+     auch wenn im Profil Mo–Fr steht (vorher wurden diese Tage nie gezählt) */
+  const ww=we?workWeekend(k,r):null;
+  if(ww===true)return {c:1,why:''};
+  if(ww===false)return r.refund?{c:0,why:'free'}:r.count==='all'?{c:1,why:''}:{c:0,why:'off'};
   if(r.count==='week'&&!workdays().includes(wd))return {c:0,why:'off'};
   if(r.refund&&plannedFree(k,r))return {c:0,why:'free'};
   return {c:1,why:''}}
@@ -83,7 +88,9 @@
   const total=base+extra+carry,left=total-taken-planned;
   /* Rest aus dem Vorjahr muss bis 31. März angetreten werden (Ausnahme: bis 31. Mai bei Krankheit/dienstlichen Gründen) */
   const usedQ1=sumCost(days.filter(k=>k<=y+'-03-31')),carryOpen=Math.max(0,carry-usedQ1);
-  return {y,base,extra,carry,carryAuto,total,taken,planned,left,days,carryOpen}}
+  /* v1.0.87: Aufschlüsselung, warum eingetragene Tage keinen Urlaub kosten */
+  const why={hol:0,off:0,free:0};days.forEach(k=>{const w=dayCost(k);if(!w.c)why[w.why]++});
+  return {y,base,extra,carry,carryAuto,total,taken,planned,left,days,carryOpen,why}}
 
  /* ---------- Ansichten ---------- */
  let Y=new Date().getFullYear();
@@ -97,7 +104,9 @@
    '<div class="vp-card"><div class="vp-left"><b>'+fmt(b.left)+'</b><span>'+(Math.abs(b.left)===1?'Tag':'Tage')+' übrig</span></div>'+
    '<div class="vp-bar" aria-hidden="true"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
    '<div class="vp-grid"><span><small>Genommen</small><b>'+fmt(b.taken)+'</b></span><span><small>Geplant</small><b>'+fmt(b.planned)+'</b></span><span><small>Anspruch gesamt</small><b>'+fmt(b.total)+'</b></span></div>'+
-   '<p class="vp-sum">'+fmt(b.base)+' Tage Jahresurlaub'+(b.extra?' + '+fmt(b.extra)+' Zusatzurlaub':'')+(b.carry?' + '+fmt(b.carry)+' Rest aus '+(Y-1):'')+'</p></div>';
+   '<p class="vp-sum">'+fmt(b.base)+' Tage Jahresurlaub'+(b.extra?' + '+fmt(b.extra)+' Zusatzurlaub':'')+(b.carry?' + '+fmt(b.carry)+' Rest aus '+(Y-1):'')+'</p>'+
+   (b.days.length?'<p class="vp-sum" style="margin-top:6px">'+b.days.length+(b.days.length===1?' Tag':' Tage')+' als Urlaub eingetragen'+
+    ((b.why.free+b.why.off+b.why.hol)?' · davon kosten keinen Urlaub: '+[b.why.free?b.why.free+' gutgeschrieben (planmäßig frei)':'',b.why.off?b.why.off+' ohne Arbeit laut Zählweise':'',b.why.hol?b.why.hol+(b.why.hol===1?' Feiertag':' Feiertage'):''].filter(Boolean).join(', '):'')+'</p>':'')+'</div>';
   if(b.left<0)h+='<p class="vp-warn">'+IC.warn+'<span>Du hast '+fmt(-b.left)+' Urlaubstage mehr eingetragen als dir zustehen.</span></p>';
   if(showCarry)h+='<p class="vp-warn">'+IC.warn+'<span>Noch '+fmt(b.carryOpen)+' '+(b.carryOpen===1?'Tag':'Tage')+' Resturlaub aus '+(Y-1)+': in der Regel bis 31. März antreten (bei Krankheit oder dienstlichen Gründen bis 31. Mai).</span></p>';
   h+='<div class="ls">'+
