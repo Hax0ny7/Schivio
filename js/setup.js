@@ -48,11 +48,11 @@
  function employers(){const j=s.job;
   if(j==='feuerwehr')return [['beamte','Verbeamtet','Beamtin / Beamter','shield'],['oed','Angestellt','öffentlicher Dienst','city'],['privat','Anderer Arbeitgeber','eigene Werte','build']];
   if(j==='polizei')return [['beamte','Landespolizei','verbeamtet','shield'],['bund','Bundespolizei','verbeamtet','bund'],['oed','Angestellt','Tarifbeschäftigte','city']];
-  if(j==='arzt')return [['oed','Kommunale Klinik','Stadt oder Kreis','city'],['uni','Uniklinik','Land','uni'],['privat','Andere Klinik oder Praxis','eigene Werte','build']];
+  if(j==='arzt')return [['oed','Kommunale Klinik','Stadt oder Kreis','city'],['uni','Uniklinik','Land','uni'],['caritas','Katholische Klinik','Caritas · AVR Anlage 30','cross'],['privat','Andere Klinik oder Praxis','eigene Werte','build']];
   const l=[['oed','Öffentlicher Dienst','Stadt, Kreis, Kommune','city'],['uni','Uniklinik / Land','','uni'],['caritas','Caritas','','cross'],['diakonie','Diakonie','','dove'],['drk','Rotes Kreuz','DRK','red'],['privat','Privat / anderer','eigene Werte','build']];
   if(j==='mfa')l.unshift(['praxis','Arztpraxis','eigene Werte','clip']);if(j==='mtr')l.splice(l.length-1,0,['praxis','Radiologische Praxis / MVZ','eigene Werte','rad']);return l}
  function tariff(){const e=s.emp,j=s.job;if(e==='beamte'||e==='bund')return 'Beamte';if(e==='privat'||e==='praxis')return 'Individuell';
-  if(j==='arzt')return e==='uni'?'TV-Ärzte/TdL':'TV-Ärzte/VKA';if(e==='oed')return j==='polizei'?'TV-L':'TVöD-P';if(e==='uni')return 'TV-L';if(e==='caritas')return 'AVR Caritas';if(e==='drk')return 'DRK';
+  if(j==='arzt')return e==='uni'?'TV-Ärzte/TdL':e==='caritas'?'AVR Caritas Ärzte':'TV-Ärzte/VKA';if(e==='oed')return j==='polizei'?'TV-L':'TVöD-P';if(e==='uni')return 'TV-L';if(e==='caritas')return 'AVR Caritas';if(e==='drk')return 'DRK';
   if(e==='diakonie')return DIAKONIE[s.state]||'Individuell';return 'Individuell'}
  const tkey=()=>P.normalizeTariff(tariff()),T=()=>P.TARIFFS[tkey()];
  const workplace=()=>(JOBS.find(x=>x[0]===s.job)||[])[4]||'other';

@@ -115,6 +115,14 @@ const TARIFFS={
  'tv-aerzte-vka':{name:'TV-Ärzte/VKA (kommunale Krankenhäuser)',fulltime:40,rates:AE_VKA_RATES,groupHint:'Ä 1 Arzt · Ä 2 Facharzt · Ä 3 Oberarzt · Ä 4 ständige Vertretung',
   periods:()=>[{from:'2025-08-01',to:'2026-05-31',label:'01.08.2025 – 31.05.2026',table:AE_VKA25,bdTable:AE_VKA_BD25},{from:'2026-06-01',to:'2026-12-31',label:'01.06.2026 – 31.12.2026',table:AE_VKA26,bdTable:AE_VKA_BD26}],
   source:'https://tarifvertrag-online.de/entgelttabelle/aerzte/vka'},
+ // AVR Caritas Anlage 30 (Ärztinnen und Ärzte), mittlere Werte der Bundeskommission (Beschluss 05.06.2025, befristet bis 31.12.2026):
+ // Tabellen und BD-Stundensätze ab 01.12.2025 und ab 01.03.2026 deckungsgleich mit TV-Ärzte/VKA (amtlich, Amtsblatt Bistum Görlitz 6/2025).
+ // Nacht 20–6 Uhr 20 %, Samstag 13–20 Uhr 20 % (ab 10/2025); BD-Bewertung und -Zuschläge wie TV-Ärzte/VKA übernommen.
+ 'avr-caritas-aerzte':{name:'AVR Caritas Ärzte (Anlage 30)',fulltime:40,roman:true,rates:AE_VKA_RATES,groupHint:'EG I Arzt · EG II Facharzt · EG III Oberarzt · EG IV leitender Oberarzt',
+  periods:()=>[{from:'2025-12-01',to:'2026-02-28',label:'01.12.2025 – 28.02.2026',table:AE_VKA25,bdTable:AE_VKA_BD25},{from:'2026-03-01',to:'2026-12-31',label:'01.03.2026 – 31.12.2026',table:AE_VKA26,bdTable:AE_VKA_BD26}],
+  hints:[['Wechselschichtzulage','315,00 €'],['Schichtzulage','315,00 € (ab 01/2026)']],
+  notesFor:st=>[st.state==='NW'?'In NRW hat die Regionalkommission abweichende Werte für Anlage 30 beschlossen – die Prognose nutzt die bundesweiten mittleren Werte, bitte mit der Gehaltsabrechnung vergleichen.':'Werte der Bundeskommission (mittlere Werte); Regionalkommissionen können um bis zu 20 % abweichen.'],
+  source:'https://www.bistum-goerlitz.de/wp-content/uploads/2025/09/Amtsblatt-6-von-2025.pdf'},
  'tv-aerzte-tdl':{name:'TV-Ärzte/TdL (Unikliniken)',fulltime:40,rates:AE_TDL_RATES,groupHint:'Ä 1 Arzt · Ä 2 Facharzt · Ä 3 Oberarzt · Ä 4 ständige Vertretung',
   periods:()=>[{from:'2026-04-01',to:'2027-08-31',label:'01.04.2026 – 31.08.2027',table:AE_TDL26}],
   source:'https://www.finanzverwaltung.nrw.de/system/files/media/document/file/tv-aerzte-ab-01.04.2026.pdf'},
@@ -159,12 +167,12 @@ const TARIFFS={
   source:'https://www.dbb.de/fileadmin/user_upload/globale_elemente/pdfs/2026/Einkommensrunde_TV-L/Entgelttabellen_final/2_Entgelttabelle_TV-L_Anlage_B_Allgemeiner_Teil_April_2026_bis_Februar_2027.pdf'}
 };
 function normalizeTariff(t){t=String(t||'').toLowerCase();
- if(!t)return '';if(t.includes('ärzte')||t.includes('aerzte')){return (t.includes('tdl')||t.includes('uni'))?'tv-aerzte-tdl':'tv-aerzte-vka'}if(t.includes('tvöd')||t.includes('tvoed'))return 'tvoed-vka-p';if(t.includes('caritas'))return 'avr-caritas-p';
+ if(!t)return '';if((t.includes('ärzte')||t.includes('aerzte')||t.includes('anlage 30'))&&t.includes('caritas'))return 'avr-caritas-aerzte';if(t.includes('ärzte')||t.includes('aerzte')){return (t.includes('tdl')||t.includes('uni'))?'tv-aerzte-tdl':'tv-aerzte-vka'}if(t.includes('tvöd')||t.includes('tvoed'))return 'tvoed-vka-p';if(t.includes('caritas'))return 'avr-caritas-p';
  if(t.includes('bat-kf')||t.includes('batkf'))return 'bat-kf';if(t.includes('avr dd')||t.includes('avr-dd')||t.includes('avr.dd'))return 'avr-dd';
  if(t.includes('dwbo')){return t.includes('ost')?'avr-dwbo-o':'avr-dwbo-w'}if(t.includes('ktd')||t.includes('nordkirche'))return 'ktd';if(t.includes('mitteldeutsch'))return 'avr-dwm';if(t.includes('tv dn')||t.includes('tvdn')||t.includes('niedersachsen'))return 'tv-dn';if(t.includes('bayern'))return 'avr-bayern';if(t.includes('württemberg')||t.includes('wuerttemberg')||t.includes('avr-wü')){return /\biv\b|buch 4/.test(t)?'avr-wue-4':'avr-wue-1'}if(t.includes('diakonie'))return 'avr-diakonie';if(t.includes('tv-l')||t==='tvl')return 'tv-l';if(t.includes('drk')||t.includes('rotes kreuz'))return 'drk';if(t.includes('beamt')||t.includes('feuerwehr')||t.includes('polizei'))return 'beamte';if(t.includes('individ'))return 'individual';return t}
 function normalizeGroup(g,tid){tid=TARIFFS[tid]?.aliasOf||tid;g=String(g||'').replace(/\s+/g,'').toUpperCase().replace(/^ENTGELTGRUPPE/,'');
  if(tid==='tv-l'){let m=/^(?:KR)?(\d+)$/.exec(g);if(m)return 'KR'+m[1];m=/^(?:EG|E)?(\d+[A-CÜ])$/.exec(g)||/^(?:EG|E)(\d+)$/.exec(g);if(m)return 'E'+m[1];return g}
- if(tid==='tv-aerzte-vka'||tid==='tv-aerzte-tdl'){const m=/^(?:Ä|AE|A|EG|E)?([1-4])$/.exec(g);return m?'Ä'+m[1]:g}
+ if(/aerzte/.test(tid)){const rm={I:1,II:2,III:3,IV:4};const m=/^(?:Ä|AE|A|EG|E)?([1-4]|IV|III|II|I)$/.exec(g);return m?'Ä'+(rm[m[1]]||m[1]):g}
  if(tid==='tvoed-vka-p'){if(/^P\d/.test(g)||g==='N')return g;if(/^NOTFALL/.test(g))return 'N';const m=/^(?:EG|E)?(\d+[A-CÜ]?)$/.exec(g);if(m)return 'E'+m[1];return g}
  if(tid==='avr-caritas-p'){const e=/^(?:EG|E)(\d+[A-C]?)$/.exec(g);if(e)return 'E'+e[1];const m=/^(?:VG|VERG\.?GR\.?|VERGÜTUNGSGRUPPE)?(\d+[A-C]?)$/.exec(g);if(m)return 'VG'+m[1]}
  if(/^P\d/.test(g))return g;return g.replace(/^(EG|KR|E)(?=\d)/,'')}
@@ -258,7 +266,7 @@ function compute(y,m){
   else if(rates.basis==='own'){hourly=r2(amount/(ft*4.348));out.hourlyBasis=hourly;out.notes.push('Zuschlagsbasis: eigenes Stundenentgelt '+eur(amount)+' ÷ ('+String(ft).replace('.',',')+' Std. × 4,348) = '+eur(hourly)+' je Stunde.')}
   else{const s3=row[2]||(rates.basis==='stufe3max'?row.filter(Boolean).slice(-1)[0]:null)||amount;hourly=r2(s3/(ft*4.348));out.hourlyBasis=hourly;
    out.notes.push('Zuschlagsbasis: '+(row[2]?'Stufe 3':'höchste Stufe')+' von '+groupLabel(T,st.group).replace(/ · .*$/,'').replace(' (Notfallsanitäter)','')+' ('+eur(s3)+') ÷ ('+String(ft).replace('.',',')+' Std. × 4,348) = '+eur(hourly)+' je Stunde.');}
-  out.hints=T.hints||[];if(T.aliasNote)out.notes.push(T.aliasNote);
+  out.hints=T.hints||[];if(T.aliasNote)out.notes.push(T.aliasNote);if(T.notesFor)out.notes.push(...T.notesFor(st));
  }
  if(rates.nightRef&&out.table){const per2=T.periods(st).find(p=>p.label===out.table.period);const refRow=per2?.table?.[rates.nightRef[0]];const ref=refRow?refRow[rates.nightRef[1]-1]/((out.fulltime||T.fulltime)*4.348):NaN;if(Number.isFinite(ref)&&hourly>0){out.notes.push('Nachtzuschlag: '+rates.night.toLocaleString('de-DE')+' % vom Stundenentgelt EG '+rates.nightRef[0]+' Stufe '+rates.nightRef[1]+' ('+eur(r2(ref))+').');rates={...rates,night:rates.night*ref/hourly}}}
  const e=effective(rates,st,hourly);out.rates=e;
@@ -326,7 +334,7 @@ TARIFFS['avr-wue-1']={...TARIFFS['tvoed-vka-p'],name:'AVR Württemberg Buch I (K
 TARIFFS['avr-wue-4']={...TARIFFS['avr-dd'],name:'AVR Württemberg Buch IV (wie AVR DD)',aliasOf:'avr-dd',aliasNote:'AVR Württemberg Buch IV übernimmt die AVR DD; die App rechnet mit den AVR-DD-Werten.'};
 function levelLabels(tariffValue){const T=TARIFFS[normalizeTariff(tariffValue)];return T?.levels||null}
 // Für Auswahllisten: Gruppen und besetzte Stufen der aktuell gültigen Tabelle (sonst der jüngsten).
-function groupLabel(T,key){if(T.groupPrefix)return T.groupPrefix+key;if(/^P\d/.test(key))return key;if(key==='N')return 'N (Notfallsanitäter)';if(/^VG\d/.test(key))return 'VG '+key.slice(2).toLowerCase();if(/^Ä\d/.test(key))return 'Ä '+key.slice(1)+' · '+({1:'Arzt/Ärztin',2:'Facharzt/-ärztin',3:'Oberarzt/-ärztin',4:'ständige Vertretung'}[key.slice(1)]);if(/^KR\d/.test(key))return 'KR '+key.slice(2);
+function groupLabel(T,key){if(T.groupPrefix)return T.groupPrefix+key;if(/^P\d/.test(key))return key;if(key==='N')return 'N (Notfallsanitäter)';if(/^VG\d/.test(key))return 'VG '+key.slice(2).toLowerCase();if(/^Ä\d/.test(key)&&T.roman)return 'EG '+['','I','II','III','IV'][key.slice(1)]+' · '+({1:'Arzt/Ärztin',2:'Facharzt/-ärztin',3:'Oberarzt/-ärztin',4:'leitender Oberarzt/-ärztin'}[key.slice(1)]);if(/^Ä\d/.test(key))return 'Ä '+key.slice(1)+' · '+({1:'Arzt/Ärztin',2:'Facharzt/-ärztin',3:'Oberarzt/-ärztin',4:'ständige Vertretung'}[key.slice(1)]);if(/^KR\d/.test(key))return 'KR '+key.slice(2);
  const k=key.replace(/^E(?=\d)/,'');return 'EG '+k.replace(/(\d)([A-D])$/,(m,d,l)=>d+l.toLowerCase())}
 /* v1.0.84: Entgeltgruppen passend zur Berufsgruppe (P/KR = Pflege, N = Notfallsanitäter, EG/VG = andere Berufe).
    Gruppen ohne Buchstaben (DRK, Diakonie) und Ärzte-Gruppen werden nie ausgefiltert. */
