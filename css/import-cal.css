@@ -1,0 +1,9 @@
+/* v1.0.89: Kalender übernehmen */
+.sx-ds .ls .ci-how{display:block;padding:0;border-bottom:1px solid var(--sx-line)}
+.sx-ds .ci-how:last-child{border-bottom:0}
+.sx-ds .ci-how summary{list-style:none;cursor:pointer;padding:13px 14px;font-size:14.5px;display:flex;justify-content:space-between;align-items:center}
+.sx-ds .ci-how summary::-webkit-details-marker{display:none}
+.sx-ds .ci-how summary::after{content:'';width:8px;height:8px;border-right:2px solid var(--sx-muted);border-bottom:2px solid var(--sx-muted);transform:rotate(45deg);transition:transform .25s var(--sx-ease,ease);margin-right:4px}
+.sx-ds .ci-how[open] summary::after{transform:rotate(225deg)}
+.sx-ds .ci-how small{display:block;padding:0 14px 14px;font-size:13px;line-height:1.5;color:var(--sx-muted);animation:sxUp .3s var(--sx-ease,ease) both}
+.sx-ds .ci-how summary b{flex:1}

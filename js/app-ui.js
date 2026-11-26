@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.86';
+ const VERSION='1.0.89';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -329,6 +329,7 @@
      R('#34d399','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>','Steuer-Helfer','Fahrten &amp; Fortbildungen · Export mit Pro','tax')+
      R('#f472b6','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 20c0-5 3-8 7-8s7 3 7 8M12 12V4M12 4l5 3"/></svg>','Urlaubsplaner',(()=>{try{const b=window.SchivioVacation?.balance(new Date().getFullYear());return b?String(b.left).replace('.',',')+' Tage übrig · Brückentage mit Pro':'Resturlaub &amp; Brückentage'}catch(e){return 'Resturlaub &amp; Brückentage'}})(),'vac')+
      R('#a78bfa','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 10h8M8 14h5"/></svg>','Dienstplan-Import','Datei, PDF oder Foto','import','<span class="bdg beta">Beta</span><span class="bdg pro">Pro</span>')+
+     R('#14b8a6','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M9 15h6M13 13l2 2-2 2"/></svg>','Kalender übernehmen','Aus FamilyWall, Google, iPhone &amp; Co.','calimp')+
      R('#2dd4bf','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></svg>','Schichtmuster',(()=>{try{const p=window.SchivioPattern?.get();return p?p.cycle.length+'-Tage-Rhythmus'+(p.until?' · bis '+new Date(p.until+'T12:00:00').toLocaleDateString('de-DE',{day:'numeric',month:'short'}):''):'Dienst-Rhythmus automatisch eintragen'}catch(e){return 'Dienst-Rhythmus automatisch eintragen'}})(),'pattern')+
     '</div></section>'+
     '<section><h3>Darstellung</h3><div class="gp">'+R('#f59e0b','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18c1.4 0 2-1 2-2s-1-1.5-1-2.5 1-1.5 2-1.5h2a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>','Aussehen',esc(skinName())+' · Dienstfarben '+(vivid?'kräftig':'dezent'),'appear')+'</div>'+
@@ -358,6 +359,7 @@
    else if(a==='tax')window.SchivioTax?.open()
    else if(a==='free')window.SchivioFreeTime?.open()
    else if(a==='import')window.SchivioImport?.open()
+   else if(a==='calimp')window.SchivioCalImport?.open()
    else if(a==='vac')window.SchivioVacation?.open()
    else if(a==='pattern')window.SchivioPattern?.open()
    else if(a==='appear'){appearOpen=!appearOpen;render();if(appearOpen)setTimeout(()=>box.querySelector('.sx-appear')?.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'}),40)}
