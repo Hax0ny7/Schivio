@@ -7,3 +7,6 @@
 .sx-ds .ci-how[open] summary::after{transform:rotate(225deg)}
 .sx-ds .ci-how small{display:block;padding:0 14px 14px;font-size:13px;line-height:1.5;color:var(--sx-muted);animation:sxUp .3s var(--sx-ease,ease) both}
 .sx-ds .ci-how summary b{flex:1}
+.sx-ds .ci-link{display:flex;gap:8px;margin-top:10px}
+.sx-ds .ci-link input{flex:1;min-width:0;min-height:46px;border-radius:14px;padding:0 12px;font:inherit;font-size:14px}
+.sx-ds .ci-link .bt{flex:none;width:auto!important;min-height:46px;margin:0!important;padding:0 16px}

@@ -24,7 +24,7 @@
 
  /* ---------- Anleitungen je Quelle ---------- */
  const SRC=[
-  ['familywall','FamilyWall','Am einfachsten über den Handy-Kalender: In FamilyWall unter Kalender → Einstellungen die Synchronisierung mit deinem Google- bzw. iPhone-Kalender einschalten. Danach wie bei Google oder iPhone exportieren. Falls deine FamilyWall-Version einen iCal-Export oder -Link anbietet, kannst du auch diese Datei nehmen.'],
+  ['familywall','FamilyWall','FamilyWall gibt dir einen iCal-Link. Kopiere ihn und füge ihn oben ins Feld ein. Klappt das nicht: Link im Handy-Browser öffnen (vorne „webcal://“ durch „https://“ ersetzen) – die Datei landet in „Downloads“ und du wählst sie oben aus. Teile den Link mit niemandem, er öffnet deinen Kalender.'],
   ['google','Google Kalender (Android)','Am Computer calendar.google.com öffnen → Zahnrad → Einstellungen → Importieren & Exportieren → Exportieren. Du bekommst eine ZIP-Datei; darin steckt pro Kalender eine .ics-Datei.'],
   ['apple','iPhone / iCloud','Am Mac in der Kalender-App: Kalender auswählen → Ablage → Exportieren. Ohne Mac: auf icloud.com den Kalender kurz öffentlich teilen, den Link im Browser öffnen und die Datei speichern – danach das Teilen wieder ausschalten.'],
   ['outlook','Outlook','Kalender → Freigeben/Veröffentlichen → ICS-Link oder Datei → Speichern unter → iCalendar (.ics).'],
@@ -116,20 +116,31 @@
   const node=el('<div>'+DS.head('Tools','Kalender übernehmen')+
    '<p class="ip-p">Nimm deine Termine aus einem anderen Kalender mit – z. B. aus FamilyWall, Google, dem iPhone oder Supershift. Du brauchst dafür eine Kalenderdatei (.ics).</p>'+
    '<button type="button" class="ip-src" data-x="pick"><span class="ii">'+IC.file+'</span><span class="tt"><b>Kalenderdatei auswählen</b><small>.ics oder .ical · bleibt nur auf deinem Handy</small></span></button>'+
+   '<div class="ci-link"><input type="url" inputmode="url" data-f="url" placeholder="oder iCal-Link einfügen (webcal:// oder https://)" autocomplete="off" autocapitalize="off" spellcheck="false"><button type="button" class="bt pr" data-x="link">Laden</button></div>'+
+   '<p class="ip-hint" data-lh hidden></p>'+
    '<p class="ip-p" style="margin-top:18px"><b style="color:var(--sx-text)">So bekommst du die Datei</b></p>'+
    '<div class="ls">'+SRC.map(([id,t,h])=>'<details class="r ci-how"><summary><b>'+esc(t)+'</b></summary><small>'+esc(h)+'</small></details>').join('')+'</div>'+
    (u?'<button type="button" class="ip-undo" data-x="undo">Letzten Kalender-Import rückgängig machen<small>'+u.n+' Einträge vom '+new Date(u.at).toLocaleDateString('de-DE')+'</small></button>':'')+
    '<p class="ip-hint">Termine aus der Datei werden einmalig kopiert. Änderungen im alten Kalender kommen danach nicht automatisch nach Schivio.</p></div>');
-  DS.wire(node,{pick:()=>pickFile(),undo:()=>undo()});
+  DS.wire(node,{pick:()=>pickFile(),undo:()=>undo(),link:b=>loadLink(node,b)});
   return node}
  function pickFile(){const inp=document.createElement('input');inp.type='file';inp.accept='.ics,.ical,.icalendar,text/calendar';
   inp.onchange=async()=>{const f=inp.files?.[0];if(!f)return;
    if(f.size>15e6){toast('Die Datei ist zu groß (max. 15 MB).');return}
    if(/\.zip$/i.test(f.name)){toast('Bitte die ZIP-Datei zuerst entpacken und die .ics-Datei darin wählen.');return}
-   try{const txt=await f.text();if(!/BEGIN:VCALENDAR/i.test(txt))throw new Error('Das ist keine Kalenderdatei (.ics).');
-    const p=parse(txt);if(!p.evs.length)throw new Error('In der Datei wurden keine Termine gefunden.');
-    st={p,name:f.name,range:'year',over:false};DS.swap(rangeView(),1)}catch(x){toast(x.message||'Die Datei konnte nicht gelesen werden.')}};
+   try{start(await f.text(),f.name)}catch(x){toast(x.message||'Die Datei konnte nicht gelesen werden.')}};
   inp.click()}
+ function start(txt,name){if(!/BEGIN:VCALENDAR/i.test(txt))throw new Error('Das ist keine Kalenderdatei (.ics).');
+  const p=parse(txt);if(!p.evs.length)throw new Error('In der Datei wurden keine Termine gefunden.');
+  st={p,name,range:'year',over:false};DS.swap(rangeView(),1)}
+ /* iCal-Link direkt laden. Viele Anbieter erlauben das aus einer Web-App nicht (CORS) – dann erklären wir den Umweg über den Browser.
+    Der Link selbst wird nicht gespeichert (er ist wie ein Passwort zum Kalender). */
+ async function loadLink(node,btn){const inp=node.querySelector('[data-f="url"]'),hint=node.querySelector('[data-lh]');let u=inp.value.trim();
+  if(!u){inp.focus();return}u=u.replace(/^webcals?:\/\//i,'https://');if(!/^https?:\/\//i.test(u)){hint.hidden=false;hint.textContent='Das sieht nicht wie ein Kalender-Link aus. Er beginnt meist mit webcal:// oder https://';return}
+  btn.disabled=true;const old=btn.textContent;btn.textContent='Lädt …';hint.hidden=true;
+  try{const r=await fetch(u,{cache:'no-store',credentials:'omit'});if(!r.ok)throw new Error('http '+r.status);const txt=await r.text();start(txt,'Kalender-Link')}
+  catch(x){hint.hidden=false;hint.innerHTML='Der Anbieter erlaubt das direkte Laden leider nicht. So klappt es trotzdem: <b>Link kopieren → im Handy-Browser (z. B. Chrome) in die Adresszeile einfügen</b> – vorne „webcal://“ durch „https://“ ersetzen – öffnen. Die Datei wird heruntergeladen; danach oben „Kalenderdatei auswählen“ und sie im Ordner „Downloads“ wählen.'}
+  finally{btn.disabled=false;btn.textContent=old}}
  const RANGES=[['future','Nur ab heute'],['year','Ab vor 1 Jahr'],['all','Alles']];
  function bounds(){const t=today();return {lo:st.range==='future'?t:st.range==='year'?addDays(t,-365):'1990-01-01',hi:addDays(t,730)}}
  function compute(){const b=bounds();const r=build(st.p,b.lo,b.hi);st.items=r.items;st.skipped=r.skipped;
