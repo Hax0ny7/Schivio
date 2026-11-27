@@ -96,7 +96,8 @@
    for(const k of days){
     if(ad){const endK=addDays(k,len-1);if(endK<lo||k>hi)continue;out.push({k,title:e.title,ad:true,s:'',e:'',endK:len>1?endK:'',place:e.place||'',note:e.note||'',uid:(e.uid||'')+'|'+k})}
     else{const sm=toMin(e.a.t),em=sm+dur;if(k<lo&&addDays(k,Math.floor(em/1440))<lo)continue;if(k>hi)continue;
-     out.push({k,title:e.title,ad:false,s:e.a.t,e:dur?fromMin(em):'',endK:em>=1440&&dur>=1440?addDays(k,Math.floor(em/1440)):'',place:e.place||'',note:e.note||'',uid:(e.uid||'')+'|'+k,mins:dur})}
+     const span=e.b&&e.b.t?Math.round((toDate(e.b.k)-toDate(e.a.k))/864e5):Math.floor(em/1440);const eT=e.b&&e.b.t?e.b.t:fromMin(em);/* Wanduhr, damit die Zeitumstellung nicht stört */
+     out.push({k,title:e.title,ad:false,s:e.a.t,e:dur?eT:'',endK:span>=1&&dur>=1440?addDays(k,span):'',place:e.place||'',note:e.note||'',uid:(e.uid||'')+'|'+k,mins:dur,span,eT})}
     if(out.length>MAX_EVENTS*2)break}}
   return {items:out.sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:(a.s<b.s?-1:1)),skipped}}
 
@@ -185,7 +186,9 @@
   for(const o of st.items){const m=st.map[o.title.toUpperCase()]||'ev';if(m==='skip')continue;
    if(m==='ev'){if(uids.has(o.uid)||have.has(o.k+'|'+norm(o.title)+'|'+(o.ad?'':o.s))){dup.push(o);continue}have.add(o.k+'|'+norm(o.title)+'|'+(o.ad?'':o.s));ev.push(o);continue}
    /* Dienst: mehrtägige Einträge (z. B. Urlaub) auf jeden Tag verteilen */
-   const last=o.ad&&o.endK?o.endK:o.k;for(let k=o.k;k<=last;k=addDays(k,1)){if(seenSh[k])continue;seenSh[k]=1;const old=data.shifts[k]||'';
+   /* v1.0.95: auch mehrtägige Einträge mit Uhrzeit auf jeden Tag verteilen (z. B. Nachtdienst 24.–28.10.).
+      Der letzte Tag zählt nur, wenn der Eintrag dort nach 10 Uhr endet – sonst ist es nur das Ende der Nacht davor. */
+   let last=o.k;if(o.ad&&o.endK)last=o.endK;else if(!o.ad&&o.span>0)last=addDays(o.k,toMin(o.eT)>600?o.span:o.span-1);for(let k=o.k;k<=last;k=addDays(k,1)){if(seenSh[k])continue;seenSh[k]=1;const old=data.shifts[k]||'';
     if(old===m)continue;if(old&&!st.over){conf.push(k);continue}sh.push({k,c:m,old})}}
   return {ev,sh,dup,conf}}
  function preview(){const P=plan();
@@ -237,5 +240,5 @@
  function welcome(){if(data.calImportAsked)return;data.calImportAsked=true;try{persist()}catch(e){}DS.node(welcomeView)}
 
  function open(){st=null;DS.node(intro)}
- window.SchivioCalImport={open,welcome,_test:{parse,build,occurrences,guess}};
+ window.SchivioCalImport={open,welcome,_test:{parse,build,occurrences,guess,plan:(items,map)=>{st={items,map,over:true};return plan()}}};
 })();
