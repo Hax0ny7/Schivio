@@ -76,7 +76,7 @@ function refresh(){const enabled=!!data.setupOptions?.salaryEnabled;summary.hidd
  else setCenter('Tarifliches Grundentgelt','–',get('tariffBaseInfo')?.textContent||'Tarifprofil einrichten');
  renderBreakdown();
 }
-const oldRender=render;render=function(){oldRender();refresh()};const oldStats=renderStatsOnly;renderStatsOnly=function(){oldStats();refresh()};
+const oldRender=render;render=function(){oldRender();if(!get('hoursPanel')?.classList.contains('hidden'))refresh()};/* v1.0.99: nur bei offener Auswertung */const oldStats=renderStatsOnly;renderStatsOnly=function(){oldStats();refresh()};
 get('bonusSave')?.addEventListener('click',()=>queueMicrotask(refresh));
 refresh();
 })();

@@ -131,10 +131,11 @@
    '<p class="ip-p" style="margin-top:18px"><b style="color:var(--sx-text)">So bekommst du die Datei</b></p>'+
    '<div class="ls">'+SRC.map(([id,t,h])=>'<details class="r ci-how"><summary><b>'+esc(t)+'</b></summary><small>'+esc(h)+'</small></details>').join('')+'</div>'+
    (()=>{const i=storeInfo();return '<p class="ip-hint">Übernommene Termine im Kalender: <b>'+i.imp+'</b> · Speicher ca. '+i.pct+' % belegt'+(i.pct>=85?' – <b>fast voll</b>':'')+'</p>'})()+
+   (()=>{const n=oldImported().length;return n?'<button type="button" class="ip-src" data-x="old" style="margin-top:12px"><span class="tt"><b>'+n+' übernommene Termine vor '+MON(calLo())+'</b><small>Der Kalender zeigt sie nicht an – antippen zum Entfernen und Speicher sparen</small></span></button>':''})()+
    (()=>{const n=impShifts().length;return n?'<button type="button" class="ip-src" data-x="shifts" style="margin-top:12px"><span class="tt"><b>'+n+' Dienste stammen aus dem Import</b><small>Prüfen, nach Monat ansehen und gezielt entfernen</small></span></button>':''})()+
    (u?'<button type="button" class="ip-undo" data-x="undo">Kalender-Import rückgängig machen<small>Entfernt alle übernommenen Termine und stellt deine Dienste wieder her</small></button>':'')+
    '<p class="ip-hint">Termine aus der Datei werden einmalig kopiert. Änderungen im alten Kalender kommen danach nicht automatisch nach Schivio.</p></div>');
-  DS.wire(node,{pick:()=>pickFile(),undo:()=>undo(),link:b=>loadLink(node,b),shifts:()=>DS.swap(shiftsView(),1)});
+  DS.wire(node,{pick:()=>pickFile(),undo:()=>undo(),link:b=>loadLink(node,b),shifts:()=>DS.swap(shiftsView(),1),old:b=>{b.disabled=true;const lo=calLo();let n=0;for(const k of Object.keys(data.events||{})){if(k>=lo)continue;const l=data.events[k];if(!Array.isArray(l))continue;const keep=l.filter(e=>!(e&&e.src==='import'));n+=l.length-keep.length;if(keep.length)data.events[k]=keep;else delete data.events[k]}let ok=false;try{ok=persist()!==false}catch(e){}refresh();toast(ok?n+' alte Termine entfernt':'Speichern fehlgeschlagen');DS.swap(intro(),0)}});
   return node}
  function pickFile(){const inp=document.createElement('input');inp.type='file';inp.accept='.ics,.ical,.icalendar,text/calendar';
   inp.onchange=async()=>{const f=inp.files?.[0];if(!f)return;
@@ -153,8 +154,10 @@
   try{const r=await fetch(u,{cache:'no-store',credentials:'omit'});if(!r.ok)throw new Error('http '+r.status);const txt=await r.text();start(txt,'Kalender-Link')}
   catch(x){hint.hidden=false;hint.innerHTML='Der Anbieter erlaubt das direkte Laden leider nicht. So klappt es trotzdem: <b>Link kopieren → im Handy-Browser (z. B. Chrome) in die Adresszeile einfügen</b> – vorne „webcal://“ durch „https://“ ersetzen – öffnen. Die Datei wird heruntergeladen; danach oben „Kalenderdatei auswählen“ und sie im Ordner „Downloads“ wählen.'}
   finally{btn.disabled=false;btn.textContent=old}}
+ /* v1.0.99: „Alles“ reicht nur so weit zurück, wie der Kalender Monate anzeigt – ältere Termine wären unsichtbar, kosten aber Speicher */
+ const calLo=()=>typeof calendarStart!=='undefined'?key(calendarStart):'2000-01-01';
  const RANGES=[['future','Nur ab heute'],['year','Ab vor 1 Jahr'],['all','Alles']];
- function bounds(){const t=today();return {lo:st.range==='future'?t:st.range==='year'?addDays(t,-365):'1990-01-01',hi:addDays(t,730)}}
+ function bounds(){const t=today();return {lo:st.range==='future'?t:st.range==='year'?addDays(t,-365):calLo(),hi:addDays(t,730)}}
  function compute(){const b=bounds();const r=build(st.p,b.lo,b.hi);st.items=r.items;st.skipped=r.skipped;
   const u={};st.items.forEach(o=>{const k=o.title.toUpperCase();const x=u[k]=u[k]||{t:o.title,n:0};x.n++});st.uniq=u}
  function rangeView(){compute();const n=st.items.length;
@@ -163,7 +166,7 @@
    (()=>{const f=st.stats||(st.stats=fileStats(st.p));return '<div class="ls"><div class="r"><span><b>Datei reicht von '+(f.lo?MON(f.lo):'–')+' bis '+(f.hi?MON(f.hi):'–')+'</b><small>'+Object.keys(f.yr).sort().map(y=>y+': '+f.yr[y]).join(' · ')+(f.rec?' · '+f.rec+' wiederkehrend':'')+(f.bad?' · '+f.bad+' ohne Titel/Datum':'')+(f.canc?' · '+f.canc+' abgesagt':'')+'</small></span></div></div>'})()+
    '<div class="vp-q" style="padding:14px 0 0"><b>Welche Termine sollen mit?</b><div class="vp-seg" role="radiogroup">'+RANGES.map(([v,l])=>'<button type="button" role="radio" data-x="rg" data-v="'+v+'" aria-checked="'+(st.range===v)+'" class="'+(st.range===v?'on':'')+'">'+l+'</button>').join('')+'</div></div>'+
    '<div class="vp-cost"><b data-n>'+n+'</b><span>Termine im Zeitraum (bis 2 Jahre voraus)</span></div>'+
-   '<p class="ip-hint">Ältere Termine brauchst du meist nicht – weniger Einträge halten Schivio schnell.</p>'+
+   ((st.stats||{}).lo&&st.stats.lo<calLo()?'<p class="ip-hint">Der Kalender zeigt Monate ab '+MON(calLo())+'. Ältere Einträge der Datei werden deshalb nicht übernommen.</p>':'')+'<p class="ip-hint">Ältere Termine brauchst du meist nicht – weniger Einträge halten Schivio schnell.</p>'+
    '<div class="ac"><button type="button" class="bt pr" data-x="next"'+(n?'':' disabled')+'>Weiter</button></div></div>');
   DS.wire(node,{back:()=>{st=null;DS.swap(intro(),-1)},
    rg:b=>{st.range=b.dataset.v;DS.swap(rangeView(),0)},
@@ -234,6 +237,7 @@
 
  /* ---------- Importierte Dienste prüfen (v1.0.98) ---------- */
  /* Tage, deren Dienst der Import gesetzt hat und die noch genau diesen Stand haben */
+ function oldImported(){const lo=calLo(),out=[];for(const [k,l] of Object.entries(data.events||{}))if(k<lo&&Array.isArray(l))l.forEach(e=>{if(e&&e.src==='import')out.push(k)});return out}
  function impShifts(){const u=data.calImportUndo;if(!u||!u.prev)return [];return Object.keys(u.prev).filter(k=>data.shifts[k]&&data.shifts[k]!==u.prev[k]).sort()}
  function shiftsView(sel){const ks=impShifts(),u=data.calImportUndo||{},tt=u.titles||{};const by={};
   ks.forEach(k=>{const m=k.slice(0,7);const g=by[m]=by[m]||{n:0,c:{}};g.n++;const lab=tt[k]||shiftTitle(data.shifts[k]);g.c[lab]=(g.c[lab]||0)+1});
@@ -258,5 +262,5 @@
  function welcome(){if(data.calImportAsked)return;data.calImportAsked=true;try{persist()}catch(e){}DS.node(welcomeView)}
 
  function open(){st=null;DS.node(intro)}
- window.SchivioCalImport={open,welcome,_test:{parse,build,occurrences,guess,plan:(items,map)=>{st={items,map,over:true};return plan()}}};
+ window.SchivioCalImport={open,welcome,ics:{parse,build},_test:{parse,build,occurrences,guess,plan:(items,map)=>{st={items,map,over:true};return plan()}}};
 })();

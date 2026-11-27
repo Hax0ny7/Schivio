@@ -17,6 +17,7 @@ function refreshTariff(){
 const originalRenderStats=renderStatsOnly;
 renderStatsOnly=function(){originalRenderStats();refreshTariff()};
 const originalRender=render;
-render=function(){originalRender();refreshTariff()};
+/* v1.0.99: nur rechnen, wenn die Auswertung offen ist – tab('hours') ruft beim Öffnen renderStatsOnly() auf */
+render=function(){originalRender();if(!document.getElementById('hoursPanel')?.classList.contains('hidden'))refreshTariff()};
 refreshTariff();
 })();

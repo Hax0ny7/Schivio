@@ -48,20 +48,11 @@
   catch(x){fail(x)}}
 
  /* ---------- Kalenderdatei (.ics) ---------- */
- function icsDate(v){const m=/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})?(Z)?)?/.exec(v.trim());if(!m)return null;
-  if(m[4]&&m[7]){const d=new Date(Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0)));return {k:key(d),t:pad2(d.getHours())+':'+pad2(d.getMinutes())}}
-  return {k:m[1]+'-'+m[2]+'-'+m[3],t:m[4]?m[4]+':'+m[5]:''}}
- function fromIcs(txt){const lines=txt.replace(/\r\n?/g,'\n').replace(/\n[ \t]/g,'').split('\n');const evs=[];let cur=null;
-  for(const ln of lines){if(ln==='BEGIN:VEVENT'){cur={};continue}if(ln==='END:VEVENT'){if(cur)evs.push(cur);cur=null;continue}if(!cur)continue;
-   const i=ln.indexOf(':');if(i<0)continue;const nm=ln.slice(0,i).split(';')[0].toUpperCase(),val=ln.slice(i+1);
-   if(nm==='SUMMARY')cur.sum=val.replace(/\\n/gi,' ').replace(/\\([,;\\])/g,'$1').trim();
-   else if(nm==='DTSTART')cur.a=icsDate(val);else if(nm==='DTEND')cur.b=icsDate(val);
-   else if(nm==='STATUS'&&/CANCELLED/i.test(val))cur.x=true}
-  const lo=addDays(today(),-400),hi=addDays(today(),400),out=[];
-  for(const e of evs){if(!e.a||e.x||!e.sum)continue;
-   /* ganztägige Termine über mehrere Tage (z. B. Urlaub) auf jeden Tag verteilen */
-   const days=[e.a.k];if(!e.a.t&&e.b&&!e.b.t){let k=addDays(e.a.k,1);while(k<e.b.k&&days.length<31){days.push(k);k=addDays(k,1)}}
-   for(const k of days)if(k>=lo&&k<=hi)out.push({k,t:e.sum.slice(0,40),time:e.a.t})}
+ /* v1.0.99: nutzt den gemeinsamen Kalender-Leser aus import-cal.js (kann auch Wiederholungen, Zeitzonen, Ausnahmen) */
+ function fromIcs(txt){const I=window.SchivioCalImport?.ics;if(!I)throw new Error('Kalender-Leser nicht geladen.');
+  const r=I.build(I.parse(txt),addDays(today(),-400),addDays(today(),400)),out=[];
+  for(const o of r.items){const days=[o.k];/* ganztägige Termine über mehrere Tage (z. B. Urlaub) auf jeden Tag verteilen */if(o.ad&&o.endK){let k=addDays(o.k,1);while(k<=o.endK&&days.length<31){days.push(k);k=addDays(k,1)}}
+   for(const k of days)out.push({k,t:o.title.slice(0,40),time:o.ad?'':o.s})}
   /* gleicher Titel, aber verschiedene Uhrzeiten (z. B. alles heißt „Dienst“) → nach Beginn trennen, damit Früh/Spät/Nacht unterscheidbar sind */
   const times={};out.forEach(o=>{(times[o.t]=times[o.t]||new Set()).add(o.time||'')});
   out.forEach(o=>{const set=times[o.t];if(set.size>1&&set.size<=6&&!set.has(''))o.t=o.t.slice(0,30)+' '+o.time});
