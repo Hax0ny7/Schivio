@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.93';
+ const VERSION='1.0.94';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -100,7 +100,11 @@
    rows.forEach((items,w)=>{if(!items.length)return;const wk=document.createElement('div');wk.className='sx-week';wk.style.gridRow=String(w+1);wk.innerHTML=html(items,g,cells.slice(w*7,w*7+7).map(c=>c.dataset.date||null));grid.append(wk)});grid.classList.add('sx-bars')}
   function paint(root){const g=measure(root);if(!g){requestAnimationFrame(()=>{if(measure(root))paint(root)});return}geo=g;
    const grids=[...root.querySelectorAll('.month-grid')];const vis=grids.filter(gr=>{const r=gr.getBoundingClientRect();return r.bottom>-innerHeight*2&&r.top<innerHeight*3});vis.forEach(gr=>paintGrid(gr,g));
-   clearTimeout(paint.t);paint.t=setTimeout(()=>{const run=()=>{const rest=grids.filter(gr=>cache.get(gr)===undefined||!vis.includes(gr));let n=0;for(const gr of rest){paintGrid(gr,geo);if(++n>6)break}if(rest.length>6)setTimeout(run,60)};run()},250)}
+   /* v1.0.94: übrige Monate genau einmal der Reihe nach nachmalen – vorher blieb die Schleife an den ersten Monaten hängen und lief endlos */
+   clearTimeout(paint.t);const queue=grids.filter(gr=>!vis.includes(gr));paint.t=setTimeout(function run(){for(let n=0;n<6&&queue.length;n++)paintGrid(queue.shift(),geo);if(queue.length)paint.t=setTimeout(run,60)},250)}
+  /* beim Scrollen die sichtbaren Monate sicher malen */
+  let st=0;const onScroll=()=>{if(st)return;st=requestAnimationFrame(()=>{st=0;const root=$('calendar');if(!root||!geo)return;for(const gr of root.querySelectorAll('.month-grid')){const r=gr.getBoundingClientRect();if(r.bottom>-innerHeight&&r.top<innerHeight*2)paintGrid(gr,geo)}})};
+  setTimeout(()=>{$('monthScroll')?.addEventListener('scroll',onScroll,{passive:true})},0);
   let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{const root=$('calendar');if(root)paint(root)},200)});
   return {paint}})();
  const oldRCM=renderCalendarMonths;renderCalendarMonths=function(){const r=oldRCM.apply(this,arguments);try{decorate()}catch(e){}return r};
