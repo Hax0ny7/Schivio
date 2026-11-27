@@ -10,3 +10,13 @@
 .sx-ds .ci-link{display:flex;gap:8px;margin-top:10px}
 .sx-ds .ci-link input{flex:1;min-width:0;min-height:46px;border-radius:14px;padding:0 12px;font:inherit;font-size:14px}
 .sx-ds .ci-link .bt{flex:none;width:auto!important;min-height:46px;margin:0!important;padding:0 16px}
+/* v1.0.98: importierte Dienste nach Monat */
+.sx-ds .ls .ci-mon{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--sx-line);color:inherit;font:inherit;padding:12px 14px;cursor:pointer}
+.sx-ds .ls .ci-mon:last-child{border-bottom:0}
+.sx-ds .ci-mon>span{flex:1;min-width:0}
+.sx-ds .ci-mon b{display:block;font-size:14.5px}
+.sx-ds .ci-mon em{font-style:normal;font-size:11px;font-weight:700;color:var(--sx-a);margin-left:6px}
+.sx-ds .ci-mon small{display:block;color:var(--sx-muted);font-size:12.5px;margin-top:2px}
+.sx-ds .ci-mon i{flex:none;width:22px;height:22px;border-radius:7px;box-shadow:inset 0 0 0 2px var(--sx-line);transition:background .2s,box-shadow .2s}
+.sx-ds .ci-mon.on i{background:var(--sx-a);box-shadow:none;-webkit-mask:none}
+.sx-ds .ci-mon.on i::after{content:"";display:block;width:6px;height:11px;border:solid #0b1a1f;border-width:0 2.5px 2.5px 0;transform:translate(7px,3px) rotate(45deg)}

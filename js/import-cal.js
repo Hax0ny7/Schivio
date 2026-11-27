@@ -131,9 +131,10 @@
    '<p class="ip-p" style="margin-top:18px"><b style="color:var(--sx-text)">So bekommst du die Datei</b></p>'+
    '<div class="ls">'+SRC.map(([id,t,h])=>'<details class="r ci-how"><summary><b>'+esc(t)+'</b></summary><small>'+esc(h)+'</small></details>').join('')+'</div>'+
    (()=>{const i=storeInfo();return '<p class="ip-hint">Übernommene Termine im Kalender: <b>'+i.imp+'</b> · Speicher ca. '+i.pct+' % belegt'+(i.pct>=85?' – <b>fast voll</b>':'')+'</p>'})()+
+   (()=>{const n=impShifts().length;return n?'<button type="button" class="ip-src" data-x="shifts" style="margin-top:12px"><span class="tt"><b>'+n+' Dienste stammen aus dem Import</b><small>Prüfen, nach Monat ansehen und gezielt entfernen</small></span></button>':''})()+
    (u?'<button type="button" class="ip-undo" data-x="undo">Kalender-Import rückgängig machen<small>Entfernt alle übernommenen Termine und stellt deine Dienste wieder her</small></button>':'')+
    '<p class="ip-hint">Termine aus der Datei werden einmalig kopiert. Änderungen im alten Kalender kommen danach nicht automatisch nach Schivio.</p></div>');
-  DS.wire(node,{pick:()=>pickFile(),undo:()=>undo(),link:b=>loadLink(node,b)});
+  DS.wire(node,{pick:()=>pickFile(),undo:()=>undo(),link:b=>loadLink(node,b),shifts:()=>DS.swap(shiftsView(),1)});
   return node}
  function pickFile(){const inp=document.createElement('input');inp.type='file';inp.accept='.ics,.ical,.icalendar,text/calendar';
   inp.onchange=async()=>{const f=inp.files?.[0];if(!f)return;
@@ -189,7 +190,7 @@
    /* v1.0.95: auch mehrtägige Einträge mit Uhrzeit auf jeden Tag verteilen (z. B. Nachtdienst 24.–28.10.).
       Der letzte Tag zählt nur, wenn der Eintrag dort nach 10 Uhr endet – sonst ist es nur das Ende der Nacht davor. */
    let last=o.k;if(o.ad&&o.endK)last=o.endK;else if(!o.ad&&o.span>0)last=addDays(o.k,toMin(o.eT)>600?o.span:o.span-1);for(let k=o.k;k<=last;k=addDays(k,1)){if(seenSh[k])continue;seenSh[k]=1;const old=data.shifts[k]||'';
-    if(old===m)continue;if(old&&!st.over){conf.push(k);continue}sh.push({k,c:m,old})}}
+    if(old===m)continue;if(old&&!st.over){conf.push(k);continue}sh.push({k,c:m,old,t:o.title})}}
   return {ev,sh,dup,conf}}
  function preview(){const P=plan();
   const node=el('<div>'+DS.head('Kalender übernehmen','Vorschau',{back:true})+
@@ -211,10 +212,10 @@
    if(o.endK&&o.endK>o.k)it.endDate=o.endK;
    const l=Array.isArray(data.events[o.k])?data.events[o.k]:[];l.push(it);data.events[o.k]=l;ids.push([o.k,it.id])}
   for(const k of Object.keys(data.events)){const l=data.events[k];if(Array.isArray(l)&&l.length>1)l.sort((a,b)=>(a.allDay?-1:toMin(a.start))-(b.allDay?-1:toMin(b.start)))}
-  const prev={};P.sh.forEach(r=>{prev[r.k]=r.old||null;data.shifts[r.k]=r.c});
+  const prev={},tit={};P.sh.forEach(r=>{prev[r.k]=r.old||null;tit[r.k]=r.t;data.shifts[r.k]=r.c});
   const c=cfg();Object.entries(st.map).forEach(([k,v])=>{if(v!=='ev')c.map[k]=v;else delete c.map[k]});
   const pu=data.calImportUndo;const allPrev=Object.assign({},prev,pu&&pu.prev||{});/* frühester Stand gewinnt */
-  data.calImportUndo={at:new Date().toISOString(),n:(pu?pu.n:0)+ids.length+P.sh.length,ids:[],prev:allPrev};
+  data.calImportUndo={at:new Date().toISOString(),n:(pu?pu.n:0)+ids.length+P.sh.length,ids:[],prev:allPrev,titles:Object.assign({},pu&&pu.titles||{},tit)};
   let ok=true;try{ok=persist()!==false}catch(e){ok=false}
   if(!ok){data.events=JSON.parse(before.events);data.shifts=before.shifts;delete data.calImportUndo;try{persist()}catch(e){}toast('Speicher voll – bitte einen kürzeren Zeitraum wählen.');return}
   const first=(P.ev.find(o=>o.k>=today())||P.ev[0]||P.sh[0]||{}).k;st=null;refresh();DS.close();
@@ -231,6 +232,23 @@
    if(ok){toast('Kalender-Import rückgängig gemacht');DS.swap(intro(),-1)}else{b.disabled=false;b.textContent='Entfernen';toast('Speichern fehlgeschlagen – der Gerätespeicher ist voll. Bitte Screenshot an Claude schicken.')}},60)}});
   DS.swap(node,1)}
 
+ /* ---------- Importierte Dienste prüfen (v1.0.98) ---------- */
+ /* Tage, deren Dienst der Import gesetzt hat und die noch genau diesen Stand haben */
+ function impShifts(){const u=data.calImportUndo;if(!u||!u.prev)return [];return Object.keys(u.prev).filter(k=>data.shifts[k]&&data.shifts[k]!==u.prev[k]).sort()}
+ function shiftsView(sel){const ks=impShifts(),u=data.calImportUndo||{},tt=u.titles||{};const by={};
+  ks.forEach(k=>{const m=k.slice(0,7);const g=by[m]=by[m]||{n:0,c:{}};g.n++;const lab=tt[k]||shiftTitle(data.shifts[k]);g.c[lab]=(g.c[lab]||0)+1});
+  sel=sel||new Set();const months=Object.keys(by).sort();const now=today().slice(0,7);
+  const node=el('<div>'+DS.head('Kalender übernehmen','Importierte Dienste',{back:true})+
+   '<p class="ip-p">Diese Dienste hat der Kalender-Import eingetragen. Selbst eingetragene Dienste tauchen hier nicht auf. Wähle Monate aus, deren importierte Dienste du entfernen möchtest – vorher eingetragene Dienste kommen dann zurück.</p>'+
+   (months.length?'<div class="ls">'+months.map(m=>'<button type="button" class="r ci-mon'+(sel.has(m)?' on':'')+'" data-x="tg" data-m="'+m+'"><span><b>'+MON(m+'-15')+' · '+by[m].n+' Dienste'+(m>now?' <em>Zukunft</em>':'')+'</b><small>'+Object.entries(by[m].c).sort((a,b)=>b[1]-a[1]).map(([t,n])=>esc(t)+' '+n+'×').join(' · ')+'</small></span><i aria-hidden="true"></i></button>').join('')+'</div>':'<p class="ip-p">Keine importierten Dienste gefunden.</p>')+
+   (months.some(m=>m>now)?'<div class="ac" style="margin-top:10px"><button type="button" class="bt" data-x="fut">Alle zukünftigen Monate auswählen</button></div>':'')+
+   '<div class="ac"><button type="button" class="bt pr" data-x="rm"'+(sel.size?'':' disabled')+'>'+(sel.size?'Dienste aus '+sel.size+(sel.size===1?' Monat':' Monaten')+' entfernen':'Monate auswählen')+'</button></div></div>');
+  DS.wire(node,{back:()=>DS.swap(intro(),-1),
+   tg:b=>{const m=b.dataset.m;sel.has(m)?sel.delete(m):sel.add(m);DS.swap(shiftsView(sel),0)},
+   fut:()=>{months.filter(m=>m>now).forEach(m=>sel.add(m));DS.swap(shiftsView(sel),0)},
+   rm:b=>{b.disabled=true;let n=0;for(const k of ks){if(!sel.has(k.slice(0,7)))continue;const old=u.prev[k];if(old)data.shifts[k]=old;else delete data.shifts[k];delete u.prev[k];if(u.titles)delete u.titles[k];n++}
+    let ok=false;try{ok=persist()!==false}catch(e){}refresh();toast(ok?n+' importierte Dienste entfernt':'Speichern fehlgeschlagen');DS.swap(shiftsView(),0)}});
+  return node}
  /* ---------- Willkommens-Frage nach der ersten Einrichtung ---------- */
  function welcomeView(){const node=el('<div>'+DS.head('Willkommen','Kalender mitnehmen?')+
    '<p class="ip-p">Nutzt du bisher einen anderen Kalender – z. B. FamilyWall, Google, den iPhone-Kalender oder Supershift? Dann kannst du deine Termine und Dienste jetzt übernehmen, statt alles neu einzutragen.</p>'+
