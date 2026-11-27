@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.95';
+ const VERSION='1.0.96';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -64,7 +64,8 @@
  const dayFmt=new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'numeric',month:'long'});/* v1.0.91: einmal anlegen statt pro Tag */
  function decorate(){const st=data.profile?.state||'NW';const root=$('calendar');if(!root)return;
   for(const b of root.querySelectorAll('.day[data-date]')){const k=b.dataset.date,y=k.slice(0,4),ck=y+st;if(!holCache[ck]){try{holCache[ck]=holidaySet(Number(y),st)}catch(e){holCache[ck]=new Set()}}
-   b.classList.toggle('sx-hol',holCache[ck].has(k));b.querySelector('.sx-ev')?.remove();
+   b.classList.toggle('sx-hol',holCache[ck].has(k));
+   /* v1.0.96: freie Tage – sanft getönt, mit Nachbartagen verbunden */const fr=data.shifts[k]==='O',wd=new Date(k+'T12:00:00').getDay();b.classList.toggle('sx-free',fr);b.classList.toggle('fl',fr&&wd!==1&&data.shifts[addDays(k,-1)]==='O');b.classList.toggle('fr',fr&&wd!==0&&data.shifts[addDays(k,1)]==='O');b.querySelector('.sx-ev')?.remove();
    const c=data.shifts[k],ev=eventsOn(k);const base=dayFmt.format(new Date(k+'T12:00:00'));b.setAttribute('aria-label',base+(c?', '+shiftTitle(c):'')+(ev.length?', '+ev.length+' Termin'+(ev.length>1?'e':''):'')+(window.SchivioWaste?SchivioWaste.cellLabel(k):''));try{window.SchivioWaste?.paint(b,k)}catch(e){}}
   Bars.paint(root)}
  /* Durchgehende Balken für Dienste und Termine (je Woche, in Spuren gestapelt) */

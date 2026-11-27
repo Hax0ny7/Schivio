@@ -159,7 +159,7 @@
  function guess(t){const g=guessRaw(t);return g===''||codes().includes(g)?g:''}
  function guessRaw(t){const k=t.toUpperCase(),m=cfg().map;if(Object.prototype.hasOwnProperty.call(m,k))return m[k];
   for(const c of codes())if(k===shiftTitle(c).toUpperCase())return c;
-  const rules=[[/^(X|FREI|FR|-|–|—|\/|\.|0|AZ|ZA|WF|RT)$/,''],[/^(FB|FORTB|FORTBILDUNG|SCHUL|SEM)/,'T'],[/^(U|UR|URL|URLAUB)$/,'U'],[/^(K|KR|KRANK|AU)$/,'K'],
+  const rules=[[/^(FREI|FR)$/,'O'],[/^(X|-|–|—|\/|\.|0|AZ|ZA|WF|RT)$/,''],[/^(FB|FORTB|FORTBILDUNG|SCHUL|SEM)/,'T'],[/^(U|UR|URL|URLAUB)$/,'U'],[/^(K|KR|KRANK|AU)$/,'K'],
    [/^(N|ND|NA|NACHT)/,'N'],[/^(S|SD|SP|SPÄT|SPAET)/,'S'],[/^(F|FD|FRÜH|FRUEH|E|ED)/,'F']];
   for(const [re,c] of rules)if(re.test(k))return c;
   return ''}

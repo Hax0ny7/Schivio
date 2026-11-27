@@ -16,7 +16,7 @@
  const MIN_SLOT=120;               // freie Zeit erst ab 2 Stunden
  const BUF=30;                     // Weg zur Arbeit / nach Hause
  const REST=390;                   // nach Nachtdienst: Schlaf (6,5 Std. ab Dienstende)
- const FREE_CODES=['U','A'];       // Urlaub, Überstundenabbau = frei
+ const FREE_CODES=['U','A','O'];       // Urlaub, Überstundenabbau = frei
  const BUSY_CODES=['K','T'];       // Krank, Fortbildung = ganzer Tag belegt
  const tmpl=c=>data.templates?.[c]||data.customShifts?.[c]||null;
 

@@ -107,7 +107,7 @@
  /* nur eindeutige Fälle vorschlagen – „Fitness“ ist kein Frühdienst */
  function guess(t){const u=t.trim().toUpperCase();const m=cfg().map;if(Object.prototype.hasOwnProperty.call(m,u))return m[u];
   for(const c of codes()){const n=String(shiftTitle(c)).toUpperCase();if(u===n||u===c)return c}
-  const rules=[[/^(FRÜH|FRUEH)(DIENST|SCHICHT)?\b/,'F'],[/^(SPÄT|SPAET)(DIENST|SCHICHT)?\b/,'S'],[/^NACHT(DIENST|SCHICHT)?\b/,'N'],[/^URLAUB\b/,'U'],[/^(KRANK|AU)\b/,'K'],[/^(FORTBILDUNG|SCHULUNG)\b/,'T']];
+  const rules=[[/^(FRÜH|FRUEH)(DIENST|SCHICHT)?\b/,'F'],[/^(SPÄT|SPAET)(DIENST|SCHICHT)?\b/,'S'],[/^NACHT(DIENST|SCHICHT)?\b/,'N'],[/^URLAUB\b/,'U'],[/^(KRANK|AU)\b/,'K'],[/^(FORTBILDUNG|SCHULUNG)\b/,'T'],[/^(FREI|DIENSTFREI|FREIER TAG)\b/,'O']];
   for(const [re,c] of rules)if(re.test(u))return codes().includes(c)?c:'';return 'ev'}
  const optList=(v)=>'<option value="ev"'+(v==='ev'?' selected':'')+'>Als Termin</option>'+codes().map(c=>'<option value="'+esc(c)+'"'+(c===v?' selected':'')+'>Dienst: '+esc(shiftTitle(c))+'</option>').join('')+'<option value="skip"'+(v==='skip'?' selected':'')+'>Nicht übernehmen</option>';
 

@@ -19,7 +19,7 @@
  const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
  const MON3=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
  const dShort=k=>{const d=toDate(k);return WD[d.getDay()]+'., '+d.getDate()+'. '+MON3[d.getMonth()]+' '+d.getFullYear()};
- const KEEP=['U','K','T'];/* werden nie überschrieben */
+ const KEEP=['U','K','T','O'];/* werden nie überschrieben */
  const codes=()=>typeof orderedPlannerCodes==='function'?orderedPlannerCodes().filter(c=>!KEEP.includes(c)):['F','S','N','X','A'];
  const title=c=>c?shiftTitle(c):'Frei';
  const color=c=>c?(typeof displayShiftColor==='function'?displayShiftColor(shiftColor(c)):shiftColor(c)):'transparent';
