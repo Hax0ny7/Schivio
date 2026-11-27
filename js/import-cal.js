@@ -110,6 +110,15 @@
   for(const [re,c] of rules)if(re.test(u))return codes().includes(c)?c:'';return 'ev'}
  const optList=(v)=>'<option value="ev"'+(v==='ev'?' selected':'')+'>Als Termin</option>'+codes().map(c=>'<option value="'+esc(c)+'"'+(c===v?' selected':'')+'>Dienst: '+esc(shiftTitle(c))+'</option>').join('')+'<option value="skip"'+(v==='skip'?' selected':'')+'>Nicht übernehmen</option>';
 
+ /* ---------- Diagnose (v1.0.92) ---------- */
+ const MON=k=>toDate(k).toLocaleDateString('de-DE',{month:'short',year:'numeric'});
+ function storeInfo(){let all=0,own=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);const n=(localStorage.getItem(k)||'').length;all+=n;if(k==='schivio-v01')own=n}}catch(e){}
+  const imp=Object.values(data.events||{}).reduce((n,l)=>n+(Array.isArray(l)?l.filter(e=>e&&e.src==='import').length:0),0);
+  return {pct:Math.round(all/5e6*100),imp}}/* Browser erlauben meist ca. 5 Mio. Zeichen */
+ /* Was steckt in der Datei? – Zeitraum, Einträge je Jahr, Wiederholungen, unlesbare Einträge */
+ function fileStats(p){let lo='',hi='',rec=0,bad=0,canc=0,noUid=0;const yr={};
+  for(const e of p.evs){if(!e.a||!e.title){bad++;continue}if(e.cancel){canc++;continue}if(!e.uid)noUid++;const k=e.a.k;if(!lo||k<lo)lo=k;if(!hi||k>hi)hi=k;const y=k.slice(0,4);yr[y]=(yr[y]||0)+1;if(e.rrule)rec++}
+  return {lo,hi,rec,bad,canc,noUid,yr}}
  /* ---------- Ablauf ---------- */
  let st=null,busy=false;
  function intro(){const u=data.calImportUndo||Object.values(data.events||{}).some(l=>Array.isArray(l)&&l.some(e=>e&&e.src==='import'));
@@ -120,6 +129,7 @@
    '<p class="ip-hint" data-lh hidden></p>'+
    '<p class="ip-p" style="margin-top:18px"><b style="color:var(--sx-text)">So bekommst du die Datei</b></p>'+
    '<div class="ls">'+SRC.map(([id,t,h])=>'<details class="r ci-how"><summary><b>'+esc(t)+'</b></summary><small>'+esc(h)+'</small></details>').join('')+'</div>'+
+   (()=>{const i=storeInfo();return '<p class="ip-hint">Übernommene Termine im Kalender: <b>'+i.imp+'</b> · Speicher ca. '+i.pct+' % belegt'+(i.pct>=85?' – <b>fast voll</b>':'')+'</p>'})()+
    (u?'<button type="button" class="ip-undo" data-x="undo">Kalender-Import rückgängig machen<small>Entfernt alle übernommenen Termine und stellt deine Dienste wieder her</small></button>':'')+
    '<p class="ip-hint">Termine aus der Datei werden einmalig kopiert. Änderungen im alten Kalender kommen danach nicht automatisch nach Schivio.</p></div>');
   DS.wire(node,{pick:()=>pickFile(),undo:()=>undo(),link:b=>loadLink(node,b)});
@@ -148,7 +158,8 @@
  function rangeView(){compute();const n=st.items.length;
   const node=el('<div>'+DS.head('Kalender übernehmen','Zeitraum',{back:true})+
    '<p class="ip-p"><b style="color:var(--sx-text)">'+esc(st.p.cal||st.name)+'</b> · '+st.p.evs.length+' Einträge in der Datei'+(st.p.evs.some(e=>e.rrule)?', wiederkehrende Termine werden einzeln eingetragen':'')+'.</p>'+
-   '<div class="vp-q" style="padding:0"><b>Welche Termine sollen mit?</b><div class="vp-seg" role="radiogroup">'+RANGES.map(([v,l])=>'<button type="button" role="radio" data-x="rg" data-v="'+v+'" aria-checked="'+(st.range===v)+'" class="'+(st.range===v?'on':'')+'">'+l+'</button>').join('')+'</div></div>'+
+   (()=>{const f=st.stats||(st.stats=fileStats(st.p));return '<div class="ls"><div class="r"><span><b>Datei reicht von '+(f.lo?MON(f.lo):'–')+' bis '+(f.hi?MON(f.hi):'–')+'</b><small>'+Object.keys(f.yr).sort().map(y=>y+': '+f.yr[y]).join(' · ')+(f.rec?' · '+f.rec+' wiederkehrend':'')+(f.bad?' · '+f.bad+' ohne Titel/Datum':'')+(f.canc?' · '+f.canc+' abgesagt':'')+'</small></span></div></div>'})()+
+   '<div class="vp-q" style="padding:14px 0 0"><b>Welche Termine sollen mit?</b><div class="vp-seg" role="radiogroup">'+RANGES.map(([v,l])=>'<button type="button" role="radio" data-x="rg" data-v="'+v+'" aria-checked="'+(st.range===v)+'" class="'+(st.range===v?'on':'')+'">'+l+'</button>').join('')+'</div></div>'+
    '<div class="vp-cost"><b data-n>'+n+'</b><span>Termine im Zeitraum (bis 2 Jahre voraus)</span></div>'+
    '<p class="ip-hint">Ältere Termine brauchst du meist nicht – weniger Einträge halten Schivio schnell.</p>'+
    '<div class="ac"><button type="button" class="bt pr" data-x="next"'+(n?'':' disabled')+'>Weiter</button></div></div>');
@@ -213,7 +224,8 @@
   DS.wire(node,{back:()=>DS.swap(intro(),-1),go:b=>{b.disabled=true;b.textContent='Wird entfernt …';setTimeout(()=>{
    for(const k of Object.keys(data.events||{})){const l=data.events[k];if(!Array.isArray(l))continue;const keep=l.filter(e=>!(e&&e.src==='import'));if(keep.length)data.events[k]=keep;else delete data.events[k]}
    for(const [k,old] of Object.entries(data.calImportUndo?.prev||{})){if(old)data.shifts[k]=old;else delete data.shifts[k]}
-   delete data.calImportUndo;try{persist()}catch(e){}refresh();toast('Kalender-Import rückgängig gemacht');DS.swap(intro(),-1)},60)}});
+   delete data.calImportUndo;let ok=false;try{ok=persist()!==false}catch(e){}refresh();
+   if(ok){toast('Kalender-Import rückgängig gemacht');DS.swap(intro(),-1)}else{b.disabled=false;b.textContent='Entfernen';toast('Speichern fehlgeschlagen – der Gerätespeicher ist voll. Bitte Screenshot an Claude schicken.')}},60)}});
   DS.swap(node,1)}
 
  /* ---------- Willkommens-Frage nach der ersten Einrichtung ---------- */
