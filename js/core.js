@@ -50,7 +50,7 @@ function monthStats(y,m){let worked=0,credit=0,absence=0;const target=monthTarge
 function monthHours(y,m){return monthStats(y,m).total}
 function fmtHours(n){return n.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})}
 function monthKey(y,m){return dateKey(y,m,1).slice(0,7)}
-function isComplete(y,m){return monthKey(y,m)<monthKey(new Date().getFullYear(),new Date().getMonth())}
+
 function hasEntriesOrComplete(y,m){return monthHasEntries(y,m)||Object.prototype.hasOwnProperty.call(data.monthTargets||{},monthKey(y,m))||Number(data.hourPayouts?.[monthKey(y,m)]||0)!==0}
 function displaySaldo(y,m){const t=monthTarget(y,m);if(!t)return null;if(!hasEntriesOrComplete(y,m))return null;return monthHours(y,m)-t.target}
 function displaySaldoText(value){return value===null?'–':(value>=0?'+':'')+fmtHours(value)+' h'}
@@ -210,7 +210,7 @@ data.customShifts||={};data.shiftMeta||={};
 let plannerActive=false,plannerShift='F';
 function applyPlanner(keys){if(!keys?.length)return;for(const k of keys){if(plannerShift)data.shifts[k]=plannerShift;else delete data.shifts[k]}persist();selectionStart='';selectionEnd='';updateSelection();render()}
 function orderedPlannerCodes(){const all=['F','S','N','X','U','T','A','O',...Object.keys(data.customShifts)];const saved=Array.isArray(data.plannerOrder)?data.plannerOrder:[];return [...saved.filter(c=>all.includes(c)),...all.filter(c=>!saved.includes(c))]}
-function movePlannerCode(from,to){if(!from||!to||from===to)return;const arr=orderedPlannerCodes();const a=arr.indexOf(from),b=arr.indexOf(to);if(a<0||b<0)return;arr.splice(a,1);arr.splice(b,0,from);data.plannerOrder=arr;persist();renderPlannerItems()}
+
 let suppressPlannerClick=false;
 function renderPlannerItems(){const root=$('plannerItems');root.replaceChildren();const entries=orderedPlannerCodes().map(id=>[id,shiftTitle(id)]).concat([['','✕ Löschen']]);for(const [id,name] of entries){const b=document.createElement('button');b.type='button';b.textContent=name;b.dataset.code=id;b.className=id===plannerShift?'active':'';if(id)b.style.borderLeft='5px solid '+displayShiftColor(shiftColor(id));b.onclick=e=>{if(suppressPlannerClick){e.preventDefault();return}plannerShift=id;renderPlannerItems()};if(id){
  /* v1.0.29: Langes Drücken + Ziehen sortiert Schichten (Touch & Maus). */
