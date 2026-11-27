@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.99';
+ const VERSION='1.1.0';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -284,9 +284,27 @@
  window.SchivioPro=PRO;
  openAgenda=function(day){DS.open(day)};
 
- /* ---------- Backup inkl. Termine ---------- */
- const exp=$('exportData');if(exp){const orig=exp.onclick;exp.onclick=function(ev){const js=JSON.stringify;JSON.stringify=function(v,...r){if(v&&typeof v==='object'&&v.version&&v.shifts){v.events=data.events||{};v.icsReminder=data.icsReminder}return js.call(this,v,...r)};try{orig?.call(this,ev)}finally{JSON.stringify=js}data.lastBackup=new Date().toISOString();persist();MX.render()}}
- const imp=$('importFile');if(imp){const orig=imp.onchange;imp.onchange=async function(ev){const f=ev.target.files?.[0];let extra=null;try{if(f&&f.size<2000000)extra=JSON.parse(await f.text())}catch(e){}const before=data.shifts;await orig?.call(this,ev);if(extra&&data.shifts!==before){data.events=extra.events&&typeof extra.events==='object'&&!Array.isArray(extra.events)?extra.events:{};if('icsReminder' in extra)data.icsReminder=extra.icsReminder;persist();render();MX.render()}}}
+ /* ---------- Backup (v1.1.0): komplette Daten statt einzelner Felder ----------
+    Vorher fehlten u. a. Urlaubsplaner, Müllkalender, Steuer-Helfer, Schichtmuster, eigene Gehaltswerte und Design;
+    Termine kamen nur über einen Umweg dazu, und große Backups (> 2 MB) ließen sich nicht wiederherstellen. */
+ const SKIP_BACKUP=['importUndo','patternUndo'];/* Rückgängig-Zwischenstände werden nicht gesichert */
+ const exp=$('exportData');if(exp){exp.onclick=function(){const out={};for(const [k,v] of Object.entries(data))if(!SKIP_BACKUP.includes(k))out[k]=v;
+   out.version=11;out.app='Schivio';out.exportedAt=new Date().toISOString();
+   const now=new Date(),name='Schivio-Backup-'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'.json';
+   const url=URL.createObjectURL(new Blob([JSON.stringify(out)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+   const st=$('backupStatus');if(st)st.textContent='Backup-Datei wurde zum Download angeboten.';data.lastBackup=now.toISOString();persist();MX.render()}}
+ const imp=$('importFile');if(imp){const legacy=imp.onchange;imp.onchange=async function(ev){const f=ev.target.files?.[0];if(!f)return;const st=$('backupStatus');
+   let obj=null;try{if(f.size>30e6)throw Error('Datei zu groß');obj=JSON.parse(await f.text());if(!obj||typeof obj.shifts!=='object'||Array.isArray(obj.shifts))throw Error('Das ist kein Schivio-Backup')}catch(err){if(st)st.textContent='Import fehlgeschlagen: '+err.message;toast('Import fehlgeschlagen: '+err.message);ev.target.value='';return}
+   /* ältere Backups (bis Version 10) über den bisherigen Weg einlesen, Termine dazu */
+   if(!(Number(obj.version)>=11)){await legacy?.call(this,ev);data.events=obj.events&&typeof obj.events==='object'&&!Array.isArray(obj.events)?obj.events:(data.events||{});if('icsReminder' in obj)data.icsReminder=obj.icsReminder;persist();render();MX.render();return}
+   const when=obj.exportedAt?new Date(obj.exportedAt).toLocaleDateString('de-DE'):'';
+   if(!confirm('Alle aktuellen Daten durch dieses Backup'+(when?' vom '+when:'')+' ersetzen?')){ev.target.value='';return}
+   const before=JSON.stringify(data);delete obj.version;delete obj.app;delete obj.exportedAt;
+   for(const k of Object.keys(data))delete data[k];Object.assign(data,obj);
+   try{migrate()}catch(e){}
+   let ok=false;try{ok=persist()!==false}catch(e){}
+   if(!ok){const old=JSON.parse(before);for(const k of Object.keys(data))delete data[k];Object.assign(data,old);try{persist()}catch(e){}toast('Backup konnte nicht gespeichert werden – Speicher voll?');ev.target.value='';return}
+   toast('Backup wiederhergestellt');setTimeout(()=>location.reload(),600)}}
 
  /* ---------- Kalenderdatei (.ics) ---------- */
  function makeICS(){const remind=data.icsReminder!==false;const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Schivio//Dienstplan//DE','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Schivio'];

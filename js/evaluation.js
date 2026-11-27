@@ -43,7 +43,7 @@
 
  /* Mitte */
  const amount=el('div','sv-amount','–');
- const eyebrow=center.querySelector('#wheelEyebrow'),info=center.querySelector('#wheelInfo'),srcAmount=center.querySelector('#wheelAmount');
+ const eyebrow=center.querySelector('#wheelEyebrow'),info=center.querySelector('#wheelInfo');center.querySelector('#wheelAmount')?.remove();
  eyebrow.after(amount);
  const hrs=el('div','sv-hrs');const more=el('div','sv-more','Details ›');
  info.after(hrs,more);
@@ -76,11 +76,13 @@
   const step=now=>{const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3);amount.textContent=euro(from+(target-from)*e)+suffix;if(p<1)raf=requestAnimationFrame(step)};
   shownAmount=target;raf=requestAnimationFrame(step)}
  const salaryOn=()=>!!data.setupOptions?.salaryEnabled;
- function syncCenter(){
-  if(salaryOn()){countTo(srcAmount.textContent);info.textContent=(info.textContent||'').replace(/\s*·\s*Details\s*$/,'');more.hidden=false}
- }
- new MutationObserver(()=>{if(salaryOn())syncCenter()}).observe(srcAmount,{childList:true,characterData:true,subtree:true});
- new MutationObserver(()=>{if(/·\s*Details\s*$/.test(info.textContent))info.textContent=info.textContent.replace(/\s*·\s*Details\s*$/,'')}).observe(info,{childList:true,characterData:true,subtree:true});
+ /* v1.1.0: Gehalt für die Mitte direkt berechnen (vorher über das alte, versteckte Gehaltsfenster) – gleiche Summe wie in „Gehalt im Monat“ */
+ function syncCenter(){const y=shown.getFullYear(),m=shown.getMonth();let r=null;try{r=SchivioPay.compute(y,m)}catch(e){}
+  more.hidden=false;
+  if(!r||!(r.base>0)){eyebrow.textContent='Tarifliches Grundentgelt';cancelAnimationFrame(raf);amount.textContent='–';shownAmount=null;info.textContent=(r&&r.reason)||'Tarifprofil einrichten';return}
+  const al=Math.round((window.SchivioAllow?.sum?.()||0)*100)/100,z=r.zuschlag?r.zuschlag.total:null,tot=r.base+al+(z||0);
+  eyebrow.textContent=z!==null?'Brutto · Prognose':'Brutto · Zwischensumme';
+  countTo(euro(tot)+(z!==null?'':' +'));info.textContent=z!==null?'inkl. Zuschläge':'Zuschläge noch offen'}
 
  function pt(r,deg){const a=(deg-90)*Math.PI/180;return [C+r*Math.cos(a),C+r*Math.sin(a)]}
  function arc(r,a0,a1){const [x0,y0]=pt(r,a0),[x1,y1]=pt(r,a1);return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 ${a1-a0>180?1:0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`}
