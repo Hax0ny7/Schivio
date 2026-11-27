@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.1.2';
+ const VERSION='1.1.3';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=SU.esc;
@@ -34,6 +34,12 @@
  const EV_COLORS=['#3b82f6','#14b8a6','#f59e0b','#ef4444','#8b5cf6','#ec4899','#64748b'];
  const ABSENCE=['U','K','T','A'];
  data.events=data.events&&typeof data.events==='object'&&!Array.isArray(data.events)?data.events:{};
+ /* v1.1.3: Startmonat fürs Zeitkonto festlegen, falls noch keiner gesetzt ist – vom aktuellen Monat rückwärts,
+    solange ein Monat gut gefüllt ist (mind. 12 Tage mit Dienst/Frei/Urlaub …); lückenhafte ältere Monate zählen nicht mit */
+ if(data.balanceStart===undefined){const now=new Date();let y=now.getFullYear(),m=now.getMonth(),start=monthKey(y,m);
+  for(let i=0;i<120;i++){const mk=monthKey(y,m);let n=0;for(const k in data.shifts)if(k.startsWith(mk)&&data.shifts[k])n++;
+   if(i>0&&n<12)break;start=mk;m--;if(m<0){m=11;y--}}
+  data.balanceStart=start;try{persist()}catch(e){}}
  /* v1.0.91: Reparatur nach mehrfach ausgelöstem Kalender-Import – identische importierte Termine am selben Tag nur einmal behalten */
  (()=>{let rm=0;for(const [k,list] of Object.entries(data.events)){if(!Array.isArray(list))continue;const seen=new Set();const keep=list.filter(e=>{if(!e||e.src!=='import')return true;const s=[e.uid||'',(e.title||'').trim().toLowerCase(),e.allDay?1:0,e.start||'',e.end||'',e.endDate||''].join('|');if(seen.has(s)){rm++;return false}seen.add(s);return true});if(keep.length!==list.length)data.events[k]=keep}if(rm){try{persist()}catch(e){}setTimeout(()=>{try{window.SchivioToast?.(rm+' doppelte Termine entfernt')}catch(e){}},1500)}})();
  const toast=(()=>{let t,n;return msg=>{if(!n){n=document.createElement('div');n.className='sx-toast';n.setAttribute('role','status');document.body.append(n)}n.textContent=msg;n.classList.add('on');clearTimeout(t);t=setTimeout(()=>n.classList.remove('on'),3200)}})();

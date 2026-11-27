@@ -97,3 +97,9 @@ body[data-theme="light"] .sk .add{color:var(--sx-b)!important}
 .sk .tip{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px 14px;border-radius:16px;background:var(--sx-card);border:1px solid var(--sx-line);font-size:13px;line-height:1.45;color:var(--sx-muted)}
 .sk .tip svg{width:18px;height:18px;flex:none;color:var(--sx-a);margin-top:1px}
 .sx-swipe{transition:transform .28s var(--sx-ease)!important}
+/* v1.1.3: Startmonat des Zeitkontos */
+.sx-ds .ls .r.bsr{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sx-ds .ls .r.bsr>span:first-child{flex:1;min-width:0}
+.sx-ds .ls .r.bsr .bsn{display:flex!important;flex-direction:row!important;gap:8px;flex:none;margin-left:auto}
+.sx-ds .ls .r.bsr .bsn button{width:42px;height:42px;border-radius:12px;border:1px solid var(--sx-line);background:transparent;color:var(--sx-text);font-size:20px;font-weight:700;cursor:pointer;display:grid;place-items:center;padding:0}
+.sx-ds .ls .r.bsr .bsn button:active{transform:scale(.94)}

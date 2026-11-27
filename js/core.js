@@ -52,7 +52,9 @@ function fmtHours(n){return n.toLocaleString('de-DE',{minimumFractionDigits:1,ma
 function monthKey(y,m){return dateKey(y,m,1).slice(0,7)}
 
 function hasEntriesOrComplete(y,m){return monthHasEntries(y,m)||Object.prototype.hasOwnProperty.call(data.monthTargets||{},monthKey(y,m))||Number(data.hourPayouts?.[monthKey(y,m)]||0)!==0}
-function displaySaldo(y,m){const t=monthTarget(y,m);if(!t)return null;if(!hasEntriesOrComplete(y,m))return null;return monthHours(y,m)-t.target}
+/* v1.1.3: Zeitkonto zählt erst ab einem Startmonat – vorher zählte jeder Monat mit irgendeinem Eintrag (z. B. aus einem Kalender-Import) mit vollem Soll */
+function balanceStart(){return /^\d{4}-\d\d$/.test(data.balanceStart||'')?data.balanceStart:''}
+function displaySaldo(y,m){const t=monthTarget(y,m);if(!t)return null;if(balanceStart()&&monthKey(y,m)<balanceStart())return null;if(!hasEntriesOrComplete(y,m))return null;return monthHours(y,m)-t.target}
 function displaySaldoText(value){return value===null?'–':(value>=0?'+':'')+fmtHours(value)+' h'}
 function monthHasEntries(y,m){const prefix=dateKey(y,m,1).slice(0,7);return Object.keys(data.shifts).some(k=>k.startsWith(prefix))||Object.prototype.hasOwnProperty.call(data.adjustments,prefix)}
 function carryAt(y,m){
@@ -62,7 +64,7 @@ function carryAt(y,m){
   const keys=new Set();
   for(const k of Object.keys(data.shifts||{}))if(/^\d{4}-\d\d-\d\d$/.test(k))keys.add(k.slice(0,7));
   for(const obj of [data.adjustments,data.monthTargets,data.hourPayouts])for(const k of Object.keys(obj||{}))if(/^\d{4}-\d\d$/.test(k))keys.add(k);
-  const months=[...keys].filter(k=>k<=end).sort();
+  const st=balanceStart();const months=[...keys].filter(k=>k<=end&&(!st||k>=st)).sort();
   let sum=opening,count=0,missing=0;
   for(const k of months){const yy=Number(k.slice(0,4)),mm=Number(k.slice(5,7))-1,t=monthTarget(yy,mm);
     if(t){sum+=monthHours(yy,mm)-t.target;count++}else missing++;
