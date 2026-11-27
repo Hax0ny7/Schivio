@@ -3,8 +3,8 @@
  const DS=window.SchivioDay,toast=window.SchivioToast||(()=>{});if(!DS)return;
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const el=html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
+ const esc=SU.esc;
+ const el=SU.el;
  const H=v=>fmtHours(v)+' h';
  const sgn=v=>v===null||v===undefined?'–':(v>=0.05?'+':'')+fmtHours(v)+' h';
  const cls=v=>v===null?'':v>=0.05?'pos':v<=-0.05?'neg':'';

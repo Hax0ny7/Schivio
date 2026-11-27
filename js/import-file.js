@@ -8,13 +8,13 @@
    Gespeichert werden nur die übernommenen Dienste, die Kürzel-Zuordnung und das Namens-Stichwort. */
 (function(){
  const DS=window.SchivioDay,toast=window.SchivioToast||(()=>{});if(!DS)return;
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const el=html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
- const pad2=n=>String(n).padStart(2,'0');
- const key=d=>d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
- const toDate=k=>new Date(k+'T12:00:00');
- const addDays=(k,n)=>{const t=toDate(k);t.setDate(t.getDate()+n);return key(t)};
- const today=()=>key(new Date());
+ const esc=SU.esc;
+ const el=SU.el;
+ const pad2=SU.pad2;
+ const key=SU.key;
+ const toDate=SU.toDate;
+ const addDays=SU.addDays;
+ const today=SU.today;
  const MON=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
  const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
  const IC={

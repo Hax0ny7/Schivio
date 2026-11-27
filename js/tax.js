@@ -2,12 +2,12 @@
    Hinweis: Keine Steuerberatung. Alle Werte werden aus den eingetragenen Diensten ermittelt. */
 (function(){
  const DS=window.SchivioDay,toast=window.SchivioToast||(()=>{});if(!DS)return;
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const el=html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
- const pad2=n=>String(n).padStart(2,'0');
- const key=d=>d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
- const addDays=(k,n)=>{const t=new Date(k+'T12:00:00');t.setDate(t.getDate()+n);return key(t)};
- const today=()=>key(new Date());
+ const esc=SU.esc;
+ const el=SU.el;
+ const pad2=SU.pad2;
+ const key=SU.key;
+ const addDays=SU.addDays;
+ const today=SU.today;
  const eur=v=>(Math.round((Number(v)||0)*100)/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
  const eur0=v=>Math.round(Number(v)||0).toLocaleString('de-DE')+' €';
  const num=v=>{const n=parseFloat(String(v??'').replace(/\./g,'').replace(',','.'));return isFinite(n)&&n>0?n:0};

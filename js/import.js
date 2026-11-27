@@ -9,9 +9,9 @@
 (function(){
  const DS=window.SchivioDay,toast=window.SchivioToast||(()=>{}),Lib=window.SchivioImportLib;if(!DS||!Lib||!Lib.grid)return;
  const OCR=Lib.ocr,G=Lib.grid;
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const el=html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
- const pad2=n=>String(n).padStart(2,'0');
+ const esc=SU.esc;
+ const el=SU.el;
+ const pad2=SU.pad2;
  const pct=(v,t)=>(Math.max(0,v)/t*100).toFixed(3)+'%';
  const MON=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
  const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];

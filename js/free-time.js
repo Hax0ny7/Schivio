@@ -2,9 +2,9 @@
    v1.0.62: Teilen – freie Zeiten finden und freie Tage als PDF (ohne Dienste und Termine) */
 (function(){
  const DS=window.SchivioDay,toast=window.SchivioToast||(()=>{});if(!DS)return;
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const el=html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
- const pad2=n=>String(n).padStart(2,'0');
+ const esc=SU.esc;
+ const el=SU.el;
+ const pad2=SU.pad2;
  const key=(y,m,d)=>y+'-'+pad2(m+1)+'-'+pad2(d);
  const addDays=(k,n)=>{const t=new Date(k+'T12:00:00');t.setDate(t.getDate()+n);return key(t.getFullYear(),t.getMonth(),t.getDate())};
  const mm=t=>{const v=/^(\d\d):(\d\d)$/.exec(t||'');return v?Number(v[1])*60+Number(v[2]):null};

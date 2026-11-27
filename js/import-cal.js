@@ -8,13 +8,13 @@
    Datenschutz: Die Datei wird nur im Arbeitsspeicher gelesen; gespeichert werden nur die übernommenen Termine und Dienste. */
 (function(){
  const DS=window.SchivioDay,toast=window.SchivioToast||(()=>{});if(!DS)return;
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const el=html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
- const pad2=n=>String(n).padStart(2,'0');
- const key=d=>d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
- const toDate=k=>new Date(k+'T12:00:00');
- const addDays=(k,n)=>{const t=toDate(k);t.setDate(t.getDate()+n);return key(t)};
- const today=()=>key(new Date());
+ const esc=SU.esc;
+ const el=SU.el;
+ const pad2=SU.pad2;
+ const key=SU.key;
+ const toDate=SU.toDate;
+ const addDays=SU.addDays;
+ const today=SU.today;
  const MAX_SERIES=800,MAX_EVENTS=8000,COLOR='#14b8a6';
  const IC={
   file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5 12 18l2.5-2.5"/></svg>',

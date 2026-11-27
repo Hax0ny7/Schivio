@@ -16,7 +16,7 @@
   {id:'wald',name:'Wald',sub:'Ruhiges Grün mit Baum',base:'dark',meta:'#141d17',pro:true}];
  const NEON=[['anthracite','Türkis','#3ee6da'],['emerald','Smaragd','#16924c'],['blue','Blau','#1977b9'],['violet','Violett','#8654ba'],['amber','Gold','#ba8731'],['teal','Petrol','#148f8c'],['rose','Rosé','#b45d79']];
  const byId=id=>SKINS.find(s=>s.id===id)||SKINS[0];
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const esc=SU.esc;
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
  function current(){if(data.skin&&SKINS.some(s=>s.id===data.skin))return data.skin;return data.palette==='light'?'klar':'neon'}

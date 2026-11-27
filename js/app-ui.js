@@ -1,9 +1,9 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.1.0';
+ const VERSION='1.1.1';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const esc=SU.esc;
  const el=(html)=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
  const todayKey=()=>{const n=new Date();return dateKey(n.getFullYear(),n.getMonth(),n.getDate())};
  const ICON={
@@ -48,7 +48,7 @@
  const longTitle=c=>(!data.shiftMeta?.[c]?.name&&!data.customShifts?.[c]&&LONG[c])||shiftTitle(c);
  function shiftDetail(c){const t=tmplOf(c);if(isAllDay(c))return ABSENCE.includes(c)?'Ganztägig · wird gutgeschrieben':'Ganztägig';let s=t.start+' – '+t.end+' Uhr';const d=typeof duration==='function'?duration(t):NaN;if(t.bd?.stage==='RB')s+=' · Rufbereitschaft';else{if(Number.isFinite(d))s+=' · '+hrs(d)+' h';if(Number(t.break))s+=' · Pause '+t.break+' Min.'}return s}
  const evList=k=>Array.isArray(data.events[k])?data.events[k]:[];
- const addDays=(k,n)=>{const t=new Date(k+'T12:00:00');t.setDate(t.getDate()+n);return dateKey(t.getFullYear(),t.getMonth(),t.getDate())};
+ const addDays=SU.addDays;
  const dayDiff=(a,b)=>Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5);
  let evIdx=null,evSig='',evTick=false;
  /* v1.0.91: Signatur nur einmal pro Durchlauf und ohne Notizen/Bilder – vorher wurde für jeden Kalendertag der komplette Terminbestand serialisiert */

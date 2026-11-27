@@ -1,13 +1,13 @@
 /* v1.0.65: Müllkalender – Tonnen als kleine Symbole im Kalender, Import (.ics) oder selbst eintragen */
 (function(){
  const DS=window.SchivioDay,toast=window.SchivioToast||(()=>{});if(!DS)return;
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const el=html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
- const pad2=n=>String(n).padStart(2,'0');
- const key=d=>d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
- const addDays=(k,n)=>{const t=new Date(k+'T12:00:00');t.setDate(t.getDate()+n);return key(t)};
+ const esc=SU.esc;
+ const el=SU.el;
+ const pad2=SU.pad2;
+ const key=SU.key;
+ const addDays=SU.addDays;
  const diffDays=(a,b)=>Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5);
- const today=()=>key(new Date());
+ const today=SU.today;
  const dLabel=k=>new Date(k+'T12:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'numeric'}).replace(/\.,/,',');
  const dLong=k=>new Date(k+'T12:00:00').toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
  const save=()=>{try{persist()}catch(e){}try{render()}catch(e){}try{window.SchivioMore?.render?.()}catch(e){}};
