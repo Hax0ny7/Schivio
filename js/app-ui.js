@@ -1,6 +1,6 @@
 /* v1.0.55: Kalender-Optik, Stift-Menü, Tagesansicht mit Terminen, neuer Reiter „Mehr“ */
 (function(){
- const VERSION='1.0.90';
+ const VERSION='1.0.91';
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(7)}catch(e){}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -34,6 +34,8 @@
  const EV_COLORS=['#3b82f6','#14b8a6','#f59e0b','#ef4444','#8b5cf6','#ec4899','#64748b'];
  const ABSENCE=['U','K','T','A'];
  data.events=data.events&&typeof data.events==='object'&&!Array.isArray(data.events)?data.events:{};
+ /* v1.0.91: Reparatur nach mehrfach ausgelöstem Kalender-Import – identische importierte Termine am selben Tag nur einmal behalten */
+ (()=>{let rm=0;for(const [k,list] of Object.entries(data.events)){if(!Array.isArray(list))continue;const seen=new Set();const keep=list.filter(e=>{if(!e||e.src!=='import')return true;const s=[e.uid||'',(e.title||'').trim().toLowerCase(),e.allDay?1:0,e.start||'',e.end||'',e.endDate||''].join('|');if(seen.has(s)){rm++;return false}seen.add(s);return true});if(keep.length!==list.length)data.events[k]=keep}if(rm){try{persist()}catch(e){}setTimeout(()=>{try{window.SchivioToast?.(rm+' doppelte Termine entfernt')}catch(e){}},1500)}})();
  const toast=(()=>{let t,n;return msg=>{if(!n){n=document.createElement('div');n.className='sx-toast';n.setAttribute('role','status');document.body.append(n)}n.textContent=msg;n.classList.add('on');clearTimeout(t);t=setTimeout(()=>n.classList.remove('on'),3200)}})();
 
  /* ---------- Hilfen für Dienste, Termine, Feiertage ---------- */
@@ -48,8 +50,10 @@
  const evList=k=>Array.isArray(data.events[k])?data.events[k]:[];
  const addDays=(k,n)=>{const t=new Date(k+'T12:00:00');t.setDate(t.getDate()+n);return dateKey(t.getFullYear(),t.getMonth(),t.getDate())};
  const dayDiff=(a,b)=>Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5);
- let evIdx=null,evSig='';
- function eventsOn(k){const sig=JSON.stringify(data.events);if(!evIdx||sig!==evSig){evSig=sig;evIdx={};for(const [key,list] of Object.entries(data.events||{})){for(const e of evList(key)){const end=e.endDate&&e.endDate>key?e.endDate:key;const n=Math.min(dayDiff(key,end),366);for(let i=0;i<=n;i++){const d=addDays(key,i);(evIdx[d]=evIdx[d]||[]).push({e,key,end,i,n})}}}}return evIdx[k]||[]}
+ let evIdx=null,evSig='',evTick=false;
+ /* v1.0.91: Signatur nur einmal pro Durchlauf und ohne Notizen/Bilder – vorher wurde für jeden Kalendertag der komplette Terminbestand serialisiert */
+ const evSigOf=()=>{let s='';for(const [key,list] of Object.entries(data.events||{})){if(!Array.isArray(list))continue;s+=key+':';for(const e of list)s+=e.id+(e.title||'')+(e.allDay?'g':'')+(e.start||'')+(e.end||'')+(e.endDate||'')+(e.color||'')+',';}return s};
+ function eventsOn(k){let sig=evSig;if(!evTick){evTick=true;queueMicrotask(()=>{evTick=false});sig=evSigOf()}if(!evIdx||sig!==evSig){evSig=sig;evIdx={};for(const [key,list] of Object.entries(data.events||{})){for(const e of evList(key)){const end=e.endDate&&e.endDate>key?e.endDate:key;const n=Math.min(dayDiff(key,end),366);for(let i=0;i<=n;i++){const d=addDays(key,i);(evIdx[d]=evIdx[d]||[]).push({e,key,end,i,n})}}}}return evIdx[k]||[]}
  function holidayName(k){const y=Number(k.slice(0,4));const st=data.profile?.state||'NW';let set;try{set=holidaySet(y,st)}catch(e){return ''}if(!set.has(k))return '';const e=easter(y),off=(n)=>{const t=new Date(e);t.setDate(t.getDate()+n);return dateKey(t.getFullYear(),t.getMonth(),t.getDate())};
   const md=k.slice(5);const fixed={'01-01':'Neujahr','01-06':'Heilige Drei Könige','03-08':'Internationaler Frauentag','05-01':'Tag der Arbeit','08-08':'Augsburger Friedensfest','08-15':'Mariä Himmelfahrt','09-20':'Weltkindertag','10-03':'Tag der Deutschen Einheit','10-31':'Reformationstag','11-01':'Allerheiligen','12-25':'1. Weihnachtsfeiertag','12-26':'2. Weihnachtsfeiertag'};
   if(fixed[md])return fixed[md];const m={[off(-2)]:'Karfreitag',[off(0)]:'Ostersonntag',[off(1)]:'Ostermontag',[off(39)]:'Christi Himmelfahrt',[off(49)]:'Pfingstsonntag',[off(50)]:'Pfingstmontag',[off(60)]:'Fronleichnam'};if(m[k])return m[k];
@@ -57,10 +61,11 @@
 
  /* ---------- Kalender: Feiertage, Termin-Punkte, Navigation ---------- */
  const holCache={};
+ const dayFmt=new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'numeric',month:'long'});/* v1.0.91: einmal anlegen statt pro Tag */
  function decorate(){const st=data.profile?.state||'NW';const root=$('calendar');if(!root)return;
   for(const b of root.querySelectorAll('.day[data-date]')){const k=b.dataset.date,y=k.slice(0,4),ck=y+st;if(!holCache[ck]){try{holCache[ck]=holidaySet(Number(y),st)}catch(e){holCache[ck]=new Set()}}
    b.classList.toggle('sx-hol',holCache[ck].has(k));b.querySelector('.sx-ev')?.remove();
-   const c=data.shifts[k],ev=eventsOn(k);const base=new Date(k+'T12:00:00').toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});b.setAttribute('aria-label',base+(c?', '+shiftTitle(c):'')+(ev.length?', '+ev.length+' Termin'+(ev.length>1?'e':''):'')+(window.SchivioWaste?SchivioWaste.cellLabel(k):''));try{window.SchivioWaste?.paint(b,k)}catch(e){}}
+   const c=data.shifts[k],ev=eventsOn(k);const base=dayFmt.format(new Date(k+'T12:00:00'));b.setAttribute('aria-label',base+(c?', '+shiftTitle(c):'')+(ev.length?', '+ev.length+' Termin'+(ev.length>1?'e':''):'')+(window.SchivioWaste?SchivioWaste.cellLabel(k):''));try{window.SchivioWaste?.paint(b,k)}catch(e){}}
   Bars.paint(root)}
  /* Durchgehende Balken für Dienste und Termine (je Woche, in Spuren gestapelt) */
  const Bars=(()=>{const cache=new WeakMap();let geo=null;

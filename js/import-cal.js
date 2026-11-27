@@ -111,8 +111,8 @@
  const optList=(v)=>'<option value="ev"'+(v==='ev'?' selected':'')+'>Als Termin</option>'+codes().map(c=>'<option value="'+esc(c)+'"'+(c===v?' selected':'')+'>Dienst: '+esc(shiftTitle(c))+'</option>').join('')+'<option value="skip"'+(v==='skip'?' selected':'')+'>Nicht übernehmen</option>';
 
  /* ---------- Ablauf ---------- */
- let st=null;
- function intro(){const u=data.calImportUndo;
+ let st=null,busy=false;
+ function intro(){const u=data.calImportUndo||Object.values(data.events||{}).some(l=>Array.isArray(l)&&l.some(e=>e&&e.src==='import'));
   const node=el('<div>'+DS.head('Tools','Kalender übernehmen')+
    '<p class="ip-p">Nimm deine Termine aus einem anderen Kalender mit – z. B. aus FamilyWall, Google, dem iPhone oder Supershift. Du brauchst dafür eine Kalenderdatei (.ics).</p>'+
    '<button type="button" class="ip-src" data-x="pick"><span class="ii">'+IC.file+'</span><span class="tt"><b>Kalenderdatei auswählen</b><small>.ics oder .ical · bleibt nur auf deinem Handy</small></span></button>'+
@@ -120,7 +120,7 @@
    '<p class="ip-hint" data-lh hidden></p>'+
    '<p class="ip-p" style="margin-top:18px"><b style="color:var(--sx-text)">So bekommst du die Datei</b></p>'+
    '<div class="ls">'+SRC.map(([id,t,h])=>'<details class="r ci-how"><summary><b>'+esc(t)+'</b></summary><small>'+esc(h)+'</small></details>').join('')+'</div>'+
-   (u?'<button type="button" class="ip-undo" data-x="undo">Letzten Kalender-Import rückgängig machen<small>'+u.n+' Einträge vom '+new Date(u.at).toLocaleDateString('de-DE')+'</small></button>':'')+
+   (u?'<button type="button" class="ip-undo" data-x="undo">Kalender-Import rückgängig machen<small>Entfernt alle übernommenen Termine und stellt deine Dienste wieder her</small></button>':'')+
    '<p class="ip-hint">Termine aus der Datei werden einmalig kopiert. Änderungen im alten Kalender kommen danach nicht automatisch nach Schivio.</p></div>');
   DS.wire(node,{pick:()=>pickFile(),undo:()=>undo(),link:b=>loadLink(node,b)});
   return node}
@@ -188,7 +188,7 @@
    (P.ev.length>3000?'<p class="ip-warn">'+IC.warn+'<span>Sehr viele Termine. Wenn der Speicher nicht reicht, wähle einen kürzeren Zeitraum.</span></p>':'')+
    (P.ev.length?'<p class="ip-p" style="margin-top:16px"><b style="color:var(--sx-text)">Nächste Termine</b></p><div class="ls">'+(P.ev.some(o=>o.k>=today())?P.ev.filter(o=>o.k>=today()):P.ev).slice(0,6).map(o=>'<div class="r"><span><b>'+esc(o.title)+'</b><small>'+toDate(o.k).toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+(o.ad?' · ganztägig':' · '+o.s+(o.e?'–'+o.e:'')+' Uhr')+(o.place?' · '+esc(o.place):'')+'</small></span></div>').join('')+'</div>':'')+
    '<div class="ac"><button type="button" class="bt pr" data-x="apply"'+(P.ev.length+P.sh.length?'':' disabled')+'>Übernehmen</button></div></div>');
-  DS.wire(node,{back:()=>DS.swap(mapView(),-1),over:()=>{st.over=!st.over;DS.swap(preview(),0)},apply:()=>apply(P)});
+  DS.wire(node,{back:()=>DS.swap(mapView(),-1),over:()=>{st.over=!st.over;DS.swap(preview(),0)},apply:b=>{if(busy)return;busy=true;b.disabled=true;b.textContent='Wird übernommen …';node.querySelectorAll('button').forEach(x=>x.disabled=true);setTimeout(()=>{try{apply(P)}finally{busy=false}},60)}});
   return node}
  function apply(P){if(!data.events||typeof data.events!=='object')data.events={};
   const before={events:JSON.stringify(data.events),shifts:Object.assign({},data.shifts)};
@@ -199,17 +199,22 @@
   for(const k of Object.keys(data.events)){const l=data.events[k];if(Array.isArray(l)&&l.length>1)l.sort((a,b)=>(a.allDay?-1:toMin(a.start))-(b.allDay?-1:toMin(b.start)))}
   const prev={};P.sh.forEach(r=>{prev[r.k]=r.old||null;data.shifts[r.k]=r.c});
   const c=cfg();Object.entries(st.map).forEach(([k,v])=>{if(v!=='ev')c.map[k]=v;else delete c.map[k]});
-  data.calImportUndo={at:new Date().toISOString(),n:ids.length+P.sh.length,ids,prev};
+  const pu=data.calImportUndo;const allPrev=Object.assign({},prev,pu&&pu.prev||{});/* frühester Stand gewinnt */
+  data.calImportUndo={at:new Date().toISOString(),n:(pu?pu.n:0)+ids.length+P.sh.length,ids:[],prev:allPrev};
   let ok=true;try{ok=persist()!==false}catch(e){ok=false}
   if(!ok){data.events=JSON.parse(before.events);data.shifts=before.shifts;delete data.calImportUndo;try{persist()}catch(e){}toast('Speicher voll – bitte einen kürzeren Zeitraum wählen.');return}
   const first=(P.ev.find(o=>o.k>=today())||P.ev[0]||P.sh[0]||{}).k;st=null;refresh();DS.close();
   toast(ids.length+' Termine'+(P.sh.length?' und '+P.sh.length+' Dienste':'')+' übernommen');
   if(first)setTimeout(()=>{try{document.getElementById('tabPlan')?.click()}catch(e){}try{const d=toDate(first);shown=new Date(d.getFullYear(),d.getMonth(),1);render()}catch(e){}},350)}
- function undo(){const u=data.calImportUndo;if(!u)return;if(!confirm('Alle '+u.n+' Einträge aus dem letzten Kalender-Import entfernen?'))return;
-  const rm={};u.ids.forEach(([k,id])=>{(rm[k]=rm[k]||new Set()).add(id)});
-  for(const k of Object.keys(rm)){const l=(data.events[k]||[]).filter(e=>!rm[k].has(e.id));if(l.length)data.events[k]=l;else delete data.events[k]}
-  for(const [k,old] of Object.entries(u.prev||{})){if(old)data.shifts[k]=old;else delete data.shifts[k]}
-  delete data.calImportUndo;try{persist()}catch(e){}refresh();toast('Kalender-Import rückgängig gemacht');DS.swap(intro(),0)}
+ function undo(){const evN=Object.values(data.events||{}).reduce((n,l)=>n+(Array.isArray(l)?l.filter(e=>e&&e.src==='import').length:0),0);const shN=Object.keys(data.calImportUndo?.prev||{}).length;
+  const node=el('<div>'+DS.head('Kalender übernehmen','Rückgängig machen',{back:true})+
+   '<p class="ip-p">Das entfernt <b style="color:var(--sx-text)">'+evN+' übernommene Termine</b>'+(shN?' und setzt <b style="color:var(--sx-text)">'+shN+' Dienste</b> auf den Stand vor dem Import zurück':'')+'. Selbst eingetragene Termine bleiben.</p>'+
+   '<div class="ac"><button type="button" class="bt" data-x="back">Abbrechen</button><button type="button" class="bt pr" data-x="go">Entfernen</button></div></div>');
+  DS.wire(node,{back:()=>DS.swap(intro(),-1),go:b=>{b.disabled=true;b.textContent='Wird entfernt …';setTimeout(()=>{
+   for(const k of Object.keys(data.events||{})){const l=data.events[k];if(!Array.isArray(l))continue;const keep=l.filter(e=>!(e&&e.src==='import'));if(keep.length)data.events[k]=keep;else delete data.events[k]}
+   for(const [k,old] of Object.entries(data.calImportUndo?.prev||{})){if(old)data.shifts[k]=old;else delete data.shifts[k]}
+   delete data.calImportUndo;try{persist()}catch(e){}refresh();toast('Kalender-Import rückgängig gemacht');DS.swap(intro(),-1)},60)}});
+  DS.swap(node,1)}
 
  /* ---------- Willkommens-Frage nach der ersten Einrichtung ---------- */
  function welcomeView(){const node=el('<div>'+DS.head('Willkommen','Kalender mitnehmen?')+
