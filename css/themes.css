@@ -193,7 +193,9 @@ html body[data-skin="wald"]:not(#sx) #togglePlanner.floating-edit{background:#d9
 .sx-tree{position:absolute;right:-18px;bottom:-6px;width:min(64%,300px);aspect-ratio:240/260;pointer-events:none;z-index:1;color:#c9b48a;opacity:.16}
 .sx-tree .tr{width:100%;height:100%;display:block}
 .sx-tree .tr circle{fill:#8ab17d}.sx-tree .tr .c1{fill:#d9a441}.sx-tree .tr .c2{fill:#6f9a62}
-.sx-tree .lf{position:absolute;top:var(--top);left:var(--left);width:16px;height:16px;opacity:0;animation:sxLeaf 13s linear infinite;animation-delay:var(--d)}
+/* v1.1.5 Akku: Blätter fliegen nicht mehr endlos, sondern zwei Runden nach dem Öffnen bzw. einer Berührung (themes.js setzt .run) */
+.sx-tree .lf{position:absolute;top:var(--top);left:var(--left);width:16px;height:16px;opacity:0}
+.sx-tree.run .lf{animation:sxLeaf 13s linear 2;animation-delay:var(--d)}
 .sx-tree .lf svg{width:100%;height:100%;display:block;fill:#d9a441}
 .sx-tree .lf.l1 svg{fill:#e76f51}.sx-tree .lf.l2 svg{fill:#8ab17d}
 @keyframes sxLeaf{0%{opacity:0;transform:translate(0,0) rotate(0) scale(var(--s))}8%{opacity:1}55%{transform:translate(calc(var(--x)*.55),calc(var(--y)*.3 + 30px)) rotate(calc(var(--r)*.5)) scale(var(--s))}85%{opacity:.9}100%{opacity:0;transform:translate(var(--x),calc(var(--y)*.2 + 70px)) rotate(var(--r)) scale(var(--s))}}

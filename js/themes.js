@@ -28,7 +28,12 @@
  function forest(on){const shell=document.querySelector('.calendar-shell');if(!shell)return;let t=shell.querySelector('.sx-tree');
   if(!on){t?.remove();return}if(t)return;t=document.createElement('div');t.className='sx-tree';t.setAttribute('aria-hidden','true');
   t.innerHTML=TREE+(reduce?'':Array.from({length:7},(_,i)=>'<i class="lf l'+(i%3)+'" style="--d:'+(i*1.9).toFixed(1)+'s;--x:'+(-120-(i*37)%110)+'px;--y:'+(-60-(i*53)%140)+'px;--r:'+(160+i*70)+'deg;--s:'+(0.75+(i%3)*0.2)+';--top:'+(40+(i*29)%80)+'px;--left:'+(60+(i*41)%120)+'px">'+LEAF+'</i>').join(''));
-  shell.append(t)}
+  shell.append(t);blow()}
+ /* v1.1.5 Akku: Blätter nur zeitweise fliegen lassen – beim Öffnen, beim Zurückkehren in die App und bei Berührung, wenn gerade keine fliegen */
+ const LEAF_MS=(6*1.9+2*13+1)*1000;
+ function blow(){const t=document.querySelector('.calendar-shell .sx-tree');if(!t||reduce||t.classList.contains('run'))return;t.classList.add('run');clearTimeout(blow.tm);blow.tm=setTimeout(()=>t.classList.remove('run'),LEAF_MS)}
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)blow()});
+ document.addEventListener('pointerdown',e=>{if(e.target.closest?.('.calendar-shell'))blow()},{passive:true});
  function apply(id){const s=byId(id);document.body.dataset.skin=s.id;try{forest(s.id==='wald')}catch(e){}const pal=s.id==='neon'?neonPalette():(s.base==='light'?'light':'anthracite');
   if(typeof applyPalette==='function')applyPalette(pal);document.querySelector('meta[name="theme-color"]')?.setAttribute('content',s.id==='neon'&&pal!=='anthracite'?getComputedStyle(document.body).getPropertyValue('--surface-deep').trim()||s.meta:s.meta)}
  function set(id,pal){const s=byId(id);if(pal&&NEON.some(n=>n[0]===pal))data.neonPalette=pal;data.skin=s.id;data.palette=s.id==='neon'?neonPalette():(s.base==='light'?'light':'anthracite');
